@@ -1,1 +1,1 @@
-web: gunicorn hummus_project.wsgi
+web: python manage.py migrate && python manage.py collectstatic --no-input && gunicorn hummus_project.wsgi
