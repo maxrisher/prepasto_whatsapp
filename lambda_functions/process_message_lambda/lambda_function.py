@@ -5,7 +5,7 @@ import os
 import requests
 
 async def call_llm_api_async(text):
-    await asyncio.sleep(60)
+    await asyncio.sleep(1)
     return f"LLM response to :{text}"
 
 def send_whatsapp_message(recipient, message):
@@ -25,13 +25,12 @@ def send_whatsapp_message(recipient, message):
     return response.json()
 
 def lambda_handler(event, context):
-    # TODO implement
 
-
-    body = json.loads(event['body'])
-    message = body['entry'][0]['changes'][0]['value']['messages'][0]
+    message = event['entry'][0]['changes'][0]['value']['messages'][0]
     sender = message['from']
     text = message['text']['body']
+    
+    print(json.dumps(event))
 
     response = asyncio.run(call_llm_api_async(text))
     send_whatsapp_message(sender, response)
