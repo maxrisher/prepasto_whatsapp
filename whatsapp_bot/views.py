@@ -22,9 +22,9 @@ def webhook(request):
             return HttpResponse('Forbidden', status=403)
     
     if request.method == 'POST':
-        lambda_client = boto3.client('lambda')
+        lambda_client = boto3.client('lambda', region_name='us-east-2')
         lambda_client.invoke(
-            FunctionName='',
+            FunctionName='process_message_lambda',
             InvocationType='Event',
             Payload=request.body
         )
