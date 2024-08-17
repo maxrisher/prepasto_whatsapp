@@ -22,6 +22,9 @@ def webhook(request):
             return HttpResponse('Forbidden', status=403)
     
     if request.method == 'POST':
+        request_body_dict = json.loads(request.body)
+        json_payload = json.dumps(request_body_dict)
+
         lambda_client = boto3.client('lambda', 
                                      region_name=os.getenv('AWS_REGION'),
                                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
@@ -29,7 +32,7 @@ def webhook(request):
         lambda_client.invoke(
             FunctionName='process_message_lambda',
             InvocationType='Event',
-            Payload=request.body
+            Payload=json_payload
         )
     
     return HttpResponse('OK', status=200)
