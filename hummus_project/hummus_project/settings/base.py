@@ -124,5 +124,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-print("BASE_DIR:", BASE_DIR)
-print("STATIC_ROOT:", STATIC_ROOT)
