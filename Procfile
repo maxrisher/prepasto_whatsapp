@@ -1,0 +1,1 @@
+web: gunicorn hummus_project.wsgi
