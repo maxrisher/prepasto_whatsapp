@@ -22,7 +22,10 @@ def webhook(request):
             return HttpResponse('Forbidden', status=403)
     
     if request.method == 'POST':
-        lambda_client = boto3.client('lambda', region_name='us-east-2')
+        lambda_client = boto3.client('lambda', 
+                                     region_name=os.getenv('AWS_REGION'),
+                                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
         lambda_client.invoke(
             FunctionName='process_message_lambda',
             InvocationType='Event',
