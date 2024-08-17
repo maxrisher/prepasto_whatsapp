@@ -1,6 +1,9 @@
 #lambda compressed
 *function.zip
 
+#aws_layer
+aws_layer/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
