@@ -1,1 +1,0 @@
-web: python manage.py migrate && python manage.py collectstatic --no-input && gunicorn hummus_project.wsgi --bind 0.0.0.0:$PORT
