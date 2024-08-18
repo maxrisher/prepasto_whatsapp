@@ -14,3 +14,4 @@ pip install -r requirements.txt -t aws_layer/python/
 # TODOs:
 - integrate AWS layers into the testing environment
 - Should I try to have all tests (django and pytest) run when I call pytest?
+- use dataclasses for dish objects "from dataclasses import dataclass, asdict"
