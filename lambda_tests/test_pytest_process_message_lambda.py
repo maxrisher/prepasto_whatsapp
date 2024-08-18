@@ -1,8 +1,8 @@
-from lambda_functions.process_message_lambda.lambda_function import lambda_handler, call_llm_api_async, send_whatsapp_message
-
 import pytest
 import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
+
+from lambda_functions.process_message_lambda.lambda_function import lambda_handler, call_llm_api_async, send_whatsapp_message
 
 @pytest.fixture
 def sample_event():
@@ -19,12 +19,12 @@ def sample_event():
         }]
     }
 
-@patch('your_lambda_module.requests.post')
-@patch('your_lambda_module.os.getenv')
-@patch('your_lambda_module.asyncio.run')
-def test_lambda_handler(mock_asyncio_run, mock_getenv, mock_post, sample_event):
+@patch('lambda_functions.process_message_lambda.lambda_function.call_llm_api_async', new_callable=AsyncMock)
+@patch('lambda_functions.process_message_lambda.lambda_function.requests.post')
+@patch('lambda_functions.process_message_lambda.lambda_function.os.getenv')
+def test_lambda_handler(mock_getenv, mock_post, mock_call_llm_api_async, sample_event):
     # Mocking the LLM API response
-    mock_asyncio_run.return_value = "LLM response to :Hello!"
+    mock_call_llm_api_async.return_value = "LLM response to :Hello!"
 
     # Mocking environment variables
     mock_getenv.side_effect = lambda x: {
@@ -43,7 +43,7 @@ def test_lambda_handler(mock_asyncio_run, mock_getenv, mock_post, sample_event):
     assert json.loads(response['body']) == 'All good bro!'
 
     # Asserting that the LLM API was called with the correct text
-    mock_asyncio_run.assert_called_once_with(call_llm_api_async('Hello!'))
+    mock_call_llm_api_async.assert_awaited_once_with('Hello!')
 
     # Asserting that the WhatsApp API was called with correct parameters
     mock_post.assert_called_once_with(
