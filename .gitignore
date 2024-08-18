@@ -1,3 +1,8 @@
+#food csv files
+fndds_foods.csv
+fndds_nutrients.csv
+fndds_portions.csv
+
 #lambda compressed
 process_message_lambda.zip
 

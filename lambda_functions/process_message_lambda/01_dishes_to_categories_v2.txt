@@ -1,0 +1,406 @@
+<WweiaCategories>
+    <Group name="Milk and Dairy">
+        <SubGroup name="Milk">
+            <WweiaCategory code="1002">Milk, whole</WweiaCategory>
+            <WweiaCategory code="1004">Milk, reduced fat</WweiaCategory>
+            <WweiaCategory code="1006">Milk, lowfat</WweiaCategory>
+            <WweiaCategory code="1008">Milk, nonfat</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Flavored Milk">
+            <WweiaCategory code="1202">Flavored milk, whole</WweiaCategory>
+            <WweiaCategory code="1204">Flavored milk, reduced fat</WweiaCategory>
+            <WweiaCategory code="1206">Flavored milk, lowfat</WweiaCategory>
+            <WweiaCategory code="1208">Flavored milk, nonfat</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Dairy Drinks">
+            <WweiaCategory code="1402">Milk shakes and other dairy drinks</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Cheese">
+            <WweiaCategory code="1602">Cheese</WweiaCategory>
+            <WweiaCategory code="1604">Cottage/ricotta cheese</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Yogurt">
+            <WweiaCategory code="1820">Yogurt, regular</WweiaCategory>
+            <WweiaCategory code="1822">Yogurt, Greek</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Plant-based Dairy">
+            <WweiaCategory code="1902">Plant-based milk</WweiaCategory>
+            <WweiaCategory code="1904">Plant-based yogurt</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Protein Foods">
+        <SubGroup name="Meats">
+            <WweiaCategory code="2002">Beef, excludes ground</WweiaCategory>
+            <WweiaCategory code="2004">Ground beef</WweiaCategory>
+            <WweiaCategory code="2006">Pork</WweiaCategory>
+            <WweiaCategory code="2008">Lamb, goat, game</WweiaCategory>
+            <WweiaCategory code="2010">Liver and organ meats</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Poultry">
+            <WweiaCategory code="2202">Chicken, whole pieces</WweiaCategory>
+            <WweiaCategory code="2204">Chicken patties, nuggets and tenders</WweiaCategory>
+            <WweiaCategory code="2206">Turkey, duck, other poultry</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Seafood">
+            <WweiaCategory code="2402">Fish</WweiaCategory>
+            <WweiaCategory code="2404">Shellfish</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Eggs">
+            <WweiaCategory code="2502">Eggs and omelets</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Cured Meats/Poultry">
+            <WweiaCategory code="2602">Cold cuts and cured meats</WweiaCategory>
+            <WweiaCategory code="2604">Bacon</WweiaCategory>
+            <WweiaCategory code="2606">Frankfurters</WweiaCategory>
+            <WweiaCategory code="2608">Sausages</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Plant-based Protein Foods">
+            <WweiaCategory code="2802">Beans, peas, legumes</WweiaCategory>
+            <WweiaCategory code="2804">Nuts and seeds</WweiaCategory>
+            <WweiaCategory code="2806">Soy and meat-alternative products</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Mixed Dishes">
+        <SubGroup name="Meat and Poultry">
+            <WweiaCategory code="3002">Meat mixed dishes</WweiaCategory>
+            <WweiaCategory code="3004">Poultry mixed dishes</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Seafood">
+            <WweiaCategory code="3006">Seafood mixed dishes</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Bean/Vegetable-based">
+            <WweiaCategory code="3102">Bean, pea, legume dishes</WweiaCategory>
+            <WweiaCategory code="3104">Vegetable dishes</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Grain-based">
+            <WweiaCategory code="3202">Rice mixed dishes</WweiaCategory>
+            <WweiaCategory code="3204">Pasta mixed dishes, excludes macaroni & cheese</WweiaCategory>
+            <WweiaCategory code="3206">Macaroni and cheese</WweiaCategory>
+            <WweiaCategory code="3208">Turnovers and other grain-based items</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Asian">
+            <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>
+            <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory>
+            <WweiaCategory code="3406">Egg rolls, dumplings, sushi</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Mexican">
+            <WweiaCategory code="3502">Burritos and tacos</WweiaCategory>
+            <WweiaCategory code="3504">Nachos</WweiaCategory>
+            <WweiaCategory code="3506">Other Mexican mixed dishes</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Pizza">
+            <WweiaCategory code="3602">Pizza</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Sandwiches">
+            <WweiaCategory code="3702">Burgers</WweiaCategory>
+            <WweiaCategory code="3703">Frankfurter sandwiches</WweiaCategory>
+            <WweiaCategory code="3704">Chicken fillet sandwiches</WweiaCategory>
+            <WweiaCategory code="3706">Egg/breakfast sandwiches</WweiaCategory>
+            <WweiaCategory code="3720">Cheese sandwiches</WweiaCategory>
+            <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>
+            <WweiaCategory code="3730">Seafood sandwiches</WweiaCategory>
+            <WweiaCategory code="3740">Deli and cured meat sandwiches</WweiaCategory>
+            <WweiaCategory code="3742">Meat and BBQ sandwiches</WweiaCategory>
+            <WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Soups">
+            <WweiaCategory code="3804">Soups, broth-based</WweiaCategory>
+            <WweiaCategory code="3806">Soups, cream-based</WweiaCategory>
+            <WweiaCategory code="3808">Ramen and Asian broth-based soups</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Grains">
+        <SubGroup name="Cooked Grains">
+            <WweiaCategory code="4002">Rice</WweiaCategory>
+            <WweiaCategory code="4004">Pasta, noodles, cooked grains</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Breads, Rolls, Tortillas">
+            <WweiaCategory code="4202">Yeast breads</WweiaCategory>
+            <WweiaCategory code="4204">Rolls and buns</WweiaCategory>
+            <WweiaCategory code="4206">Bagels and English muffins</WweiaCategory>
+            <WweiaCategory code="4208">Tortillas</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Quick Breads and Bread Products">
+            <WweiaCategory code="4402">Biscuits, muffins, quick breads</WweiaCategory>
+            <WweiaCategory code="4404">Pancakes, waffles, French toast</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Ready-to-Eat Cereals">
+            <WweiaCategory code="4602">Ready-to-eat cereal, higher sugar (>21.2 g/100g)</WweiaCategory>
+            <WweiaCategory code="4604">Ready-to-eat cereal, lower sugar (=<21.2g/100g)</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Cooked Cereals">
+            <WweiaCategory code="4802">Oatmeal</WweiaCategory>
+            <WweiaCategory code="4804">Grits and other cooked cereals</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Snacks and Sweets">
+        <SubGroup name="Savory Snacks">
+            <WweiaCategory code="5002">Potato chips</WweiaCategory>
+            <WweiaCategory code="5004">Tortilla, corn, other chips</WweiaCategory>
+            <WweiaCategory code="5006">Popcorn</WweiaCategory>
+            <WweiaCategory code="5008">Pretzels/snack mix</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Crackers">
+            <WweiaCategory code="5202">Crackers, excludes saltines</WweiaCategory>
+            <WweiaCategory code="5204">Saltine crackers</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Snack/Meal Bars">
+            <WweiaCategory code="5402">Cereal bars</WweiaCategory>
+            <WweiaCategory code="5404">Nutrition bars</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Sweet Bakery Products">
+            <WweiaCategory code="5502">Cakes and pies</WweiaCategory>
+            <WweiaCategory code="5504">Cookies and brownies</WweiaCategory>
+            <WweiaCategory code="5506">Doughnuts, sweet rolls, pastries</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Candy">
+            <WweiaCategory code="5702">Candy containing chocolate</WweiaCategory>
+            <WweiaCategory code="5704">Candy not containing chocolate</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Other Desserts">
+            <WweiaCategory code="5802">Ice cream and frozen dairy desserts</WweiaCategory>
+            <WweiaCategory code="5804">Pudding</WweiaCategory>
+            <WweiaCategory code="5806">Gelatins, ices, sorbets</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Fruit">
+        <SubGroup name="Fruits">
+            <WweiaCategory code="6002">Apples</WweiaCategory>
+            <WweiaCategory code="6004">Bananas</WweiaCategory>
+            <WweiaCategory code="6006">Grapes</WweiaCategory>
+            <WweiaCategory code="6008">Peaches and nectarines</WweiaCategory>
+            <WweiaCategory code="6009">Strawberries</WweiaCategory>
+            <WweiaCategory code="6011">Blueberries and other berries</WweiaCategory>
+            <WweiaCategory code="6012">Citrus fruits</WweiaCategory>
+            <WweiaCategory code="6014">Melons</WweiaCategory>
+            <WweiaCategory code="6016">Dried fruits</WweiaCategory>
+            <WweiaCategory code="6018">Other fruits and fruit salads</WweiaCategory>
+            <WweiaCategory code="6020">Pears</WweiaCategory>
+            <WweiaCategory code="6022">Pineapple</WweiaCategory>
+            <WweiaCategory code="6024">Mango and papaya</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Vegetables">
+        <SubGroup name="Vegetables, excluding Potatoes">
+            <WweiaCategory code="6402">Tomatoes</WweiaCategory>
+            <WweiaCategory code="6404">Carrots</WweiaCategory>
+            <WweiaCategory code="6406">Other red and orange vegetables</WweiaCategory>
+            <WweiaCategory code="6407">Broccoli</WweiaCategory>
+            <WweiaCategory code="6409">Spinach</WweiaCategory>
+            <WweiaCategory code="6410">Lettuce and lettuce salads</WweiaCategory>
+            <WweiaCategory code="6411">Other dark green vegetables</WweiaCategory>
+            <WweiaCategory code="6412">String beans</WweiaCategory>
+            <WweiaCategory code="6413">Cabbage</WweiaCategory>
+            <WweiaCategory code="6414">Onions</WweiaCategory>
+            <WweiaCategory code="6416">Corn</WweiaCategory>
+            <WweiaCategory code="6418">Other starchy vegetables</WweiaCategory>
+            <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory>
+            <WweiaCategory code="6430">Fried vegetables</WweiaCategory>
+            <WweiaCategory code="6432">Coleslaw, non-lettuce salads</WweiaCategory>
+            <WweiaCategory code="6489">Vegetables on a sandwich</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="White Potatoes">
+            <WweiaCategory code="6802">White potatoes, baked or boiled</WweiaCategory>
+            <WweiaCategory code="6804">French fries and other fried white potatoes</WweiaCategory>
+            <WweiaCategory code="6806">Mashed potatoes and white potato mixtures</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Beverages">
+        <SubGroup name="100% Juice">
+            <WweiaCategory code="7002">Citrus juice</WweiaCategory>
+            <WweiaCategory code="7004">Apple juice</WweiaCategory>
+            <WweiaCategory code="7006">Other fruit juice</WweiaCategory>
+            <WweiaCategory code="7008">Vegetable juice</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Diet Beverages">
+            <WweiaCategory code="7102">Diet soft drinks</WweiaCategory>
+            <WweiaCategory code="7104">Diet sport and energy drinks</WweiaCategory>
+            <WweiaCategory code="7106">Other diet drinks</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Sweetened Beverages">
+            <WweiaCategory code="7202">Soft drinks</WweiaCategory>
+            <WweiaCategory code="7204">Fruit drinks</WweiaCategory>
+            <WweiaCategory code="7206">Sport and energy drinks</WweiaCategory>
+            <WweiaCategory code="7208">Nutritional beverages</WweiaCategory>
+            <WweiaCategory code="7220">Smoothies and grain drinks</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Coffee and Tea">
+            <WweiaCategory code="7302">Coffee</WweiaCategory>
+            <WweiaCategory code="7304">Tea</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Alcoholic Beverages">
+            <WweiaCategory code="7502">Beer</WweiaCategory>
+            <WweiaCategory code="7504">Wine</WweiaCategory>
+            <WweiaCategory code="7506">Liquor and cocktails</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Water">
+            <WweiaCategory code="7702">Tap water</WweiaCategory>
+            <WweiaCategory code="7704">Bottled water</WweiaCategory>
+            <SubGroup name="Flavored or Enhanced Water">
+                <WweiaCategory code="7802">Flavored or carbonated water</WweiaCategory>
+                <WweiaCategory code="7804">Enhanced water</WweiaCategory>
+            </SubGroup>
+        </SubGroup>
+    </Group>
+    <Group name="Fats and Oils">
+        <SubGroup name="Fats and Oils">
+            <WweiaCategory code="8002">Butter and animal fats</WweiaCategory>
+            <WweiaCategory code="8004">Margarine</WweiaCategory>
+            <WweiaCategory code="8006">Cream cheese, sour cream, whipped cream</WweiaCategory>
+            <WweiaCategory code="8008">Cream and cream substitutes</WweiaCategory>
+            <WweiaCategory code="8010">Mayonnaise</WweiaCategory>
+            <WweiaCategory code="8012">Salad dressings and vegetable oils</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Condiments and Sauces">
+        <SubGroup name="Condiments and Sauces">
+            <WweiaCategory code="8402">Tomato-based condiments</WweiaCategory>
+            <WweiaCategory code="8404">Soy-based condiments</WweiaCategory>
+            <WweiaCategory code="8406">Mustard and other condiments</WweiaCategory>
+            <WweiaCategory code="8408">Olives, pickles, pickled vegetables</WweiaCategory>
+            <WweiaCategory code="8410">Pasta sauces, tomato-based</WweiaCategory>
+            <WweiaCategory code="8412">Dips, gravies, other sauces</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Sugars">
+        <SubGroup name="Sugars">
+            <WweiaCategory code="8802">Sugars and honey</WweiaCategory>
+            <WweiaCategory code="8804">Sugar substitutes</WweiaCategory>
+            <WweiaCategory code="8806">Jams, syrups, toppings</WweiaCategory>
+        </SubGroup>
+    </Group>
+    <Group name="Baby Foods and Formulas">
+        <SubGroup name="Baby Foods">
+            <WweiaCategory code="9002">Baby food: cereals</WweiaCategory>
+            <WweiaCategory code="9004">Baby food: fruit</WweiaCategory>
+            <WweiaCategory code="9006">Baby food: vegetables</WweiaCategory>
+            <WweiaCategory code="9007">Baby food: mixtures</WweiaCategory>
+            <WweiaCategory code="9008">Baby food: meat and dinners</WweiaCategory>
+            <WweiaCategory code="9010">Baby food: yogurt</WweiaCategory>
+            <WweiaCategory code="9012">Baby food: snacks and sweets</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Baby Beverages">
+            <WweiaCategory code="9202">Baby juice</WweiaCategory>
+            <WweiaCategory code="9204">Baby water</WweiaCategory>
+        </SubGroup>
+        <SubGroup name="Infant Formulas">
+            <WweiaCategory code="9402">Formula, ready-to-feed</WweiaCategory>
+            <WweiaCategory code="9404">Formula, prepared from powder</WweiaCategory>
+            <SubGroup name="Human Milk">
+                <WweiaCategory code="9602">Human milk</WweiaCategory>
+            </SubGroup>
+        </SubGroup>
+    </Group>
+    <Group name="Other">
+        <SubGroup name="Other">
+            <WweiaCategory code="9802">Protein and nutritional powders</WweiaCategory>
+            <WweiaCategory code="9999">Not included in a food category</WweiaCategory>
+        </SubGroup>
+    </Group>
+</WweiaCategories>
+
+You are on a team that assigns "What We Eat in America" (WWEIA) codes to food from participant food diaries. Each participant food log (<FoodLog>) must be matched to one (just one!) of over 5,000 WWEIA codes. To facilitate this matching, your job is to narrow down the WWEIA food database to the proper WWEIA food category (in <WweiaCategories>) where we might find our match. Each WWEIA food category (in <WweiaCategory>) has about 40 WWEIA codes inside it. After you output your list of WWEIA categories, we will retreive all food codes in these categories and send them to an LLM to pick the single best WWEIA code for the participant food log (<FoodLog>). Although the <FoodLog> can only be assigned a single WWEIA code, we will ask you to give one or more possible WWEIA categories. This is beacause the LLM will only be able to look for WWEIA codes in the categories it's given. We don't want to omit a category which has the best WWEIA code for the <FoodLog>.
+
+You are given food logs (<FoodLog>). These are descriptions of dishes (a term for any food or beverage) which have been generated from participant food diaries. 
+
+Step 1: explain which <WweiaCategory> most likely contains a WWEIA code which fully encompasses the dish in the <FoodLog>.
+Step 2: explain which other <WweiaCategory> item most likely contains a similar dish from the <FoodLog>.
+Step 3: write the major ingredient from the dish in the <FoodLog> and explain the most likely <WweiaCategory> to contain it. 
+Step 4: output all likely <WweiaCategory> items from steps 1, 2 and 3 as your answer
+
+Note 1: If there is any ambiguity in steps 1, 2, or 3 about which <WweiaCategory> is most likely, explain it. In your explanation, reference all <WweiaCategory> items in consideration.
+Note 2: For dishes that are very common in the United States, it is safe to only pass on one or two <WweiaCategory> items. For uncommon dishes, consider a wider range of possible <WweiaCategory> items.
+Note 3: Output your thinking within <Thinking> tags. Output your answer as <WweiaCategory> tags within an <Answer> tag.
+
+<Examples>
+    <Example>
+        <FoodLog>
+            {
+                "name": "toast with almond butter",
+                "common_ingredients": [
+                "bread",
+                "almond butter"
+                ],
+                "state": "toasted",
+                "qualifiers": null,
+                "confirmed_ingredients": [
+                "sourdough bread",
+                "almond butter"
+                ],
+                "amount": "one open-faced sandwich (one thick slice of sourdough bread, standard portion of almond butter)",
+                "similar_dishes": [
+                "peanut butter toast",
+                "peanut butter and jelly sandwich",
+                "toast with nutella",
+                "toast with avocado"
+                ]
+            }
+        </FoodLog>
+        <Thinking> 
+            Step 1: The dish "Toast with almond butter" includes both bread and almond butter, making it a type of sandwich or perhaps a category of spreads on bread. Given this, our main consideration should be:
+            - <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>, as this dish explicitly includes spreads on bread. Though it calls out peanut butter and jelly, other similar nut butter-based sandwiches may logically fit here.
+            
+            Step 2: Similar dishes listed ("Peanut butter toast," "Peanut butter and jelly sandwich," "Toast with Nutella," and "Toast with avocado") also point toward the sandwich category. A couple of considerations include the following:
+            - "Peanut butter toast" and "Peanut butter and jelly sandwich are captured under <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>. However, "Toast with avocado" is not. Therefore, "Toast with avocado" might be covered by "<WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory>.
+            
+            Step 3: The major ingredient in the dish is "Sourdough bread," and the most relevant category considering sourdough bread:
+            - <WweiaCategory code="4202">Yeast breads</WweiaCategory>, as this includes sourdough bread.
+        </Thinking> 
+        <Answer> 
+            <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory> 
+            <WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory> 
+            <WweiaCategory code="4202">Yeast breads</WweiaCategory> 
+        </Answer>
+    </Example>
+    <Example>
+        <FoodLog>
+            {
+                "name": "Fish Fragrant Eggplant",
+                "common_ingredients": [
+                    "eggplant",
+                    "garlic",
+                    "ginger",
+                    "scallions",
+                    "soy sauce",
+                    "vinegar",
+                    "sugar",
+                    "chili paste"
+                ],
+                "state": "stir-fried",
+                "qualifiers": null,
+                "confirmed_ingredients": [
+                    "eggplant",
+                    "garlic",
+                    "ginger",
+                    "soy sauce"
+                ],
+                "amount": "not specified",
+                "similar_dishes": [
+                    "ratatouille",
+                    "spicy barbecue roasted vegetables",
+                    "cajun-spiced vegetables",
+                    "vegetable stir-fry with sweet and sour sauce"
+                ]
+            }
+        </FoodLog>
+        <Thinking> 
+            Step 1: The dish "Fish Fragrant Eggplant" is a stir-fried vegetable dish primarily featuring eggplant and flavored with garlic, ginger, soy sauce, and other seasonings. This is not a very common dish in the USA, so I need to consider many categories. The most relevant WWEIA category for this dish would be:
+            - <WweiaCategory code="3104">Vegetable dishes</WweiaCategory>, as it encompasses a variety of vegetable-based dishes, including stir-fried vegetables.
+            
+            Step 2: The similar dishes listed ("ratatouille," "spicy barbecue roasted vegetables," "cajun-spiced vegetables," "vegetable stir-fry with sweet and sour sauce") also point towards vegetable-based dishes. Additional considerations include:
+            - <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory>, as this category includes dishes that are stir-fried and use soy-based sauces, which aligns with the preparation and ingredients of "Fish Fragrant Eggplant."
+            - <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>, since it includes other Asian-style stir-fried dishes, although it primarily focuses on rice and noodles.
+            - <WweiaCategory code="6430">Fried vegetables</WweiaCategory>, as this category includes various fried vegetable dishes, which could encompass stir-fried eggplant.
+            
+            Step 3: The major ingredient in the dish is "eggplant," and the most relevant category considering eggplant as a vegetable:
+            - <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory>, as this category includes various vegetables and combinations, which would cover eggplant-based dishes.
+        </Thinking> 
+        <Answer> 
+            <WweiaCategory code="3104">Vegetable dishes</WweiaCategory> 
+            <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory> 
+            <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>
+            <WweiaCategory code="6430">Fried vegetables</WweiaCategory>
+            <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory> 
+        </Answer>
+    </Example>
+</Examples>

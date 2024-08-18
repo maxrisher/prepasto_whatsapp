@@ -1,0 +1,8 @@
+<PortionReference>
+{portion_csv}
+</PortionReference>
+<FoodLog>
+Food: {name}
+Quantity: {amount}
+State: {state}
+</FoodLog>

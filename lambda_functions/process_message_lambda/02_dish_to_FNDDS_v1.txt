@@ -1,0 +1,53 @@
+You are on a team that assigns "What We Eat in America" (WWEIA) codes (in <WweiaCodes>) to food from participant food diaries. Each participant food log (<FoodLog>) must be matched to one (just one!) of over 5,000 WWEIA codes. We've narrowed down the list of foods to those in just a few categories (the <Category> tags in <WweiaCodes>).
+
+First, think about the best food code. Write your thinking in a <Thinking> tag. Second, output the WWEIA code of your answer in an <Answer> tag.
+
+<Example>
+    <WweiaCodes>
+        <Category name="Dried fruits">
+    code,description,includes
+    62101050,"Dried, fruit, NFS",fruit mixture
+    62101100,"Apple, dried",apple chips
+    62104100,"Apricot, dried",
+        </Category>
+        <Category name="Tortilla, corn, other chips">
+    code,description,includes
+    41310900,Bean chips,hummus; chickpea; garbanzo bean; black bean; popped bean chips; bean puffs; lentil chips
+    41410015,Soy chips,all flavors; soy crisps
+    54318000,"Chips, rice",all flavors; brown rice crisp; Blue Ginger Multi-Grain; Riceworks
+    54401011,Corn nuts,corn nuggets; plain or flavored
+        </Category>
+        <Category name="Apples">
+    code,description,includes
+    63101000,"Apple, raw","apple, NFS"
+    63101310,"Apple, baked",fried; cooked
+    63401060,"Apple, candied",caramel apples
+        </Category>
+    </WweiaCodes>
+    <FoodLog>
+    {
+    "name": "baked Fuji apple chips",
+    "common_ingredients": [
+        "apple slices"
+    ],
+    "state": "baked, dried",
+    "qualifiers": null,
+    "confirmed_ingredients": [
+        "Fuji apple"
+    ],
+    "amount": "one package",
+    "similar_dishes": [
+        "dried apple slices",
+        "dried pear slices",
+        "banana chips",
+        "apple crisps"
+    ]
+    }
+    </FoodLog>
+    <Thinking>
+    The food log specifies "baked Fuji apple chips," which highlights dried apple slices as the main ingredient. The dish is categorized as both baked and dried, which aligns with the preparation method for dried apple products. Within the WWEIA codes, there are specific entries for dried apples, and the description "Apple, dried" with a note specifying "apple chips" under code 62101100 appears to be the most accurate match. This code directly mentions "apple chips," which corresponds with the description of the food log. It is important to choose a code that not only matches the description but also reflects the specific type and preparation of the food item to ensure accurate dietary analysis.
+    </Thinking>
+    <Answer>
+    62101100
+    </Answer>
+</Example>
