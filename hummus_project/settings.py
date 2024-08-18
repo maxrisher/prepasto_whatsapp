@@ -122,3 +122,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers':{
+        'console': {
+            # The level at which things get printed to the console
+            'level': os.getenv('DJANGO_HANDLER_LEVEL', 'INFO'),
+            'class': 'logging.StreamHandler'
+        }
+    },
+    'loggers':{
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'whatsapp_bot': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            # this means that these logs will not get sent to parent loggers (ie. django)
+            'propagate': False,
+        }
+    }
+}

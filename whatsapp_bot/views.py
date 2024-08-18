@@ -1,11 +1,14 @@
 import json
 import os
 import boto3
+import logging
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .utils import send_whatsapp_message
+
+logger = logging.getLogger('whatsapp_bot')
 
 @csrf_exempt
 def webhook(request):
@@ -40,3 +43,16 @@ def webhook(request):
 def process_message(received_text):
     # here we generate a response based on what was sent
     return f'When you said "{received_text}", I literally farted!'
+
+@csrf_exempt
+def callback(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        logger.debug('This is a debug message')
+        logger.info('This is an info message')
+        logger.warning('This is a warning message')
+        logger.error('This is an error message')
+        logger.critical('This is a critical message')
+        
+        return HttpResponse('OK', status=200)
