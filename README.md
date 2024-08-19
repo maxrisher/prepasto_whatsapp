@@ -32,6 +32,7 @@ aws lambda publish-layer-version --layer-name hummus_layer --zip-file fileb://aw
 # Testing
 
 # TODOs:
+- Get a LEGIT whatsapp account (!)
 - integrate AWS layers into the testing environment
 - Should I try to have all tests (django and pytest) run when I call pytest?
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
