@@ -8,10 +8,6 @@ from typing import List, Dict
 from llm_utils import dish_to_categories, select_food_code, get_food_grams, dish_list_from_log
 from helpers import calculate_nutrition
 
-async def call_llm_api_async(text):
-    await asyncio.sleep(1)
-    return f"LLM response to :{text}"
-
 def send_whatsapp_message(recipient, message):
     headers = {
         "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
@@ -36,8 +32,16 @@ def lambda_handler(event, context):
     
     print(json.dumps(event))
 
-    response = asyncio.run(call_llm_api_async(text))
-    send_whatsapp_message(sender, response)
+    send_whatsapp_message(sender, "Got your message, I'm thinking on it!")
+
+    response = analyze_meal(text)
+
+    if response is None:
+       text_reply = "Please try again, an error occured."
+    else:
+       text_reply = f"Calories: {response['total_nutrition']['calories']}"
+
+    send_whatsapp_message(sender, text_reply)
 
     return {
         'statusCode': 200,
@@ -146,3 +150,12 @@ class Meal:
         self.create_dishes()
         self.process_dishes()
         self.calculate_total_nutrition()  
+
+def analyze_meal(user_input_text):
+  try:
+    new_meal = Meal(user_input_text)
+    new_meal.process()
+    return new_meal.get_meal_summary()
+  except Exception as e:
+    print(f"Failed to analyze meal: {e}")
+    return None
