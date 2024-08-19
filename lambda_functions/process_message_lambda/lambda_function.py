@@ -39,7 +39,7 @@ def lambda_handler(event, context):
     if response is None:
        text_reply = "Please try again, an error occured."
     else:
-       text_reply = f"Calories: {response['total_nutrition']['calories']}"
+       text_reply = f"Calories: {response['total_nutrition']['calories']}\nCarbs: {response['total_nutrition']['carbs']}\nProtein {response['total_nutrition']['protein']}\nFat {response['total_nutrition']['fat']}"
 
     send_whatsapp_message(sender, text_reply)
 
