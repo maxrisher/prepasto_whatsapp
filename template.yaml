@@ -12,7 +12,15 @@ Resources:
       CodeUri: lambda_functions/process_message_lambda/
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
-      Timeout: 60      # Optional: Adjust based on your function's needs
+      Timeout: 60      # Number of seconds before the lambda times out
+      AutoPublishAlias: stagingAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
+
+  ProductionProcessMessageAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ProcessMessageFunction #This points to the lambda function as our reference
+      FunctionVersion: !GetAtt ProcessMessageFunction.Version
+      Name: production
 
 Outputs:
   LambdaFunction:
