@@ -24,6 +24,7 @@ def send_whatsapp_message(recipient, message):
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
 
+# This is the main function for the lambda!
 def lambda_handler(event, context):
 
     message = event['entry'][0]['changes'][0]['value']['messages'][0]
@@ -40,14 +41,15 @@ def lambda_handler(event, context):
        text_reply = "Please try again, an error occured."
     else:
        # Build the text_reply string
-        text_reply = f"Total Nutrition:\nCalories: {response['total_nutrition']['calories']} kcal\nCarbs: {response['total_nutrition']['carbs']} g\nProtein: {response['total_nutrition']['protein']} g\nFat: {response['total_nutrition']['fat']} g\n\nDishes:\n"
+       # All of this rounding is because the numeric values are all floats by default
+        text_reply = f"Total Nutrition:\nCalories: {round(response['total_nutrition']['calories'])} kcal\nCarbs: {round(response['total_nutrition']['carbs'])} g\nProtein: {round(response['total_nutrition']['protein'])} g\nFat: {round(response['total_nutrition']['fat'])} g\n\nDishes:\n"
 
         for dish in response['dishes']:
-            text_reply += (f" - {dish['name'].capitalize()} ({dish['grams']} g): "
-                        f"{dish['nutrition']['calories']} kcal, "
-                        f"Carbs: {dish['nutrition']['carbs']} g, "
-                        f"Protein: {dish['nutrition']['protein']} g, "
-                        f"Fat: {dish['nutrition']['fat']} g\n")
+            text_reply += (f" - {dish['name'].capitalize()} ({round(dish['grams'])} g): "
+                        f"{round(dish['nutrition']['calories'])} kcal, "
+                        f"Carbs: {round(dish['nutrition']['carbs'])} g, "
+                        f"Protein: {round(dish['nutrition']['protein'])} g, "
+                        f"Fat: {round(dish['nutrition']['fat'])} g\n")
 
     send_whatsapp_message(sender, text_reply)
 

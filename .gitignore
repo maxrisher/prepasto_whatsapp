@@ -1,3 +1,9 @@
+#sam managed files
+.aws-sam
+
+#aws packaged yaml
+packaged.yaml
+
 #food csv files
 fndds_foods.csv
 fndds_nutrients.csv
