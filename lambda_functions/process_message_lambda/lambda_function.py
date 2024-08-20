@@ -40,9 +40,8 @@ def lambda_handler(event, context):
     if response is None:
        text_reply = "Please try again, an error occured."
     else:
-        # Get the nutrition info into integer format
-
        # Build the text_reply string
+       # All of this rounding is because the numeric values are all floats by default
         text_reply = f"Total Nutrition:\nCalories: {round(response['total_nutrition']['calories'])} kcal\nCarbs: {round(response['total_nutrition']['carbs'])} g\nProtein: {round(response['total_nutrition']['protein'])} g\nFat: {round(response['total_nutrition']['fat'])} g\n\nDishes:\n"
 
         for dish in response['dishes']:
