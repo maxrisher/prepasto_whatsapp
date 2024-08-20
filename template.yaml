@@ -15,6 +15,13 @@ Resources:
       Timeout: 60      # Number of seconds before the lambda times out
       AutoPublishAlias: stagingAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
 
+  ProductionProcessMessageAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ProcessMessageFunction #This points to the lambda function as our reference
+      FunctionVersion: 1
+      Name: production
+
 Outputs:
   LambdaFunction:
     Description: "Lambda Function ARN"
