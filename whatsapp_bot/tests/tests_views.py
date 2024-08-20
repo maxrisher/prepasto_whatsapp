@@ -19,7 +19,7 @@ class WebhookIntegrationTest(TestCase):
                                 {
                                     "from": "+17204768288",
                                     "text": {
-                                    "body": "One hot dog!"
+                                    "body": "One carrot with a packet of hot sauce!"
                                     }
                                 }
                                 ]
