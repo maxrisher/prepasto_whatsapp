@@ -24,6 +24,7 @@ def send_whatsapp_message(recipient, message):
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
 
+# This is the main function for the lambda!
 def lambda_handler(event, context):
 
     message = event['entry'][0]['changes'][0]['value']['messages'][0]
