@@ -7,10 +7,17 @@ Versioning:
 - There is a 'production' and a 'stagingAlias' version of the lambda. The produciton version needs to be set manually in template.yaml. The stagingAlias version is always the most recently deployed one.
 
 Deployment: 
+- Download docker and the 'aws sam' CLI
 - Run docker on your machine. 
 - from the top level directory run: sam build --use-container
 - run: sam build
 - go through the menus
+
+Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. 
+
+Useful commands:
+To see lambda function versions:
+aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28
 
 # Testing
 
