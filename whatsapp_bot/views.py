@@ -33,9 +33,10 @@ def webhook(request):
                                      aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
                                      aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
         lambda_client.invoke(
-            FunctionName='process_message_lambda',
+            FunctionName='prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28',
             InvocationType='Event',
-            Payload=json_payload
+            Payload=json_payload,
+            Qualifier='production'
         )
     
     return HttpResponse('OK', status=200)
