@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main_app',
     'whatsapp_bot',
+    'custom_users',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,5 @@ LOGGING = {
         }
     }
 }
+
+AUTH_USER_MODEL = 'custom_users.CustomUser'
