@@ -40,6 +40,8 @@ def lambda_handler(event, context):
     if response is None:
        text_reply = "Please try again, an error occured."
     else:
+        # Get the nutrition info into integer format
+        
        # Build the text_reply string
         text_reply = f"Total Nutrition:\nCalories: {response['total_nutrition']['calories']} kcal\nCarbs: {response['total_nutrition']['carbs']} g\nProtein: {response['total_nutrition']['protein']} g\nFat: {response['total_nutrition']['fat']} g\n\nDishes:\n"
 
