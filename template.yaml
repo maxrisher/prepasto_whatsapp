@@ -10,26 +10,11 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda_functions/process_message_lambda/
-      Handler: app.lambda_handler
+      Handler: lambda_function.lambda_handler
       Runtime: python3.12
-      Layers:
-        - !Ref HummusLayer
       Timeout: 60      # Optional: Adjust based on your function's needs
-
-  HummusLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: hummus-layer
-      Description: Layer containing dependencies for my Django site's ProcessMessage function
-      ContentUri: aws_layer/
-      CompatibleRuntimes:
-        - python3.12
 
 Outputs:
   LambdaFunction:
     Description: "Lambda Function ARN"
     Value: !GetAtt ProcessMessageFunction.Arn
-
-  LayerVersionArn:
-    Description: "Layer ARN"
-    Value: !Ref HummusLayer
