@@ -149,3 +149,5 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'custom_users.CustomUser'
+
+CSRF_TRUSTED_ORIGINS = [os.getenv('RAILWAY_PUBLIC_DOMAIN')]
