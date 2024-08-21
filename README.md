@@ -16,7 +16,7 @@ Deployment:
 Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. 
 
 Useful commands:
-To see lambda function versions:
+- To see lambda function versions:
 aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28
 
 # Testing

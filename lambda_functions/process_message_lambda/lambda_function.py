@@ -34,6 +34,7 @@ def lambda_handler(event, context):
     print(json.dumps(event))
 
     send_whatsapp_message(sender, "Got your message, I'm thinking on it!")
+    print('Tried to send confirmation message.')
 
     response = analyze_meal(text)
 
@@ -52,6 +53,7 @@ def lambda_handler(event, context):
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
 
     send_whatsapp_message(sender, text_reply)
+    print('Tried to send meal message.')
 
     return {
         'statusCode': 200,
