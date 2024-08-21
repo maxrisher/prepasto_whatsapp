@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main_app',
     'whatsapp_bot',
+    'custom_users',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +147,7 @@ LOGGING = {
         }
     }
 }
+
+AUTH_USER_MODEL = 'custom_users.CustomUser'
+
+CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN')]

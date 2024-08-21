@@ -26,3 +26,8 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 - integrate AWS layers into the testing environment
 - Should I try to have all tests (django and pytest) run when I call pytest?
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
+
+# Useful links
+## Whatsapp
+Sending messages: https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages
+postman: https://www.postman.com/meta/whatsapp-business-platform/overview
