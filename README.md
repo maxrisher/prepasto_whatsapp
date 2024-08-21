@@ -13,7 +13,7 @@ Deployment:
 - run: sam build
 - go through the menus
 
-Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. 
+Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. To update the variables in the staging or production lambda versions **you must redeploy the lambdas**
 
 Useful commands:
 - To see lambda function versions:
