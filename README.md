@@ -30,3 +30,4 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 # Useful links
 ## Whatsapp
 Sending messages: https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages
+postman: https://www.postman.com/meta/whatsapp-business-platform/overview
