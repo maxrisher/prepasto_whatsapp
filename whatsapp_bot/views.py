@@ -25,6 +25,9 @@ def webhook(request):
             return HttpResponse('Forbidden', status=403)
     
     if request.method == 'POST':
+        
+        logger.warning("Message body:\n"+request.body)
+
         request_body_dict = json.loads(request.body)
         json_payload = json.dumps(request_body_dict)
 

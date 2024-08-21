@@ -144,6 +144,11 @@ LOGGING = {
             'level': 'DEBUG',
             # this means that these logs will not get sent to parent loggers (ie. django)
             'propagate': False,
+        },
+        'main_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
         }
     }
 }
