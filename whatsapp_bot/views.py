@@ -28,7 +28,7 @@ def webhook(request):
         
         request_body_dict = json.loads(request.body)
 
-        logger.warning("Message body:"+request_body_dict)
+        logger.warning("Message body:")
         logger.warning(request_body_dict)
 
         json_payload = json.dumps(request_body_dict)
