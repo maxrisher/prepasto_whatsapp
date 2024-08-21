@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main_app',
     'whatsapp_bot',
+    'custom_users',
 ]
 
 MIDDLEWARE = [
@@ -143,6 +144,15 @@ LOGGING = {
             'level': 'DEBUG',
             # this means that these logs will not get sent to parent loggers (ie. django)
             'propagate': False,
+        },
+        'main_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
         }
     }
 }
+
+AUTH_USER_MODEL = 'custom_users.CustomUser'
+
+CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN')]
