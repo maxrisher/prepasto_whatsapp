@@ -1,5 +1,4 @@
 import json
-import asyncio
 import os
 import requests
 from concurrent.futures import ThreadPoolExecutor
