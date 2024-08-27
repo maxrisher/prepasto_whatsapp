@@ -1,6 +1,6 @@
 from django.db import models
 
-from custom_users import CustomUser
+from custom_users.models import CustomUser
 
 # class DiaryEntry(models):
 #    user = CustomUser
