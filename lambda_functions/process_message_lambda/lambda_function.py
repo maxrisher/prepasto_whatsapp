@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict
 
 from llm_utils import dish_to_categories, select_food_code, get_food_grams, dish_list_from_log
-from helpers import calculate_nutrition
+from helpers import calculate_nutrition, send_to_django
 
 def send_whatsapp_message(recipient, message):
     headers = {
@@ -52,6 +52,7 @@ def lambda_handler(event, context):
                         f"Protein: {round(dish['nutrition']['protein'])} g, "
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
 
+    send_to_django(response)
     send_whatsapp_message(sender, text_reply)
     print('Tried to send meal message.')
 
