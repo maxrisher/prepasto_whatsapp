@@ -1,5 +1,6 @@
 import json
 import os
+import unittest
 
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -9,6 +10,7 @@ class WebhookIntegrationTest(TestCase):
         self.client = Client()
         self.url = reverse('webhook')
 
+    @unittest.skip("Costly test, skip it")
     def test_post_request_real_lambda(self):
         payload = {
                     "entry": [
@@ -131,6 +133,6 @@ class LambdaWebhookTest(TestCase):
             'llm_meal_slice': 'description of meal including details of preparation and similarities'
         }
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
-        response = self.client.post(url=self.url, data=json.dumps(payload), content_type='application/json', **headers)
+        response = self.client.post(path=self.url, data=json.dumps(payload), content_type='application/json', headers=headers)
 
         self.assertEqual(response.status_code, 200)
