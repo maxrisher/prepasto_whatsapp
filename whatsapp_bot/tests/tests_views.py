@@ -40,9 +40,7 @@ class LambdaWebhookTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.url = reverse('lambda-webhook')
-
-    def test_lambda_webhook_auth(self):
-        payload = {
+        self.meal_dict = {
             'total_nutrition': {
                 'calories': 618.0, 
                 'fat': 46.0975, 
@@ -132,7 +130,17 @@ class LambdaWebhookTest(TestCase):
             ], 
             'llm_meal_slice': 'description of meal including details of preparation and similarities'
         }
+
+    #Make sure that authenticated requests work
+    def test_lambda_webhook_auth(self):
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
-        response = self.client.post(path=self.url, data=json.dumps(payload), content_type='application/json', headers=headers)
+        response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
 
         self.assertEqual(response.status_code, 200)
+
+    #Make sure that unauthenticated requests fail
+    def test_lambda_webhook_bad_auth(self):
+        headers = {'Authorization': 'Bearer badkey'}
+        response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
+
+        self.assertEqual(response.status_code, 403)
