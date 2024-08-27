@@ -32,3 +32,7 @@ class WebhookIntegrationTest(TestCase):
         response = self.client.post(self.url, json.dumps(payload), content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
+
+class LambdaWebhookTest(TestCase):
+    def setUp(self):
+        self.client = Client()
