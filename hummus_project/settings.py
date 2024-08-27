@@ -114,15 +114,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'static/' # This is the path to static files that Django will look for, when searching our project
+
+STATIC_ROOT = BASE_DIR / 'staticfiles' # We create a folder in which to put all of our static files from all our different apps
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # This reduces the size of the static files when they are served (this is more efficient).
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 LOGGING = {
     'version': 1,
@@ -143,6 +143,11 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
             # this means that these logs will not get sent to parent loggers (ie. django)
+            'propagate': False,
+        },
+        'main_app': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
             'propagate': False,
         }
     }

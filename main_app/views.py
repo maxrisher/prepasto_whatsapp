@@ -1,4 +1,9 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+
+import logging
+
+logger = logging.getLogger('main_app')
 
 def index(request):
-    return HttpResponse("Hello chickpea and garlic world!")
+    logger.warning("Someone accessed the index page.")
+    return render(request, 'main_app/home.html')

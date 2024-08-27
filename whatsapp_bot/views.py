@@ -25,7 +25,12 @@ def webhook(request):
             return HttpResponse('Forbidden', status=403)
     
     if request.method == 'POST':
+        
         request_body_dict = json.loads(request.body)
+
+        logger.warning("Message body:")
+        logger.warning(request_body_dict)
+
         json_payload = json.dumps(request_body_dict)
 
         lambda_client = boto3.client('lambda', 
