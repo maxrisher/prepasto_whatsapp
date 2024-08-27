@@ -2,7 +2,7 @@ import pytest
 import json
 from unittest.mock import patch, MagicMock, AsyncMock
 
-from lambda_functions.process_message_lambda.lambda_function import lambda_handler, call_llm_api_async, send_whatsapp_message
+from lambda_functions.process_message_lambda.lambda_function import lambda_handler, analyze_meal
 
 @pytest.fixture
 def sample_event():
@@ -59,3 +59,12 @@ def test_lambda_handler(mock_getenv, mock_post, mock_call_llm_api_async, sample_
             "text": {"body": "LLM response to :Hello!"}
         }
     )
+
+def test_lambda_send_to_django():
+
+#create a sample post request to our lambda webhook
+
+#test a sample post request to our lambda webhook
+    response_dict = analyze_meal("three sausage patties, two fried eggs, one slice of toast")
+    print(response_dict)
+    print("done")
