@@ -140,7 +140,7 @@ class LambdaWebhookTest(TestCase):
 
     #Make sure that unauthenticated requests fail
     def test_lambda_webhook_bad_auth(self):
-        headers = {'Authorization': 'Bearer badkey'}
+        headers = {'Authorization': 'Bearer bad_key'}
         response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
 
         self.assertEqual(response.status_code, 403)
