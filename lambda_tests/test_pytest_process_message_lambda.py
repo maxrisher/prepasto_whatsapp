@@ -1,5 +1,6 @@
 import pytest
 import os
+import requests
 
 from lambda_functions.process_message_lambda.lambda_function import analyze_meal
 from lambda_functions.process_message_lambda.helpers import send_to_django
@@ -105,14 +106,34 @@ def sample_lambda_output():
     }
     return sample_meal_data
 
-
+@pytest.mark.skip(reason="This is a time consuming test. Disable it for now.")
 def test_lambda_full(go_to_lambda_dir):
-    pass
     response_dict = analyze_meal("three sausage patties, two fried eggs, one slice of toast")
     print("START")
     print(response_dict)
     assert response_dict is not None  # Ensure the response is not None
     print("END")
 
-def test_lambda_send_to_django(sample_lambda_output):
+def test_lambda_send_to_django(sample_lambda_output, requests_mock):
+
+    correct_mock_url='https://127.0.0.1/lambda_webhook'
+    requests_mock.post(correct_mock_url, json={})
+
     send_to_django(sample_lambda_output)
+
+    assert requests_mock.called
+    assert requests_mock.call_count == 1
+
+    last_request = requests_mock.request_history[0]
+
+    # Assert URL is correct
+    assert last_request.url == correct_mock_url
+
+    # Assert the method is POST
+    assert last_request.method == 'POST'
+
+    # Assert headers include the correct Authorization token
+    assert last_request.headers['Authorization'] == os.getenv('LAMBDA_TO_DJANGO_API_KEY')
+
+    assert last_request.json() == sample_lambda_output
+

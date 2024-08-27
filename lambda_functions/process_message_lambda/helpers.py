@@ -70,8 +70,10 @@ def food_portion_to_csv(category_code_int):
 # sends a post request to the backend webhook which collects lambda responses
 def send_to_django(dict):
     headers = {'Authorization': os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
+    url='https://'+os.getenv('RAILWAY_PUBLIC_DOMAIN')+'/lambda_webhook'
+    print("url here: "+url)
 
-    request = requests.post(url=os.getenv('https://'+'RAILWAY_PUBLIC_DOMAIN')+'/lambda_webhook', 
+    request = requests.post(url=url, 
                             json=dict,
                             headers=headers)
     
