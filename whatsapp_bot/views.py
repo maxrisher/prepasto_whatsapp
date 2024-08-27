@@ -3,13 +3,14 @@ import os
 import boto3
 import logging
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .utils import send_whatsapp_message
 
 logger = logging.getLogger('whatsapp_bot')
 
+# A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
 def webhook(request):
     
@@ -45,20 +46,22 @@ def webhook(request):
         )
     
     return HttpResponse('OK', status=200)
-
-def process_message(received_text):
-    # here we generate a response based on what was sent
-    return f'When you said "{received_text}", I literally farted!'
-
+    
+# A webhook to receive processed meal information from the lambda
 @csrf_exempt
-def callback(request):
+def food_processing_lambda_webhook(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        api_key = request.headers.get('Authorization')
 
-        logger.debug('This is a debug message')
-        logger.info('This is an info message')
-        logger.warning('This is a warning message')
-        logger.error('This is an error message')
-        logger.critical('This is a critical message')
+        if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
+            return JsonResponse({'error': 'Invalid API key'}, status=403)
         
-        return HttpResponse('OK', status=200)
+        payload = request.json()
+        logger.warning(payload)
+
+        # add all meal information to the database
+        # send a whatsapp message with the meal info
+        # send a whatsapp with the daily totals
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
