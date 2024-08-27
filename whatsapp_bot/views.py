@@ -56,8 +56,10 @@ def food_processing_lambda_webhook(request):
         if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
         
-        payload = request.json()
+        payload = json.loads(request.body)
         logger.warning(payload)
+
+        return JsonResponse({'message': 'OK'}, status=200)
 
         # add all meal information to the database
         # send a whatsapp message with the meal info
