@@ -67,6 +67,7 @@ def food_portion_to_csv(category_code_int):
     portions_csv = filtered_portions.to_csv(index=False)
     return portions_csv
 
+# sends a post request to the backend webhook which collects lambda responses
 def send_to_django(dict):
     headers = {'Authorization': os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
 

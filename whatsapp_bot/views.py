@@ -59,5 +59,7 @@ def food_processing_lambda_webhook(request):
         payload = request.json()
         logger.warning(payload)
 
+        # 
+
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
