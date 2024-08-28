@@ -62,6 +62,7 @@ def food_processing_lambda_webhook(request):
         return JsonResponse({'message': 'OK'}, status=200)
 
         # add all meal information to the database
+        
         # send a whatsapp message with the meal info
         # send a whatsapp with the daily totals
 
