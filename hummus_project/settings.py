@@ -162,3 +162,6 @@ CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN')]
 
 # Checks for the ssl redirect setting. Defaults to enforcing SSL. 
 SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
+
+# Railway forces https already. Something to do with Railway having a reverse proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
