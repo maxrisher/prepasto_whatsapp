@@ -8,7 +8,7 @@ from lambda_functions.process_message_lambda.helpers import send_to_django
 @pytest.fixture
 def go_to_lambda_dir():
     initial_dir = os.getcwd()
-    os.chdir('lambda_functions/process_message_lambda')
+    os.chdir('lambda_functions/process_message_lambda/lambda_environment/')
     yield
     os.chdir(initial_dir)
 
