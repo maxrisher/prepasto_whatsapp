@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 import dj_database_url
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,3 +159,9 @@ LOGGING = {
 AUTH_USER_MODEL = 'custom_users.CustomUser'
 
 CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN')]
+
+# Checks for the ssl redirect setting. Defaults to enforcing SSL. 
+SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
+
+# Railway forces https already. Trust headers from the reverse proxy.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

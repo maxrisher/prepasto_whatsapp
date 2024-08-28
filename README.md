@@ -12,6 +12,7 @@ Deployment:
 - from the top level directory run: sam build --use-container
 - run: sam build
 - go through the menus
+- You need to update the RAILWAY_PUBLIC_DOMAIN in the lambda to reflect either production or staging depending on what's needed
 
 Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. To update the variables in the staging or production lambda versions **you must redeploy the lambdas**
 

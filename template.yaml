@@ -9,7 +9,7 @@ Resources:
   ProcessMessageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: lambda_functions/process_message_lambda/
+      CodeUri: lambda_functions/process_message_lambda/lambda_environment/
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
       Timeout: 60      # Number of seconds before the lambda times out
