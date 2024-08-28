@@ -3,7 +3,7 @@ from openai import OpenAI
 import json
 import re
 
-from .helpers import get_answer_str, category_list_to_xml, food_portion_to_csv
+from helpers import get_answer_str, category_list_to_xml, food_portion_to_csv
 
 def dish_list_from_log(meal_description_text):
     client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
