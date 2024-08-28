@@ -77,7 +77,7 @@ def send_to_django(dict):
                             json=dict,
                             headers=headers)
     
-    #Something about what to do if the request is bad
+    #Ned to add something about what to do if the request is bad
     dj_response = request.json()
 
     print(dj_response)
