@@ -124,7 +124,7 @@ celerybeat.pid
 .env
 .env.local
 .venv
-.venv_lambda
+.venv_lambda/
 venv/
 ENV/
 env/
