@@ -60,9 +60,6 @@ def lambda_handler(event, context):
         'body': json.dumps('All good bro!')
     }
 
-
-###NEW###
-
 class Dish:
   def __init__(self, name: str, usual_ing: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):
     self.name = name
