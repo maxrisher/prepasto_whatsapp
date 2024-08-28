@@ -16,3 +16,6 @@ def send_whatsapp_message(recipient, message):
 
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
+
+def add_meal_to_db(payload):
+    return

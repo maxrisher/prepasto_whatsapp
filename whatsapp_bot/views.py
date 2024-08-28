@@ -6,7 +6,7 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .utils import send_whatsapp_message
+from .utils import send_whatsapp_message, add_meal_to_db
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -58,6 +58,8 @@ def food_processing_lambda_webhook(request):
         
         payload = json.loads(request.body)
         logger.warning(payload)
+
+        add_meal_to_db(payload)
 
         return JsonResponse({'message': 'OK'}, status=200)
 
