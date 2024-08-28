@@ -116,7 +116,7 @@ def test_lambda_full(go_to_lambda_dir):
 
 def test_lambda_send_to_django(sample_lambda_output, requests_mock):
 
-    correct_mock_url='https://127.0.0.1/lambda_webhook'
+    correct_mock_url='https://127.0.0.1/bot/lambda_webhook'
     requests_mock.post(correct_mock_url, json={})
 
     send_to_django(sample_lambda_output)
