@@ -2,8 +2,8 @@ import pytest
 import os
 import requests
 
-from lambda_functions.process_message_lambda.lambda_function import analyze_meal
-from lambda_functions.process_message_lambda.helpers import send_to_django
+from lambda_functions.process_message_lambda.lambda_environment.lambda_function import analyze_meal
+from lambda_functions.process_message_lambda.lambda_environment.helpers import send_to_django
 
 @pytest.fixture
 def go_to_lambda_dir():
