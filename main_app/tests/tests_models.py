@@ -65,34 +65,34 @@ class DiaryModelTest(TestCase):
 # Make sure that the same UTC time can result in diaries being created for different local dates
 class DiaryTimezoneTest(TestCase):
     def setUp(self):
-        # Create two users in different timezones
-        self.user_ny = CustomUser.objects.create_user(
+        # Create two users in different timezones on opposite sides of the International Date Line
+        self.user_gmt_minus_12 = CustomUser.objects.create_user(
             email='fake1@email.com',
             password='testpass',
         )
-        self.user_ny.time_zone = 'America/New_York' # Eastern Time (UTC-5 or UTC-4 depending on DST)
+        self.user_gmt_minus_12.time_zone = 'Etc/GMT+12'  # A timezone 12 hours behind UTC
 
-        self.user_tokyo = CustomUser.objects.create_user(
+        self.user_kiritimati = CustomUser.objects.create_user(
             email='fake2@email.com',
             password='testpass',
         )
-        self.user_ny.time_zone='Asia/Tokyo'  # Japan Standard Time (UTC+9)
+        self.user_kiritimati.time_zone = 'Pacific/Kiritimati'  # A timezone 14 hours ahead of UTC
 
     def test_diary_dates_different_timezones(self):
-        # Set a specific UTC datetime where New York and Tokyo are on different dates - ie about just before midnight in the UK
-        utc_time = datetime(2023, 8, 28, 23, 0, 0, tzinfo=ZoneInfo("UTC"))
+        # Set a specific UTC datetime where the two timezones are on different dates - just before midnight in UTC
+        utc_time = timezone.now()
         print(utc_time)
 
         # Create Diary instances without saving to DB initially
-        diary_ny = Diary(
-            custom_user=self.user_ny,
+        diary_gmt_minus_12 = Diary(
+            custom_user=self.user_gmt_minus_12,
             calories=2000,
             fat=70,
             carbs=250,
             protein=100
         )
-        diary_tokyo = Diary(
-            custom_user=self.user_tokyo,
+        diary_kiritimati = Diary(
+            custom_user=self.user_kiritimati,
             calories=1800,
             fat=60,
             carbs=220,
@@ -100,26 +100,26 @@ class DiaryTimezoneTest(TestCase):
         )
 
         # Manually set the created_at_utc attribute for both
-        diary_ny.created_at_utc = utc_time
-        diary_tokyo.created_at_utc = utc_time
+        diary_gmt_minus_12.created_at_utc = utc_time
+        diary_kiritimati.created_at_utc = utc_time
 
         # Manually call the save method to trigger the local_date calculation
-        diary_ny.save()
-        diary_tokyo.save()
+        diary_gmt_minus_12.save()
+        diary_kiritimati.save()
 
         # Calculate expected local dates based on the UTC time and timezones
-        ny_timezone = pytz.timezone(self.user_ny.time_zone)
-        tokyo_timezone = pytz.timezone(self.user_tokyo.time_zone)
+        gmt_minus_12_timezone = pytz.timezone("Etc/GMT+12")
+        kiritimati_timezone = pytz.timezone("Pacific/Kiritimati")
 
-        expected_local_date_ny = utc_time.astimezone(ny_timezone).date()
-        expected_local_date_tokyo = utc_time.astimezone(tokyo_timezone).date()
+        expected_local_date_gmt_minus_12 = utc_time.astimezone(gmt_minus_12_timezone).date()
+        expected_local_date_kiritimati = utc_time.astimezone(kiritimati_timezone).date()
 
         # Ensure that the local dates are different
-        self.assertNotEqual(expected_local_date_ny, expected_local_date_tokyo)
+        self.assertNotEqual(expected_local_date_gmt_minus_12, expected_local_date_kiritimati)
 
         # Assert that the diaries have the correct local dates
-        self.assertEqual(diary_ny.local_date, expected_local_date_ny)
-        self.assertEqual(diary_tokyo.local_date, expected_local_date_tokyo)
+        self.assertEqual(diary_gmt_minus_12.local_date, expected_local_date_gmt_minus_12)
+        self.assertEqual(diary_kiritimati.local_date, expected_local_date_kiritimati)
 
         # Also ensure that both diaries were saved correctly
         self.assertEqual(Diary.objects.count(), 2)
