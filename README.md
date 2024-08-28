@@ -23,10 +23,15 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 # Testing
 
 # TODOs:
+## general
 - Get a LEGIT whatsapp account (!)
 - integrate AWS layers into the testing environment
 - Should I try to have all tests (django and pytest) run when I call pytest?
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
+
+## security
+- Turn off debug on production django site
+- Improve authentication method for django lambda webhook
 
 # Useful links
 ## Whatsapp
