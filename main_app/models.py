@@ -7,11 +7,9 @@ from custom_users.models import CustomUser
 class Diary(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='diaries')
     created_at_utc = models.DateTimeField(auto_now_add=True)
-    local_date = models.DateField()
+    user_timezone = models.CharField(custom_user.time_zone)
+    local_date = models.DateField(editable=False)
     calories = models.IntegerField()
-    fat = models.IntegerField()
-    carbs = models.IntegerField()
-    protein = models.IntegerField()
 
     def save(self, *args, **kwargs):
         if not self.id: #Only set these things on creation
