@@ -163,14 +163,15 @@ class DiaryModelTest(TestCase):
             email='fake@email.com',
             password='testpass',
         )
-        self.user.time_zone = 'America/New_York'
-
-        test_date = timezone.now().date()
+        self.user.time_zone = 'Asia/Tokyo'
 
         self.diary = Diary.objects.create(
             custom_user=self.user,
-            local_date=test_date
+            local_date=self.user.current_date
         )
+
+        logger.info('current date tokyo:')
+        logger.info(self.user.current_date)
 
         meal1 = Meal.objects.create(
             custom_user=self.user,
@@ -189,5 +190,6 @@ class DiaryModelTest(TestCase):
             carbs=250,
             protein=100
         )
+        
     def test_calories_simple(self):
         self.assertEqual(1200, self.diary.calories)
