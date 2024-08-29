@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from custom_users.models import CustomUser
-from ..models import Diary
+from ..models import Meal
 
 import pytz
 from datetime import datetime
@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 import logging
 
 logger = logging.getLogger('main_app')
-class DiaryModelTest(TestCase):
+class MealModelTest(TestCase):
 
     def setUp(self):
         # Set up a user with a specific timezone
@@ -20,9 +20,9 @@ class DiaryModelTest(TestCase):
         )
         self.user.time_zone = 'America/New_York'
 
-    def test_diary_creation(self):
-        # Create a Diary instance
-        diary = Diary.objects.create(
+    def test_Meal_creation(self):
+        # Create a Meal instance
+        Meal = Meal.objects.create(
             custom_user=self.user,
             calories=2000,
             fat=70,
@@ -41,14 +41,14 @@ class DiaryModelTest(TestCase):
         logger.info(expected_local_date)
         
         # Assert that the local_date is correctly set
-        self.assertEqual(diary.local_date, expected_local_date)
+        self.assertEqual(Meal.local_date, expected_local_date)
         
-        # Assert that the diary entry was saved correctly
-        self.assertEqual(Diary.objects.count(), 1)
+        # Assert that the Meal entry was saved correctly
+        self.assertEqual(Meal.objects.count(), 1)
 
     def test_unique_together_constraint(self):
-        # Create a Diary instance
-        Diary.objects.create(
+        # Create a Meal instance
+        Meal.objects.create(
             custom_user=self.user,
             calories=2000,
             fat=70,
@@ -56,9 +56,9 @@ class DiaryModelTest(TestCase):
             protein=100
         )
         
-        # Attempt to create another Diary instance with the same user and date
+        # Attempt to create another Meal instance with the same user and date
         with self.assertRaises(Exception):
-            Diary.objects.create(
+            Meal.objects.create(
                 custom_user=self.user,
                 calories=1800,
                 fat=60,
@@ -67,7 +67,7 @@ class DiaryModelTest(TestCase):
             )
 
 # Make sure that the same UTC time can result in diaries being created for different local dates
-class DiaryTimezoneTest(TestCase):
+class MealTimezoneTest(TestCase):
     def setUp(self):
         # Create two users in different timezones on opposite sides of the International Date Line
         self.user_gmt_minus_12 = CustomUser.objects.create_user(
@@ -82,21 +82,21 @@ class DiaryTimezoneTest(TestCase):
         )
         self.user_kiritimati.time_zone = 'Pacific/Kiritimati'  # A timezone 14 hours ahead of UTC
 
-    def test_diary_dates_different_timezones(self):
+    def test_Meal_dates_different_timezones(self):
         # Set a specific UTC datetime where the two timezones are on different dates - just before midnight in UTC
         utc_time = timezone.now()
         logger.info("UTC time is:")
         logger.info(utc_time)
 
-        # Create Diary instances without saving to DB initially
-        diary_gmt_minus_12 = Diary(
+        # Create Meal instances without saving to DB initially
+        Meal_gmt_minus_12 = Meal(
             custom_user=self.user_gmt_minus_12,
             calories=2000,
             fat=70,
             carbs=250,
             protein=100
         )
-        diary_kiritimati = Diary(
+        Meal_kiritimati = Meal(
             custom_user=self.user_kiritimati,
             calories=1800,
             fat=60,
@@ -105,12 +105,12 @@ class DiaryTimezoneTest(TestCase):
         )
 
         # Manually set the created_at_utc attribute for both
-        diary_gmt_minus_12.created_at_utc = utc_time
-        diary_kiritimati.created_at_utc = utc_time
+        Meal_gmt_minus_12.created_at_utc = utc_time
+        Meal_kiritimati.created_at_utc = utc_time
 
         # Manually call the save method to trigger the local_date calculation
-        diary_gmt_minus_12.save()
-        diary_kiritimati.save()
+        Meal_gmt_minus_12.save()
+        Meal_kiritimati.save()
 
         # Calculate expected local dates based on the UTC time and timezones
         gmt_minus_12_timezone = pytz.timezone("Etc/GMT+12")
@@ -130,8 +130,8 @@ class DiaryTimezoneTest(TestCase):
         self.assertNotEqual(expected_local_date_gmt_minus_12, expected_local_date_kiritimati)
 
         # Assert that the diaries have the correct local dates
-        self.assertEqual(diary_gmt_minus_12.local_date, expected_local_date_gmt_minus_12)
-        self.assertEqual(diary_kiritimati.local_date, expected_local_date_kiritimati)
+        self.assertEqual(Meal_gmt_minus_12.local_date, expected_local_date_gmt_minus_12)
+        self.assertEqual(Meal_kiritimati.local_date, expected_local_date_kiritimati)
 
         # Also ensure that both diaries were saved correctly
-        self.assertEqual(Diary.objects.count(), 2)
+        self.assertEqual(Meal.objects.count(), 2)

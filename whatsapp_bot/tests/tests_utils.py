@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.utils import timezone
-from main_app.models import Diary
+from main_app.models import Meal
 from custom_users.models import CustomUser
 from whatsapp_bot.utils import add_meal_to_db  # Adjust the import path as needed
 
@@ -15,32 +15,32 @@ class AddMealToDbTests(TestCase):
             }
         }
 
-    def test_add_meal_to_db_no_existing_diary(self):
-        # Ensure no diary exists initially
-        self.assertEqual(Diary.objects.filter(custom_user=self.user).count(), 0)
+    def test_add_meal_to_db_no_existing_meal(self):
+        # Ensure no meal exists initially
+        self.assertEqual(Meal.objects.filter(custom_user=self.user).count(), 0)
         
         # Call the function
         add_meal_to_db(self.dict_from_lambda)
         
-        # Check that a new diary was created
-        self.assertEqual(Diary.objects.filter(custom_user=self.user).count(), 1)
+        # Check that a new meal was created
+        self.assertEqual(Meal.objects.filter(custom_user=self.user).count(), 1)
         
-        # Check the calories in the new diary
-        diary = Diary.objects.get(custom_user=self.user)
-        self.assertEqual(diary.calories, 500)
+        # Check the calories in the new meal
+        meal = Meal.objects.get(custom_user=self.user)
+        self.assertEqual(meal.calories, 500)
 
-    def test_add_meal_to_db_existing_diary(self):
-        # Create an initial diary entry for today
+    def test_add_meal_to_db_existing_meal(self):
+        # Create an initial meal entry for today
         local_date = timezone.localtime(timezone.now(), timezone=self.user.time_zone).date()
-        existing_diary = Diary.objects.create(custom_user=self.user, local_date=local_date, calories=200)
+        existing_meal = Meal.objects.create(custom_user=self.user, local_date=local_date, calories=200)
         
         # Call the function
         add_meal_to_db(self.dict_from_lambda)
         
-        # Ensure no new diary was created
-        self.assertEqual(Diary.objects.filter(custom_user=self.user).count(), 1)
+        # Ensure no new meal was created
+        self.assertEqual(Meal.objects.filter(custom_user=self.user).count(), 1)
         
-        # Check that the existing diary was updated with the new calories
-        existing_diary.refresh_from_db()
-        self.assertEqual(existing_diary.calories, 700)
+        # Check that the existing meal was updated with the new calories
+        existing_meal.refresh_from_db()
+        self.assertEqual(existing_meal.calories, 700)
 

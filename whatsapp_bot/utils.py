@@ -4,7 +4,7 @@ import pytz
 
 from django.utils import timezone
 
-from main_app.models import Diary
+from main_app.models import Meal
 from custom_users.models import CustomUser
 
 def send_whatsapp_message(recipient, message):
@@ -36,13 +36,13 @@ def add_meal_to_db(dict_from_lambda):
     aware_current_datetime = current_datetime.astimezone(user_tz)
 
     local_date = aware_current_datetime.date()
-    # Search for an existing diary for this date
-        # if does not exist, create diary
-    diary, created = Diary.objects.get_or_create(
+    # Search for an existing meal for this date
+        # if does not exist, create meal
+    meal, created = Meal.objects.get_or_create(
         custom_user = user,
         local_date = local_date
     )
 
-    # add meal to today's diary
-    diary.calories += new_calories
+    # add meal to today's meal
+    meal.calories += new_calories
     return

@@ -4,7 +4,7 @@ import pytz
 
 from custom_users.models import CustomUser
 
-class Diary(models.Model):
+class Meal(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='diaries')
     created_at_utc = models.DateTimeField(auto_now_add=True)
     local_date = models.DateField(editable=False)
