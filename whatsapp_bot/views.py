@@ -57,13 +57,18 @@ def food_processing_lambda_webhook(request):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
         
         payload = json.loads(request.body)
+        logger.warning("Payload received at lambda webhook:")
         logger.warning(payload)
 
-        add_meal_to_db(payload)
-
+        whatsapp_id = '17204768288'
+        
+        try:
+            calories = add_meal_to_db(payload, whatsapp_id)
+        except:
+            logger.warning(f"Error adding meal to database")
+            return JsonResponse({'error': 'user not found'}, status=404)
+        
         return JsonResponse({'message': 'OK'}, status=200)
-
-        # add all meal information to the dj database
 
         # send a whatsapp message with the meal info
         # send a whatsapp with the daily totals

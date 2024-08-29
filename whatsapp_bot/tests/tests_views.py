@@ -5,6 +5,8 @@ import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 
+from custom_users.models import CustomUser
+
 class WebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -130,6 +132,12 @@ class LambdaWebhookTest(TestCase):
             ], 
             'llm_meal_slice': 'description of meal including details of preparation and similarities'
         }
+        self.user = CustomUser.objects.create_user(
+            email='fake@email.com',
+            password='testpass',
+        )
+        self.user.phone = '17204768288'
+        self.user.save()
 
     #Make sure that authenticated requests work
     def test_lambda_webhook_auth(self):
