@@ -29,7 +29,6 @@ class Meal(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id: #Only set these things on creation
-            #Get the user's timezone from their model
-            user_timezone = pytz.timezone(self.custom_user.time_zone)
-            self.local_date = timezone.now().astimezone(user_timezone).date()
+            #Get the user's date from their model
+            self.local_date = self.custom_user.current_date
         super().save(*args, **kwargs)
