@@ -1,73 +1,40 @@
 from django.db import models
+from django.utils import timezone
+from django.db.models import Sum
+
+import pytz
 
 from custom_users.models import CustomUser
 
-# class DiaryEntry(models):
-#    user = CustomUser
+class Diary(models.Model):
+    custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='diaries')
+    local_date = models.DateField(editable=False)
 
-#    calories = 
-#    protein = 
-#    fat = 
-#    carbs = 
+    def save(self, *args, **kwargs):
+        if not self.id: #Only set these things on creation
+            #Get the user's date from their model
+            self.local_date = self.custom_user.current_date
+        super().save(*args, **kwargs)
 
+    @property
+    def calories(self):
+        total_calories = self.meals.aggregate(total_calories=Sum('calories'))['total_calories'] or 0
+        return total_calories
+    class Meta:
+        unique_together = ('custom_user', 'local_date')
 
+class Meal(models.Model):
+    custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='meals')
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='meals')
+    created_at_utc = models.DateTimeField(auto_now_add=True)
+    local_date = models.DateField(editable=False)
+    calories = models.IntegerField()
+    carbs = models.IntegerField()
+    fat = models.IntegerField()
+    protein = models.IntegerField()
 
-# class Dish(models):
-#   # do we need to associate meals with users? does this help with authentication for example?
-#   user = 
-  
-#   def __init__(self, name: str, usual_ing: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):
-#     self.name = name
-#     self.usual_ing = usual_ing
-#     self.state = state
-#     self.qualifiers = qualifiers
-#     self.confirmed_ing = confirmed_ing
-#     self.amount = amount
-#     self.similar_dishes = similar_dishes
-
-#     self.llm_responses: list[str] = ['first', 'second', 'third']
-
-#     self.wweia_cats: List[str] = None
-#     self.fndds_code: str = None
-#     self.grams: float = None
-#     self.nutrition: Dict[str, float] = None
-
-# class Meal(models):
-#     # do we need to associate meals with users? does this help with authentication for example?
-
-#     def __init__(self, user_input: str):
-#         self.description = user_input
-#         self.dishes: List[Dish] = None
-#         self.total_nutrition: Dict[str, float] = None
-
-#         self.llm_meal_slice: str = None
-
-#     def calculate_total_nutrition(self):
-#         self.total_nutrition = {
-#             "calories": sum(dish.nutrition.get("calories") for dish in self.dishes),
-#             "fat": sum(dish.nutrition.get('fat') for dish in self.dishes),
-#             "carbs": sum(dish.nutrition.get('carbs') for dish in self.dishes),
-#             "protein": sum(dish.nutrition.get('protein') for dish in self.dishes),
-#         }
-
-#     def get_meal_summary(self) -> Dict:
-#         return {
-#             "total_nutrition": self.total_nutrition,
-#             "dishes": [
-#                 {
-#                     "name": dish.name,
-#                     "common_ingredients": dish.usual_ing,
-#                     "state": dish.state,
-#                     "qualifiers": dish.qualifiers,
-#                     "confirmed_ingredients": dish.confirmed_ing,
-#                     "amount": dish.amount,
-#                     "wweia_cats": dish.wweia_cats,
-#                     "fndds_code": dish.fndds_code,
-#                     "grams": dish.grams,
-#                     "nutrition": dish.nutrition,
-#                     "llm_responses": dish.llm_responses
-#                 } for dish in self.dishes
-#             ],
-#             "llm_meal_slice": self.llm_meal_slice,
-#             "description": self.description
-#         }
+    def save(self, *args, **kwargs):
+        if not self.id: #Only set these things on creation
+            #Get the user's date from their model
+            self.local_date = self.custom_user.current_date
+        super().save(*args, **kwargs)

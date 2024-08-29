@@ -1,3 +1,5 @@
 from django.contrib import admin
+from main_app.models import Diary, Meal
 
-# Register your models here.
+admin.site.register(Diary)
+admin.site.register(Meal)

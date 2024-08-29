@@ -6,7 +6,7 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .utils import send_whatsapp_message
+from .utils import send_whatsapp_message, add_meal_to_db
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -57,13 +57,22 @@ def food_processing_lambda_webhook(request):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
         
         payload = json.loads(request.body)
+        logger.warning("Payload received at lambda webhook:")
         logger.warning(payload)
 
-        return JsonResponse({'message': 'OK'}, status=200)
+        whatsapp_id = '17204768288'
+        
+        try:
+            calories = add_meal_to_db(payload, whatsapp_id)
+            logger.warning(f'User {whatsapp_id} at {calories} calories today')
+            logger.warning(calories)
 
-        # add all meal information to the database
-        # send a whatsapp message with the meal info
-        # send a whatsapp with the daily totals
+            # send a whatsapp with the daily totals
+        except:
+            logger.warning(f"Error adding meal to database")
+            return JsonResponse({'error': 'user not found'}, status=404)
+        
+        return JsonResponse({'message': 'OK'}, status=200)
 
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
