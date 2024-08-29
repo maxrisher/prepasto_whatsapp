@@ -1,9 +1,14 @@
 import pytest
 import os
-import requests
+import sys
 
-from lambda_functions.process_message_lambda.lambda_environment.lambda_function import analyze_meal
-from lambda_functions.process_message_lambda.lambda_environment.helpers import send_to_django
+# Get the path of the lambda function. Go back one directory into the root. Then, go find the lambda environment for the function in question within lambda functions
+lambda_function_path = os.path.join(os.path.dirname(__file__), '..', 'lambda_functions', 'process_message_lambda', 'lambda_environment')
+# In our python path for searching for modules, put the lambda's path at the front
+# Convert the lambda's path into an absolute path -- remove any ambiguity of where it is.
+sys.path.insert(0, os.path.abspath(lambda_function_path))
+from lambda_function import analyze_meal
+from helpers import send_to_django
 
 @pytest.fixture
 def go_to_lambda_dir():
@@ -115,7 +120,6 @@ def test_lambda_full(go_to_lambda_dir):
     print("END")
 
 def test_lambda_send_to_django(sample_lambda_output, requests_mock):
-
     correct_mock_url='https://127.0.0.1/bot/lambda_webhook/'
     requests_mock.post(correct_mock_url, json={})
 
@@ -133,7 +137,6 @@ def test_lambda_send_to_django(sample_lambda_output, requests_mock):
     assert last_request.method == 'POST'
 
     # Assert headers include the correct Authorization token
-    assert last_request.headers['Authorization'] == os.getenv('LAMBDA_TO_DJANGO_API_KEY')
+    assert last_request.headers['Authorization'] == 'Bearer '+os.getenv('LAMBDA_TO_DJANGO_API_KEY')
 
     assert last_request.json() == sample_lambda_output
-
