@@ -20,6 +20,7 @@ def send_whatsapp_message(recipient, message):
         "text": {"body": message},
     }
 
+    #The Whatsapp api url contains the phone number that we use to send messages to users
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
 
