@@ -47,29 +47,3 @@ def add_meal_to_db(dict_from_lambda, whatsapp_id):
     )
 
     return diary.calories
-
-
-
-
-    new_calories = round(dict_from_lambda['total_nutrition']['calories'])
-    
-    #get the user instance
-    user_id = 1
-    user = CustomUser.objects.get(id=user_id)
-
-    # Get the current date for the user
-    current_datetime = timezone.now()
-    user_tz = pytz.timezone(user.time_zone)
-    aware_current_datetime = current_datetime.astimezone(user_tz)
-
-    local_date = aware_current_datetime.date()
-    # Search for an existing meal for this date
-        # if does not exist, create meal
-    meal, created = Meal.objects.get_or_create(
-        custom_user = user,
-        local_date = local_date
-    )
-
-    # add meal to today's meal
-    meal.calories += new_calories
-    return
