@@ -10,6 +10,12 @@ class Diary(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='diaries')
     local_date = models.DateField(editable=False)
 
+    def save(self, *args, **kwargs):
+        if not self.id: #Only set these things on creation
+            #Get the user's date from their model
+            self.local_date = self.custom_user.current_date
+        super().save(*args, **kwargs)
+
     @property
     def calories(self):
         total_calories = self.meals.aggregate(total_calories=Sum('calories'))['total_calories'] or 0
