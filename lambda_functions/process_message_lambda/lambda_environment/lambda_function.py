@@ -51,9 +51,9 @@ def lambda_handler(event, context):
                         f"Carbs: {round(dish['nutrition']['carbs'])} g, "
                         f"Protein: {round(dish['nutrition']['protein'])} g, "
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
-
-    send_to_django(response)
+    
     send_whatsapp_message(sender, text_reply)
+    send_to_django(response)
     print('Tried to send meal message.')
 
     return {
