@@ -64,14 +64,15 @@ def food_processing_lambda_webhook(request):
         
         try:
             calories = add_meal_to_db(payload, whatsapp_id)
+            logger.warning(f'User {whatsapp_id} at {calories} calories today')
+            logger.warning(calories)
+
+            # send a whatsapp with the daily totals
         except:
             logger.warning(f"Error adding meal to database")
             return JsonResponse({'error': 'user not found'}, status=404)
         
         return JsonResponse({'message': 'OK'}, status=200)
-
-        # send a whatsapp message with the meal info
-        # send a whatsapp with the daily totals
 
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
