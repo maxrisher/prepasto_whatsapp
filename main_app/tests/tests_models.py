@@ -1,11 +1,15 @@
 from django.test import TestCase
 from django.utils import timezone
+
 from custom_users.models import CustomUser
 from ..models import Diary
+
 import pytz
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import logging
 
+logger = logging.getLogger('main_app')
 class DiaryModelTest(TestCase):
 
     def setUp(self):
@@ -29,12 +33,12 @@ class DiaryModelTest(TestCase):
         # Get the user's timezone
         user_timezone = pytz.timezone(self.user.time_zone)
 
-        print(user_timezone)
+        logger.info(user_timezone)
         
         # Calculate expected local date
         expected_local_date = timezone.now().astimezone(user_timezone).date()
 
-        print(expected_local_date)
+        logger.info(expected_local_date)
         
         # Assert that the local_date is correctly set
         self.assertEqual(diary.local_date, expected_local_date)
@@ -81,7 +85,8 @@ class DiaryTimezoneTest(TestCase):
     def test_diary_dates_different_timezones(self):
         # Set a specific UTC datetime where the two timezones are on different dates - just before midnight in UTC
         utc_time = timezone.now()
-        print(utc_time)
+        logger.info("UTC time is:")
+        logger.info(utc_time)
 
         # Create Diary instances without saving to DB initially
         diary_gmt_minus_12 = Diary(
@@ -111,8 +116,15 @@ class DiaryTimezoneTest(TestCase):
         gmt_minus_12_timezone = pytz.timezone("Etc/GMT+12")
         kiritimati_timezone = pytz.timezone("Pacific/Kiritimati")
 
+        # Get our dates from either side of the IDL
         expected_local_date_gmt_minus_12 = utc_time.astimezone(gmt_minus_12_timezone).date()
         expected_local_date_kiritimati = utc_time.astimezone(kiritimati_timezone).date()
+
+        #Log the times on either side of the date line
+        logger.info("Etc/GMT+12 time is:")
+        logger.info(utc_time.astimezone(gmt_minus_12_timezone))
+        logger.info("Pacific/Kiritimati time is:")
+        logger.info(utc_time.astimezone(kiritimati_timezone))
 
         # Ensure that the local dates are different
         self.assertNotEqual(expected_local_date_gmt_minus_12, expected_local_date_kiritimati)
