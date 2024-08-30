@@ -36,7 +36,9 @@ def webhook(request):
             user_wa_id = request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
             message_id = request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]
             logger.warning("Relevant info:")
-            logger.warning(user_wa_id, message_id, message_text)
+            logger.warning(user_wa_id,)
+            logger.warning(message_id)
+            logger.warning(message_text)
 
         except (KeyError, IndexError) as err:
             logger.warning("This message was not a simple text message from a user")
