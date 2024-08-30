@@ -42,7 +42,7 @@ def webhook(request):
             FunctionName='prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28',
             InvocationType='Event',
             Payload=json_payload,
-            Qualifier='production'
+            Qualifier=os.getenv('LAMBDA_ALIAS')
         )
     
     return HttpResponse('OK', status=200)
