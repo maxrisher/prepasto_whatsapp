@@ -32,9 +32,9 @@ def webhook(request):
         logger.warning(request_body_dict)
 
         try:
-            message_text = request_body_dict["entry"][0]['changes'][0]['value']['messages']['text']['body']
-            user_wa_id = request_body_dict["entry"][0]['changes'][0]['value']['contacts']['wa_id']
-            message_id = request_body_dict["entry"][0]['changes'][0]['value']['messages']['id']
+            message_text = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body']
+            user_wa_id = request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
+            message_id = request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]
             logger.warning("Relevant info:")
             logger.warning(user_wa_id, message_id, message_text)
 
