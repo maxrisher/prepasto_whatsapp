@@ -13,24 +13,34 @@ logger = logging.getLogger('whatsapp_bot')
 # A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
 def webhook(request):
-    
+    # This method is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
         mode = request.GET.get('hub.mode')
         token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
-
         if mode == 'subscribe' and token == os.getenv('WHATSAPP_VERIFY_TOKEN'):
             return HttpResponse(challenge, status=200)
-        
         else:
             return HttpResponse('Forbidden', status=403)
     
+    # This is where messages from users go
     if request.method == 'POST':
         
         request_body_dict = json.loads(request.body)
 
         logger.warning("Message body:")
         logger.warning(request_body_dict)
+
+        try:
+            message_text = request_body_dict["entry"][0]['changes'][0]['value']['messages']['text']['body']
+            user_wa_id = request_body_dict["entry"][0]['changes'][0]['value']['contacts']['wa_id']
+            message_id = request_body_dict["entry"][0]['changes'][0]['value']['messages']['id']
+            logger.warning("Relevant info:")
+            logger.warning(user_wa_id, message_id, message_text)
+
+        except (KeyError, IndexError) as err:
+            logger.warning("This message was not a simple text message from a user")
+            return JsonResponse({'status': 'ignored', 'reason': 'not relevant data'}, status=200)
 
         json_payload = json.dumps(request_body_dict)
 
@@ -45,7 +55,7 @@ def webhook(request):
             Qualifier=os.getenv('LAMBDA_ALIAS')
         )
     
-    return HttpResponse('OK', status=200)
+    return JsonResponse({'status': 'success'}, status=200)
     
 # A webhook to receive processed meal information from the lambda
 @csrf_exempt
