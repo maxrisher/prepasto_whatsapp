@@ -1,4 +1,5 @@
 # prepasto_whatsapp
+## whatsapp_bot
 
 # Django hosted on railway
 
@@ -26,6 +27,7 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 ## general
 - Handle users changing timezones
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
+- index the direction and timestamp fields for better query performance of messages
 
 ## security
 - Turn off debug on production django site

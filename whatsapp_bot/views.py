@@ -7,6 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .utils import send_whatsapp_message, add_meal_to_db
+from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -32,13 +33,21 @@ def webhook(request):
         logger.warning(request_body_dict)
 
         try:
-            message_text = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body']
-            user_wa_id = request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"]
-            message_id = request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]
+            message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
+            user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
+            message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
             logger.warning("Relevant info:")
-            logger.warning(user_wa_id,)
+            logger.warning(user_wa_id)
             logger.warning(message_id)
             logger.warning(message_text)
+
+            whatsapp_user = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
+            whatsapp_message = WhatsappMessage.objects.create(
+                whatsapp_user=whatsapp_user,
+                whatsapp_message_id=message_id,
+                content=message_text,
+                direction='IN'
+            )
 
         except (KeyError, IndexError) as err:
             logger.warning("This message was not a simple text message from a user")
