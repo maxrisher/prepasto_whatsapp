@@ -41,7 +41,7 @@ def webhook(request):
             logger.warning(message_id)
             logger.warning(message_text)
 
-            whatsapp_user = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
+            whatsapp_user, created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
             whatsapp_message = WhatsappMessage.objects.create(
                 whatsapp_user=whatsapp_user,
                 whatsapp_message_id=message_id,
