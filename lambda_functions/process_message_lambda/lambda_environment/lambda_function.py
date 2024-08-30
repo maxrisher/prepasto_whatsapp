@@ -1,12 +1,11 @@
 import json
-import asyncio
 import os
 import requests
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict
 
 from llm_utils import dish_to_categories, select_food_code, get_food_grams, dish_list_from_log
-from helpers import calculate_nutrition
+from helpers import calculate_nutrition, send_to_django
 
 def send_whatsapp_message(recipient, message):
     headers = {
@@ -21,6 +20,7 @@ def send_whatsapp_message(recipient, message):
         "text": {"body": message},
     }
 
+    #The Whatsapp api url contains the phone number that we use to send messages to users
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
 
@@ -51,17 +51,15 @@ def lambda_handler(event, context):
                         f"Carbs: {round(dish['nutrition']['carbs'])} g, "
                         f"Protein: {round(dish['nutrition']['protein'])} g, "
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
-
+    
     send_whatsapp_message(sender, text_reply)
+    send_to_django(response)
     print('Tried to send meal message.')
 
     return {
         'statusCode': 200,
         'body': json.dumps('All good bro!')
     }
-
-
-###NEW###
 
 class Dish:
   def __init__(self, name: str, usual_ing: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):

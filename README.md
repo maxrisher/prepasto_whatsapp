@@ -12,6 +12,7 @@ Deployment:
 - from the top level directory run: sam build --use-container
 - run: sam build
 - go through the menus
+- You need to update the RAILWAY_PUBLIC_DOMAIN in the lambda to reflect either production or staging depending on what's needed
 
 Environmental variables: NB that the lambda code requires environmental variables. You need to input these directly into the AWS management console by hand. To update the variables in the staging or production lambda versions **you must redeploy the lambdas**
 
@@ -22,12 +23,20 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 # Testing
 
 # TODOs:
-- Get a LEGIT whatsapp account (!)
-- integrate AWS layers into the testing environment
-- Should I try to have all tests (django and pytest) run when I call pytest?
+## general
+- Handle users changing timezones
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
+
+## security
+- Turn off debug on production django site
+- Improve authentication method for django lambda webhook
 
 # Useful links
 ## Whatsapp
 Sending messages: https://developers.facebook.com/docs/whatsapp/cloud-api/guides/send-messages
 postman: https://www.postman.com/meta/whatsapp-business-platform/overview
+
+# Env variables
+- Railway
+- .env local file
+- aws lambda

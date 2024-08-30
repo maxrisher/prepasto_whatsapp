@@ -3,13 +3,14 @@ import os
 import boto3
 import logging
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .utils import send_whatsapp_message
+from .utils import send_whatsapp_message, add_meal_to_db
 
 logger = logging.getLogger('whatsapp_bot')
 
+# A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
 def webhook(request):
     
@@ -45,20 +46,33 @@ def webhook(request):
         )
     
     return HttpResponse('OK', status=200)
-
-def process_message(received_text):
-    # here we generate a response based on what was sent
-    return f'When you said "{received_text}", I literally farted!'
-
+    
+# A webhook to receive processed meal information from the lambda
 @csrf_exempt
-def callback(request):
+def food_processing_lambda_webhook(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        api_key = request.headers.get('Authorization')
 
-        logger.debug('This is a debug message')
-        logger.info('This is an info message')
-        logger.warning('This is a warning message')
-        logger.error('This is an error message')
-        logger.critical('This is a critical message')
+        if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
+            return JsonResponse({'error': 'Invalid API key'}, status=403)
         
-        return HttpResponse('OK', status=200)
+        payload = json.loads(request.body)
+        logger.warning("Payload received at lambda webhook:")
+        logger.warning(payload)
+
+        whatsapp_id = '17204768288'
+        
+        try:
+            calories = add_meal_to_db(payload, whatsapp_id)
+            logger.warning(f'User {whatsapp_id} at {calories} calories today')
+            logger.warning(calories)
+
+            # send a whatsapp with the daily totals
+        except:
+            logger.warning(f"Error adding meal to database")
+            return JsonResponse({'error': 'user not found'}, status=404)
+        
+        return JsonResponse({'message': 'OK'}, status=200)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

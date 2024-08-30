@@ -1,5 +1,7 @@
 import re
 import pandas as pd
+import requests
+import os
 
 def get_answer_str(response_content):
     print(response_content)
@@ -64,3 +66,18 @@ def food_portion_to_csv(category_code_int):
     filtered_portions = filtered_portions[["food","portion","grams"]]
     portions_csv = filtered_portions.to_csv(index=False)
     return portions_csv
+
+# sends a post request to the backend webhook which collects lambda responses
+def send_to_django(dict):
+    headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
+    url='https://'+os.getenv('RAILWAY_PUBLIC_DOMAIN')+'/bot/lambda_webhook/'
+    print("url here: "+url)
+
+    request = requests.post(url=url, 
+                            json=dict,
+                            headers=headers)
+    
+    #Ned to add something about what to do if the request is bad
+    dj_response = request.json()
+
+    print(dj_response)

@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-
+from django.utils import timezone
 from django.conf import settings
+
+import pytz
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -67,3 +69,10 @@ class CustomUser(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+    
+    @property
+    def current_date(self):
+        user_tz = pytz.timezone(self.time_zone)
+        now = timezone.now()
+        now_date = now.astimezone(user_tz).date()
+        return now_date
