@@ -39,7 +39,7 @@ class CustomUser(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    # we want these in the following format: +17204768288
+    # we want these in the following format: 17204768288
     phone = models.CharField(max_length=15, blank=True, null=True)
     #This will default to our application's default TIME_ZONE unless a session calls timezone.activate()
     time_zone = models.CharField(max_length=50, default=settings.TIME_ZONE)
