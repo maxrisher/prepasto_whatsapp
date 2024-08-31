@@ -5,8 +5,9 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.db import transaction
 
-from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, handle_delete_meal_request
+from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, handle_delete_meal_request, send_meal_whatsapp_message
 from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
@@ -132,7 +133,7 @@ def food_processing_lambda_webhook(request):
     # C) send updated daily total
         if whatsapp_user.user is not None:
             logger.info("I'm creating a new meal for a USER")
-            handle_user_new_meal(payload, whatsapp_id)
+            handle_user_new_meal(payload, whatsapp_user.user)
     #STEP 5: else, send simple meal text message
         else:
             logger.info("I'm creating a new meal for a NON user")
@@ -141,10 +142,18 @@ def food_processing_lambda_webhook(request):
         return JsonResponse({'message': 'OK'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    
-def handle_user_new_meal(payload, whatsapp_id):
-    add_meal_to_db(payload, whatsapp_id)
-    return
+
+@transaction.atomic
+def handle_user_new_meal(payload, custom_user):
+    # A) gets or creates diary 
+    # B) creates meal
+    diary, meal = add_meal_to_db(payload, custom_user)
+
+    # Sends a whatsapp message with a 'delete' option
+    send_meal_whatsapp_message(custom_user.phone, meal.text_summary, meal.id)
+
+    # Sends a whatsapp message with the daily total nutrition
+    diary.send_daily_total()
 
 def handle_anonymous_new_meal():
     return

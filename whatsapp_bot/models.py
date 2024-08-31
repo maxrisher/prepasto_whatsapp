@@ -27,6 +27,7 @@ class WhatsappMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     direction = models.CharField(max_length=3, choices=DIRECTION_CHOICES)
     in_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
+    button_id = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return f"{self.direction} message for {self.whatsapp_user} at {self.timestamp}"

@@ -30,7 +30,12 @@ def send_whatsapp_message(recipient, message):
     logger.warning(response.json())
     return response.json()
 
+@transaction.atomic
 def send_meal_whatsapp_message(recipient, message_text, button_id):
+    #STEP 1: Craft a message
+    # fetch our site's whatsapp user object
+    prepasto_user = WhatsappUser.objects.get_or_create(phone_number='14153476103')
+
     button_dict = {
         "type": "button",
         "body": {
@@ -61,9 +66,21 @@ def send_meal_whatsapp_message(recipient, message_text, button_id):
         "interactive": button_dict,
     }
 
+    #STEP 2: send our message
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
-    logger.warning(response.json())
-    return response.json()
+
+    #Step 3: add our sent message to the database
+    dict_response = response.json()
+    sent_message_id = dict_response['messages'][0]['id']
+    logger.info(dict_response)
+
+    sent_message = WhatsappMessage.objects.create(whatsapp_user=prepasto_user,
+                                                  whatsapp_message_id=sent_message_id,
+                                                  content=message_text,
+                                                  direction='OUT',
+                                                  button_id=button_id)
+
+    return sent_message
 
 def send_to_lambda(request_body_dict):
     json_payload = json.dumps(request_body_dict)
@@ -80,22 +97,21 @@ def send_to_lambda(request_body_dict):
     )
     return
 
-def add_meal_to_db(dict_from_lambda, whatsapp_id):
+# A) Extracts all meal information from labda dict 
+# B) creates a Meal object for this 
+# C) adds it to a custom_user's diary
+# Returns the diary and meal.
+def add_meal_to_db(dict_from_lambda, custom_user):
     meal_totals = dict_from_lambda.get('total_nutrition')
     calories = round(meal_totals.get('calories', 0))
     fat = round(meal_totals.get('fat', 0))
     carbs = round(meal_totals.get('carbs', 0))
     protein = round(meal_totals.get('protein', 0))
-
-    try:
-        user = CustomUser.objects.get(phone=whatsapp_id)
-    except CustomUser.DoesNotExist:
-        raise ValueError(f"User with WhatsApp ID {whatsapp_id} does not exist.")
     
-    diary, created = Diary.objects.get_or_create(custom_user=user, local_date=user.current_date)
+    diary, created = Diary.objects.get_or_create(custom_user=custom_user, local_date=custom_user.current_date)
 
     new_meal = Meal.objects.create(
-        custom_user=user,
+        custom_user=custom_user,
         diary=diary,
         calories=calories,
         carbs=carbs,
@@ -103,9 +119,7 @@ def add_meal_to_db(dict_from_lambda, whatsapp_id):
         protein=protein
     )
 
-    send_whatsapp_message(whatsapp_id, f'That meal had {new_meal.calories} calories.')
-
-    return diary.calories
+    return diary, new_meal
 
 # This finds a meal object referenced by a user and deletes it
 # The database operations here are all or nothing
