@@ -31,22 +31,24 @@ def send_whatsapp_message(recipient, message):
     return response.json()
 
 @transaction.atomic
-def send_meal_whatsapp_message(recipient, message_text, button_id):
+def send_meal_whatsapp_message(recipient, meal_id):
     #STEP 1: Craft a message
     # fetch our site's whatsapp user object
     prepasto_user = WhatsappUser.objects.get_or_create(phone_number='14153476103')
 
+    new_meal = Meal.objects.get(id=meal_id)
+
     button_dict = {
         "type": "button",
         "body": {
-        "text": message_text
+        "text": new_meal.text_summary
         },
         "action": {
             "buttons": [
                 {
                 "type": "reply",
                 "reply": {
-                        "id": button_id,
+                        "id": new_meal.id,
                         "title": settings.MEAL_DELETE_BUTTON_TEXT
                     }
                 }
@@ -76,11 +78,9 @@ def send_meal_whatsapp_message(recipient, message_text, button_id):
 
     sent_message = WhatsappMessage.objects.create(whatsapp_user=prepasto_user,
                                                   whatsapp_message_id=sent_message_id,
-                                                  content=message_text,
+                                                  content=new_meal.text_summary,
                                                   direction='OUT',
-                                                  button_id=button_id)
-
-    return sent_message
+                                                  meal=new_meal)
 
 def send_to_lambda(request_body_dict):
     json_payload = json.dumps(request_body_dict)

@@ -150,7 +150,7 @@ def handle_user_new_meal(payload, custom_user):
     diary, meal = add_meal_to_db(payload, custom_user)
 
     # Sends a whatsapp message with a 'delete' option
-    send_meal_whatsapp_message(custom_user.phone, meal.text_summary, meal.id)
+    send_meal_whatsapp_message(custom_user.phone, meal.id)
 
     # Sends a whatsapp message with the daily total nutrition
     diary.send_daily_total()

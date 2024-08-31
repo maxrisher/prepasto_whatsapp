@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 
+from main_app.models import Meal
+
 class WhatsappUser(models.Model):
     phone_number = models.CharField(max_length=20, unique=True)
     whatsapp_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
@@ -27,7 +29,7 @@ class WhatsappMessage(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     direction = models.CharField(max_length=3, choices=DIRECTION_CHOICES)
     in_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
-    button_id = models.CharField(max_length=255, unique=True)
+    meal = models.OneToOneField(Meal, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"{self.direction} message for {self.whatsapp_user} at {self.timestamp}"

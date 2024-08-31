@@ -17,6 +17,9 @@ class Diary(models.Model):
             self.local_date = self.custom_user.current_date
         super().save(*args, **kwargs)
 
+    class Meta:
+        unique_together = ('custom_user', 'local_date')
+
     @property
     def calories(self):
         total_calories = self.meals.aggregate(total_calories=Sum('calories'))['total_calories'] or 0
@@ -24,9 +27,6 @@ class Diary(models.Model):
     
     def send_daily_total(self):
         send_whatsapp_message(self.custom_user.phone, f"Your daily calorie total is: {self.calories}")
-
-    class Meta:
-        unique_together = ('custom_user', 'local_date')
 
 class Meal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
