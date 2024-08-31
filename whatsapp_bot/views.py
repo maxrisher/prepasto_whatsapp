@@ -93,11 +93,14 @@ def is_delete_request(request_body_dict):
     try:
         button_title = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
         if button_title == 'DELETE this meal.':
+            logger.info("This message WAS a button press. It WAS delete request")
             return True
+        else:
+            logger.info("This message WAS a button press. It was NOT a delete request")
+            return False
     except KeyError as e:
+        logger.info("This message was NOT a button press")
         return False
-    return False
-
 
 
 
