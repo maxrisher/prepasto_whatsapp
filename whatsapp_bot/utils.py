@@ -75,6 +75,7 @@ def send_meal_whatsapp_message(recipient, meal_id):
     dict_response = response.json()
     sent_message_id = dict_response['messages'][0]['id']
     logger.info(dict_response)
+    logger.info(dict_response['messages'])
 
     sent_message = WhatsappMessage.objects.create(whatsapp_user=prepasto_user,
                                                   whatsapp_message_id=sent_message_id,
