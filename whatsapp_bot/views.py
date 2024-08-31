@@ -36,16 +36,20 @@ def webhook(request):
             whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
 
             if user_was_created:
+                logger.info("New user, I'm onboarding them.")
                 send_onboarding_message(user_wa_id)
                 return JsonResponse({'status': 'success'}, status=200)
             
             # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
             elif is_delete_request(request_body_dict):
+                logger.info("Request to delete, attempting to delete a meal.")
                 delete_requested_meal(request_body_dict)
                 return JsonResponse({'status': 'success'}, status=200)
 
             # Step 4: process the message as a food log
             else:
+                logger.info("Normal message, attempting to analyze it as meal.")
+
                 message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
                 message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
 
@@ -83,6 +87,12 @@ def send_onboarding_message(user_wa_id):
     return
 
 def is_delete_request(request_body_dict):
+    try:
+        button_title = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
+        if button_title == 'DELETE this meal.':
+            return True
+    except KeyError as e:
+        return False
     return False
 
 
