@@ -113,7 +113,7 @@ def add_meal_to_db(dict_from_lambda, custom_user):
 
     current_date = custom_user.current_date
     
-    diary, created = Diary.objects.get_or_create(custom_user=custom_user, local_date=current_date)
+    diary, created = Diary.objects.get_or_create(custom_user=custom_user)
 
     new_meal = Meal.objects.create(
         custom_user=custom_user,
