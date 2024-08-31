@@ -111,7 +111,8 @@ def add_meal_to_db(dict_from_lambda, whatsapp_id):
 # The database operations here are all or nothing
 @transaction.atomic
 def handle_delete_meal_request(request_body_dict, whatsapp_user):
-
+    logger.log('whatsapp_user.whatsapp_id')
+    logger.log(whatsapp_user.whatsapp_id)
     #Step 1: test if the user has an account
     if whatsapp_user.user is None:
         send_whatsapp_message(whatsapp_user.whatsapp_id, "You don't have an account. You cannot delete meals.")
