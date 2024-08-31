@@ -10,6 +10,7 @@ from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
+# CATCH MESSAGES FROM WHATSAPP
 # A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
 def webhook(request):
@@ -41,9 +42,9 @@ def webhook(request):
                 return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
             
             # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
-            elif is_delete_request(request_body_dict, whatsapp_user):
+            elif is_delete_request(request_body_dict):
                 logger.info("Request to delete, attempting to delete a meal.")
-                handle_delete_meal_request(request_body_dict)
+                handle_delete_meal_request(request_body_dict, whatsapp_user)
                 return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
             # Step 4: process the message as a food log
@@ -102,6 +103,7 @@ def is_delete_request(request_body_dict):
     return False
 
 
+# CATCH MESSAGES FROM LAMBDA
 # A webhook to receive processed meal information from the lambda
 @csrf_exempt
 def food_processing_lambda_webhook(request):
