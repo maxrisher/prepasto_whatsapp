@@ -114,29 +114,37 @@ def food_processing_lambda_webhook(request):
         if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
     
-    #STEP 2: process the payload
+    #STEP 2: test for lambda internal errors
+
+
+    #STEP 3: process the payload
         payload = json.loads(request.body)
+        whatsapp_id = '17204768288'
+        message_id = 'some_message_id'
         logger.warning("Payload received at lambda webhook:")
         logger.warning(payload)
 
-        whatsapp_id = '17204768288'
+        whatsapp_user = WhatsappUser.objects.get(whatsapp_id=whatsapp_id)
 
-    #STEP 3: if CustomUser model exists: 
+    #STEP 4: if CustomUser model exists: 
     # A) add meal to db 
     # B) send button message 
     # C) send updated daily total
-        try:
-            calories = add_meal_to_db(payload, whatsapp_id)
-            logger.warning(f'User {whatsapp_id} at {calories} calories today')
-            logger.warning(calories)
-
-            # send a whatsapp with the daily totals
-        except:
-            logger.warning(f"Error adding meal to database")
-            return JsonResponse({'error': 'user not found'}, status=404)
+        if whatsapp_user.user is not None:
+            logger.log("I'm creating a new meal for a USER")
+            handle_user_new_meal(payload, whatsapp_id)
+    #STEP 5: else, send simple meal text message
+        else:
+            logger.log("I'm creating a new meal for a NON user")
+            handle_anonymous_new_meal()
     
-    #STEP 4: else, send simple meal text message
         return JsonResponse({'message': 'OK'}, status=200)
-
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+def handle_user_new_meal(payload, whatsapp_id):
+    add_meal_to_db(payload, whatsapp_id)
+    return
+
+def handle_anonymous_new_meal():
+    return
