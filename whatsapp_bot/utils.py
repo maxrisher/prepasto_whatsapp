@@ -2,6 +2,7 @@ import requests
 import os
 import boto3
 import logging
+import json
 
 from django.utils import timezone
 
@@ -27,7 +28,9 @@ def send_whatsapp_message(recipient, message):
     logger.warning(response.json())
     return response.json()
 
-def send_to_lambda(json_payload):
+def send_to_lambda(request_body_dict):
+    json_payload = json.dumps(request_body_dict)
+
     lambda_client = boto3.client('lambda', 
                                     region_name=os.getenv('AWS_REGION'),
                                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
