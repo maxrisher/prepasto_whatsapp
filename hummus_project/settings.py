@@ -165,3 +165,6 @@ SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
 
 # Railway forces https already. Trust headers from the reverse proxy.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+#Constants for the site
+MEAL_DELETE_BUTTON_TEXT = 'DELETE this meal.'

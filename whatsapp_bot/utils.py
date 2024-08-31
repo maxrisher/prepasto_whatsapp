@@ -4,7 +4,7 @@ import boto3
 import logging
 import json
 
-from django.utils import timezone
+from django.conf import settings
 from django.db import transaction
 
 from main_app.models import Meal, Diary
@@ -24,6 +24,41 @@ def send_whatsapp_message(recipient, message):
         "to": recipient,
         "type": "text",
         "text": {"body": message},
+    }
+
+    response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
+    logger.warning(response.json())
+    return response.json()
+
+def send_meal_whatsapp_message(recipient, message_text, button_id):
+    button_dict = {
+        "type": "button",
+        "body": {
+        "text": message_text
+        },
+        "action": {
+            "buttons": [
+                {
+                "type": "reply",
+                "reply": {
+                        "id": button_id,
+                        "title": MEAL_DELETE_BUTTON_TEXT
+                    }
+                }
+            ]
+        }
+    }
+    
+    headers = {
+        "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
+        "Content-Type": "application/json",
+    }
+
+    data = data = {
+        "messaging_product": "whatsapp",
+        "to": recipient,
+        "type": "interactive",
+        "interactive": button_dict,
     }
 
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)

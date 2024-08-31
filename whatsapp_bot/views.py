@@ -4,6 +4,7 @@ import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, handle_delete_meal_request
 from .models import WhatsappMessage, WhatsappUser
@@ -93,7 +94,7 @@ def send_onboarding_message(user_wa_id):
 def is_delete_request(request_body_dict):
     try:
         button_title = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
-        if button_title == 'DELETE this meal.':
+        if button_title == MEAL_DELETE_BUTTON_TEXT:
             logger.info("This message WAS a button press. It WAS delete request")
             return True
         else:
