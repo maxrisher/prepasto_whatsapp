@@ -137,7 +137,7 @@ def food_processing_lambda_webhook(request):
     #STEP 5: else, send simple meal text message
         else:
             logger.info("I'm creating a new meal for a NON user")
-            handle_anonymous_new_meal()
+            handle_anonymous_new_meal(payload, whatsapp_id)
     
         return JsonResponse({'message': 'OK'}, status=200)
     else:
@@ -155,5 +155,7 @@ def handle_user_new_meal(payload, custom_user):
     # Sends a whatsapp message with the daily total nutrition
     diary.send_daily_total()
 
-def handle_anonymous_new_meal():
-    return
+def handle_anonymous_new_meal(dict_from_lambda, whatsapp_id):
+    meal_totals = dict_from_lambda.get('total_nutrition')
+    calories = round(meal_totals.get('calories', 0))
+    send_whatsapp_message(whatsapp_id, "DJANGO meal summary. Meal calories: {calories}")

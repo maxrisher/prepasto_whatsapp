@@ -25,6 +25,7 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 
 # TODOs:
 ## general
+- Update testing of main app models
 - Rotate secrets
 - Handle users changing timezones
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"

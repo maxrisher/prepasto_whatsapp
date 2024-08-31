@@ -48,7 +48,7 @@ def send_meal_whatsapp_message(recipient, meal_id):
                 {
                 "type": "reply",
                 "reply": {
-                        "id": new_meal.id,
+                        "id": str(new_meal.id),
                         "title": settings.MEAL_DELETE_BUTTON_TEXT
                     }
                 }
