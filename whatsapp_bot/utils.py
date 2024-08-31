@@ -1,6 +1,6 @@
 import requests
 import os
-import pytz
+import boto3
 
 from django.utils import timezone
 
@@ -22,6 +22,19 @@ def send_whatsapp_message(recipient, message):
 
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
     return response.json()
+
+def send_to_lambda(json_payload):
+    lambda_client = boto3.client('lambda', 
+                                    region_name=os.getenv('AWS_REGION'),
+                                    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                                    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
+    lambda_client.invoke(
+        FunctionName='prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28',
+        InvocationType='Event',
+        Payload=json_payload,
+        Qualifier=os.getenv('LAMBDA_ALIAS')
+    )
+    return
 
 def add_meal_to_db(dict_from_lambda, whatsapp_id):
     meal_totals = dict_from_lambda.get('total_nutrition')

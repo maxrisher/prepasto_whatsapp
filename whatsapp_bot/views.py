@@ -1,12 +1,11 @@
 import json
 import os
-import boto3
 import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .utils import send_whatsapp_message, add_meal_to_db
+from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda
 from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
@@ -26,12 +25,13 @@ def webhook(request):
     
     # This is where messages from users go
     if request.method == 'POST':
-        
+        # load the request as a python dict
         request_body_dict = json.loads(request.body)
 
         logger.warning("Message body:")
         logger.warning(request_body_dict)
 
+        #Try to extract the information from a text message; will error if we don't have a simple text message
         try:
             message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
             user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
@@ -42,6 +42,8 @@ def webhook(request):
             logger.warning(message_text)
 
             whatsapp_user, created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
+            # if created send welcome message and do nothing
+            
             whatsapp_message = WhatsappMessage.objects.create(
                 whatsapp_user=whatsapp_user,
                 whatsapp_message_id=message_id,
@@ -53,20 +55,15 @@ def webhook(request):
             logger.warning("This message was not a simple text message from a user")
             return JsonResponse({'status': 'ignored', 'reason': 'not relevant data'}, status=200)
 
+        # Now that we know it's a simple text message, lets turn it back into a string to send to the lambda
         json_payload = json.dumps(request_body_dict)
-
-        lambda_client = boto3.client('lambda', 
-                                     region_name=os.getenv('AWS_REGION'),
-                                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
-        lambda_client.invoke(
-            FunctionName='prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28',
-            InvocationType='Event',
-            Payload=json_payload,
-            Qualifier=os.getenv('LAMBDA_ALIAS')
-        )
-    
-    return JsonResponse({'status': 'success'}, status=200)
+        # Send the json payload to the lambda
+        send_to_lambda(json_payload)
+        # Notify users we're working on it
+        send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
+        return JsonResponse({'status': 'success'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
     
 # A webhook to receive processed meal information from the lambda
 @csrf_exempt
