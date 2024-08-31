@@ -131,11 +131,11 @@ def food_processing_lambda_webhook(request):
     # B) send button message 
     # C) send updated daily total
         if whatsapp_user.user is not None:
-            logger.log("I'm creating a new meal for a USER")
+            logger.info("I'm creating a new meal for a USER")
             handle_user_new_meal(payload, whatsapp_id)
     #STEP 5: else, send simple meal text message
         else:
-            logger.log("I'm creating a new meal for a NON user")
+            logger.info("I'm creating a new meal for a NON user")
             handle_anonymous_new_meal()
     
         return JsonResponse({'message': 'OK'}, status=200)
