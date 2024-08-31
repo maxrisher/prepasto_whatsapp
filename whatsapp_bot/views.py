@@ -42,7 +42,10 @@ def webhook(request):
             logger.warning(message_text)
 
             whatsapp_user, created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
-            # if created send welcome message and do nothing
+
+            if created:
+                send_whatsapp_message(user_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
+                return JsonResponse({'status': 'success'}, status=200)
             
             whatsapp_message = WhatsappMessage.objects.create(
                 whatsapp_user=whatsapp_user,
@@ -57,10 +60,13 @@ def webhook(request):
 
         # Now that we know it's a simple text message, lets turn it back into a string to send to the lambda
         json_payload = json.dumps(request_body_dict)
+
         # Send the json payload to the lambda
         send_to_lambda(json_payload)
+
         # Notify users we're working on it
         send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
+
         return JsonResponse({'status': 'success'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
