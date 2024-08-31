@@ -63,4 +63,6 @@ def add_meal_to_db(dict_from_lambda, whatsapp_id):
         protein=protein
     )
 
+    send_whatsapp_message(whatsapp_id, f'That meal had {new_meal.calories} calories.')
+
     return diary.calories
