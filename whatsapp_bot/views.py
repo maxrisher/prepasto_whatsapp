@@ -60,6 +60,7 @@ def webhook(request):
                     content=message_text,
                     direction='IN'
                 )
+                logger.info(whatsapp_message)
 
                 # Send the json payload to the lambda
                 send_to_lambda(request_body_dict)
@@ -74,6 +75,7 @@ def webhook(request):
             logger.error("Invalid JSON payload in webhook")
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
         except Exception as e:
+            logger.error(e)
             logger.error(f'Error processing webhook: {e}')
             return JsonResponse({'error': 'Error processing webhook'}, status=400)
         
