@@ -67,6 +67,7 @@ def webhook(request):
 
                 # Notify users we're analyzing their meal
                 send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
+                return JsonResponse({'status': 'success'}, status=200)
 
         except KeyError as e:
             logger.error(f"Missing key in webhook payload: {e}")
