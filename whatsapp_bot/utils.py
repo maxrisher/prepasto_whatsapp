@@ -111,9 +111,9 @@ def add_meal_to_db(dict_from_lambda, custom_user):
     logger.info(custom_user)
     logger.info(custom_user.current_date)
 
-    current_date = custom_user.current_date
+    user_local_date = custom_user.current_date
     
-    diary, created = Diary.objects.get_or_create(custom_user=custom_user)
+    diary, created = Diary.objects.get_or_create(custom_user=custom_user, local_date=user_local_date)
 
     new_meal = Meal.objects.create(
         custom_user=custom_user,
@@ -121,7 +121,8 @@ def add_meal_to_db(dict_from_lambda, custom_user):
         calories=calories,
         carbs=carbs,
         fat=fat,
-        protein=protein
+        protein=protein,
+        local_date=user_local_date,
     )
 
     return diary, new_meal
