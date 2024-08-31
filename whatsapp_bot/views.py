@@ -43,6 +43,7 @@ def webhook(request):
 
             whatsapp_user, created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
 
+            # If we do not have any previous history with a user, give them an onboarding message.
             if created:
                 send_whatsapp_message(user_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
                 return JsonResponse({'status': 'success'}, status=200)

@@ -1,11 +1,14 @@
 import requests
 import os
 import boto3
+import logging
 
 from django.utils import timezone
 
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
+
+logger = logging.getLogger('whatsapp_bot')
 
 def send_whatsapp_message(recipient, message):
     headers = {
@@ -21,6 +24,7 @@ def send_whatsapp_message(recipient, message):
     }
 
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
+    logger.warning(response.json())
     return response.json()
 
 def send_to_lambda(json_payload):
