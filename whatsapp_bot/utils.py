@@ -5,9 +5,11 @@ import logging
 import json
 
 from django.utils import timezone
+from django.db import transaction
 
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
+from models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -70,5 +72,43 @@ def add_meal_to_db(dict_from_lambda, whatsapp_id):
 
     return diary.calories
 
-def delete_requested_meal(request_body_dict):
+# This finds a meal object referenced by a user and deletes it
+# The database operations here are all or nothing
+@transaction.atomic
+def handle_delete_meal_request(request_body_dict, whatsapp_user):
+
+    #Step 1: test if the user has an account
+    if whatsapp_user.User is None:
+        send_whatsapp_message(whatsapp_user.whatsapp_id, "You don't have an account. You cannot delete meals.")
+        return
+
+    #Step 2: collect all information needed to delete the meal
+    try:
+        # Get all the information from the button
+        button_dict = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']
+        button_id = button_dict['id']
+        button_text = button_dict['title']
+        message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
+
+        delete_request_message = WhatsappMessage.objects.create(
+            whatsapp_user=whatsapp_user,
+            whatsapp_message_id=message_id,
+            content=button_text,
+            direction='IN',
+        )
+
+        #Step 3: try to delete the meal
+        # TODO: delete associated meal object for the user
+
+        #Step 4: send confirmation of meal deletion
+        send_whatsapp_message(whatsapp_user.whatsapp_id, f'Got it. I am deleting this meal: {button_id}')
+
+    except KeyError as e:
+        logger.info("This message was NOT a button press")
+        send_whatsapp_message(whatsapp_user.whatsapp_id, "Something went wrong. I wasn't able to delete a meal.")
+    except Exception as e:
+        logger.error(f'Error deleting meal: {e}')
+        logger.error(e)
+        send_whatsapp_message(whatsapp_user.whatsapp_id, "Something went wrong. I wasn't able to delete a meal.")
+
     return

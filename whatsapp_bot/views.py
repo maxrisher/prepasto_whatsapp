@@ -5,7 +5,7 @@ import logging
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, delete_requested_meal
+from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, handle_delete_meal_request
 from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
@@ -41,10 +41,10 @@ def webhook(request):
                 return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
             
             # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
-            elif is_delete_request(request_body_dict):
+            elif is_delete_request(request_body_dict, whatsapp_user):
                 logger.info("Request to delete, attempting to delete a meal.")
-                delete_requested_meal(request_body_dict)
-                return JsonResponse({'status': 'success', 'message': 'deleted meal for user'}, status=200)
+                handle_delete_meal_request(request_body_dict)
+                return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
             # Step 4: process the message as a food log
             else:
@@ -76,8 +76,8 @@ def webhook(request):
             logger.error("Invalid JSON payload in webhook")
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
         except Exception as e:
-            logger.error(e)
             logger.error(f'Error processing webhook: {e}')
+            logger.error(e)
             return JsonResponse({'error': 'Error processing webhook'}, status=400)
         
     # If we got something other than POST or GET request
