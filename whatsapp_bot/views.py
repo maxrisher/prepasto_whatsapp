@@ -108,17 +108,23 @@ def is_delete_request(request_body_dict):
 # A webhook to receive processed meal information from the lambda
 @csrf_exempt
 def food_processing_lambda_webhook(request):
+    #STEP 1: make sure the request is POST AND AUTHENTICATED
     if request.method == 'POST':
         api_key = request.headers.get('Authorization')
         if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
-        
+    
+    #STEP 2: process the payload
         payload = json.loads(request.body)
         logger.warning("Payload received at lambda webhook:")
         logger.warning(payload)
 
         whatsapp_id = '17204768288'
-        
+
+    #STEP 3: if CustomUser model exists: 
+    # A) add meal to db 
+    # B) send button message 
+    # C) send updated daily total
         try:
             calories = add_meal_to_db(payload, whatsapp_id)
             logger.warning(f'User {whatsapp_id} at {calories} calories today')
@@ -128,7 +134,8 @@ def food_processing_lambda_webhook(request):
         except:
             logger.warning(f"Error adding meal to database")
             return JsonResponse({'error': 'user not found'}, status=404)
-        
+    
+    #STEP 4: else, send simple meal text message
         return JsonResponse({'message': 'OK'}, status=200)
 
     else:
