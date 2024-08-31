@@ -35,7 +35,7 @@ def webhook(request):
 
             # Step 2: test if this is a new user. If yes, onboard user
             user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
-            whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id)
+            whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id, whatsapp_id=user_wa_id)
 
             if user_was_created:
                 logger.info("New user, I'm onboarding them.")
