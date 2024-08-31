@@ -94,7 +94,7 @@ def send_onboarding_message(user_wa_id):
 def is_delete_request(request_body_dict):
     try:
         button_title = request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
-        if button_title == MEAL_DELETE_BUTTON_TEXT:
+        if button_title == settings.MEAL_DELETE_BUTTON_TEXT:
             logger.info("This message WAS a button press. It WAS delete request")
             return True
         else:
