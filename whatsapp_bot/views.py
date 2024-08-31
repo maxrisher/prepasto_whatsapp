@@ -38,13 +38,13 @@ def webhook(request):
             if user_was_created:
                 logger.info("New user, I'm onboarding them.")
                 send_onboarding_message(user_wa_id)
-                return JsonResponse({'status': 'success'}, status=200)
+                return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
             
             # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
             elif is_delete_request(request_body_dict):
                 logger.info("Request to delete, attempting to delete a meal.")
                 delete_requested_meal(request_body_dict)
-                return JsonResponse({'status': 'success'}, status=200)
+                return JsonResponse({'status': 'success', 'message': 'deleted meal for user'}, status=200)
 
             # Step 4: process the message as a food log
             else:
@@ -67,7 +67,7 @@ def webhook(request):
 
                 # Notify users we're analyzing their meal
                 send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
-                return JsonResponse({'status': 'success'}, status=200)
+                return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
 
         except KeyError as e:
             logger.error(f"Missing key in webhook payload: {e}")
