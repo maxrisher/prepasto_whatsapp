@@ -40,7 +40,7 @@ class Meal(models.Model):
     protein = models.IntegerField()
 
     def save(self, *args, **kwargs):
-        if not self.id: #Only set these things on creation
+        if not self.pk: #Only set these things on creation
             #Get the user's date from their model
             self.local_date = self.custom_user.current_date
         super().save(*args, **kwargs)
