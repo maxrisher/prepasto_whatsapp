@@ -158,4 +158,4 @@ def handle_user_new_meal(payload, custom_user):
 def handle_anonymous_new_meal(dict_from_lambda, whatsapp_id):
     meal_totals = dict_from_lambda.get('total_nutrition')
     calories = round(meal_totals.get('calories', 0))
-    send_whatsapp_message(whatsapp_id, "DJANGO meal summary. Meal calories: {calories}")
+    send_whatsapp_message(whatsapp_id, f"DJANGO meal summary. Meal calories: {calories}")
