@@ -9,7 +9,7 @@ from django.db import transaction
 
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
-from models import WhatsappMessage, WhatsappUser
+from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
