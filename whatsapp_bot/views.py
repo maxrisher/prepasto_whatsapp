@@ -97,11 +97,9 @@ def is_delete_request(request_body_dict):
             return True
         else:
             logger.info("This message WAS a button press. It was NOT a delete request")
-            return False
     except KeyError as e:
         logger.info("This message was NOT a button press")
-        return False
-
+    return False
 
 
 # A webhook to receive processed meal information from the lambda
