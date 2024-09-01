@@ -33,25 +33,29 @@ def lambda_handler(event, context):
     
     print(json.dumps(event))
 
+    # TODO: deffo make this async
     send_whatsapp_message(sender, "Got your message, I'm thinking on it!")
     print('Tried to send confirmation message.')
 
-    response = analyze_meal(text)
+    text_reply = '' # FIXME: maybe u can remove this? not sure about scope <3
+    try:
+        response = analyze_meal(text)
+    except Exception as e:
+       print(e)
+       send_whatsapp_message(sender, "Please try again, an error occured.")
+       return { 'statusCode': 400 }
 
-    if response is None:
-       text_reply = "Please try again, an error occured."
-    else:
-       # Build the text_reply string
-       # All of this rounding is because the numeric values are all floats by default
-        text_reply = f"Total Nutrition:\nCalories: {round(response['total_nutrition']['calories'])} kcal\nCarbs: {round(response['total_nutrition']['carbs'])} g\nProtein: {round(response['total_nutrition']['protein'])} g\nFat: {round(response['total_nutrition']['fat'])} g\n\nDishes:\n"
+    # Build the text_reply string
+    # All of this rounding is because the numeric values are all floats by default
+    # FIXME: this can be cleaned up too prob?
+    text_reply = f"Total Nutrition:\nCalories: {round(response['total_nutrition']['calories'])} kcal\nCarbs: {round(response['total_nutrition']['carbs'])} g\nProtein: {round(response['total_nutrition']['protein'])} g\nFat: {round(response['total_nutrition']['fat'])} g\n\nDishes:\n"
+    for dish in response['dishes']:
+        text_reply += (f" - {dish['name'].capitalize()} ({round(dish['grams'])} g): "
+                    f"{round(dish['nutrition']['calories'])} kcal, "
+                    f"Carbs: {round(dish['nutrition']['carbs'])} g, "
+                    f"Protein: {round(dish['nutrition']['protein'])} g, "
+                    f"Fat: {round(dish['nutrition']['fat'])} g\n")
 
-        for dish in response['dishes']:
-            text_reply += (f" - {dish['name'].capitalize()} ({round(dish['grams'])} g): "
-                        f"{round(dish['nutrition']['calories'])} kcal, "
-                        f"Carbs: {round(dish['nutrition']['carbs'])} g, "
-                        f"Protein: {round(dish['nutrition']['protein'])} g, "
-                        f"Fat: {round(dish['nutrition']['fat'])} g\n")
-    
     send_whatsapp_message(sender, text_reply)
     send_to_django(response)
     print('Tried to send meal message.')
@@ -61,8 +65,21 @@ def lambda_handler(event, context):
         'body': json.dumps('All good bro!')
     }
 
+# FIXME: classes should be in their own files
 class Dish:
-  def __init__(self, name: str, usual_ing: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):
+  """
+    TODO: docstring
+  """
+  def __init__(
+        self,
+        name: str,
+        usual_ing: List[str], # FIXME: spell out ingredients
+        state: str,
+        qualifiers: List[str],
+        confirmed_ing: List[str], # FIXME: spell out ingredients
+        amount: str, # FIXME: rename to be more specific
+        similar_dishes: List[str]
+    ):
     self.name = name
     self.usual_ing = usual_ing
     self.state = state
@@ -71,11 +88,19 @@ class Dish:
     self.amount = amount
     self.similar_dishes = similar_dishes
 
-    self.llm_responses: list[str] = ['first', 'second', 'third']
+    # FIXME: refactor this, maybe just do first, second. third response
+    self.llm_responses: List[str] = ['first', 'second', 'third']
 
+    # FIXME: label this with the full name at least in a comment
     self.wweia_cats: List[str] = None
+    
+    # FIXME: label this with the full name at least in a comment
     self.fndds_code: str = None
+
     self.grams: float = None
+
+    # FIXME: label this with more context at least in a comment
+    # and maybe an example so it's easier to ID
     self.nutrition: Dict[str, float] = None
 
   def process(self):
@@ -156,16 +181,13 @@ class Meal:
             "description": self.description
         }
     
+    # TODO: make this more clearly named
     def process(self):
         self.create_dishes()
         self.process_dishes()
         self.calculate_total_nutrition()  
 
 def analyze_meal(user_input_text):
-  try:
     new_meal = Meal(user_input_text)
     new_meal.process()
     return new_meal.get_meal_summary()
-  except Exception as e:
-    print(f"Failed to analyze meal: {e}")
-    return None
