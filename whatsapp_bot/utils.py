@@ -130,6 +130,7 @@ def add_meal_to_db(dict_from_lambda, custom_user):
 
 # This finds a meal object referenced by a user and deletes it
 # The database operations here are all or nothing
+# TODO: this should prob be async too
 @transaction.atomic
 def handle_delete_meal_request(request_body_dict, whatsapp_user):
     logger.info('whatsapp_user.whatsapp_id')

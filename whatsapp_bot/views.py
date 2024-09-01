@@ -7,20 +7,26 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.db import transaction
 
+# TODO: refactor utils to be more broken out
 from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, handle_delete_meal_request, send_meal_whatsapp_message
 from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
-# CATCH MESSAGES FROM WHATSAPP
-# A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
+# TODO: rename to be more clear
 def webhook(request):
-    # This method is just for letting facebook know that we have control over this webhook
+    """
+    This method catches messages from WhatsApp
+    A webhook to receive messages from WhatsApp and hand them off to the lambda
+    TODO: clean this up
+    """
+    # This check is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
         mode = request.GET.get('hub.mode')
         token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
+
         if mode == 'subscribe' and token == os.getenv('WHATSAPP_VERIFY_TOKEN'):
             return HttpResponse(challenge, status=200)
         else:
@@ -30,12 +36,17 @@ def webhook(request):
     if request.method == 'POST':
         try:
             # Step 1: parse the JSON payload
+            # TODO: make a class that is the response and instantiate it here
+            # you can do this in a way where you call e.g., my_response = Response.from_request(request)
+            # (don't call it my_response, call it something more descriptive)
             request_body_dict = json.loads(request.body)
+            # FIXME: make this log on one line
             logger.info("Message body:")
             logger.info(request_body_dict)
 
             # Step 2: test if this is a new user. If yes, onboard user
             user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
+            # my_response.wa_id
             whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id, whatsapp_id=user_wa_id)
 
             if user_was_created:
@@ -44,50 +55,60 @@ def webhook(request):
                 return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
             
             # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
+            # elif my_response.is_delete_request():
             elif is_delete_request(request_body_dict):
                 logger.info("Request to delete, attempting to delete a meal.")
                 handle_delete_meal_request(request_body_dict, whatsapp_user)
                 return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
-            # Step 4: process the message as a food log
-            else:
-                logger.info("Normal message, attempting to analyze it as meal.")
+            # Step 4: in all other cases, process the message as a food log
+            logger.info("Normal message, attempting to analyze it as meal.")
 
-                message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
-                message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
+            # TODO: make these come from the object via attrs
+            message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
+            message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
 
-                # Add the message to our database
-                whatsapp_message = WhatsappMessage.objects.create(
-                    whatsapp_user=whatsapp_user,
-                    whatsapp_message_id=message_id,
-                    content=message_text,
-                    direction='IN'
-                )
-                logger.info(whatsapp_message)
+            # TODO: make this a method on the object, so we can call whatsapp_message = my_response.create_whatsapp_message()
+            # Add the message to our database
+            whatsapp_message = WhatsappMessage.objects.create(
+                whatsapp_user=whatsapp_user,
+                whatsapp_message_id=message_id,
+                content=message_text,
+                direction='IN'
+            )
+            logger.info(whatsapp_message)
 
-                # Send the json payload to the lambda
-                send_to_lambda(request_body_dict)
+            # Send the json payload to the lambda
+            # TODO: make this a method, e.g., my_response.send_to_lambda()
+            # TODO: rename to e.g., send_to_meal_processor_lambda
+            send_to_lambda(request_body_dict)
 
-                # Notify users we're analyzing their meal
-                send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
-                return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
+            # Notify users we're analyzing their meal
+            send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
+            return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
 
+        # TODO: move these to the parsing specifically, not the whole view
         except KeyError as e:
             logger.error(f"Missing key in webhook payload: {e}")
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
         except json.JSONDecodeError:
             logger.error("Invalid JSON payload in webhook")
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        # TODO: probably remove this since django will send an error back anyways
         except Exception as e:
             logger.error(f'Error processing webhook: {e}')
             logger.error(e)
             return JsonResponse({'error': 'Error processing webhook'}, status=400)
         
-    # If we got something other than POST or GET request
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+# TODO: add two smaller methods (workshop the names)
+# def _handle_facebook_webhook_get(request):
+# def _handle_facebook_webhook_post(request):
 
 # Sends a whatsapp message to a user, introducing them to Prepasto
+# TODO: prob make this async
 def send_onboarding_message(user_wa_id):
     send_whatsapp_message(user_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
     return
