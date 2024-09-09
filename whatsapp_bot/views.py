@@ -18,74 +18,81 @@ logger = logging.getLogger('whatsapp_bot')
 def listens_for_whatsapp_cloud_api_webhook(request):
     # This method is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
-        mode = request.GET.get('hub.mode')
-        token = request.GET.get('hub.verify_token')
-        challenge = request.GET.get('hub.challenge')
-        if mode == 'subscribe' and token == os.getenv('WHATSAPP_VERIFY_TOKEN'):
-            return HttpResponse(challenge, status=200)
-        else:
-            return HttpResponse('Forbidden', status=403)
+        _handle_whatsapp_webhook_get(request)
     
     # This is where messages from users go
     if request.method == 'POST':
-        try:
-            # Step 1: parse the JSON payload
-            request_body_dict = json.loads(request.body)
-            logger.info("Message body:")
-            logger.info(request_body_dict)
+        _handle_whatsapp_webhook_post(request)
 
-            # Step 2: test if this is a new user. If yes, onboard user
-            user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
-            whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id, whatsapp_id=user_wa_id)
-
-            if user_was_created:
-                logger.info("New user, I'm onboarding them.")
-                send_onboarding_message(user_wa_id)
-                return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
-            
-            # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
-            elif is_delete_request(request_body_dict):
-                logger.info("Request to delete, attempting to delete a meal.")
-                handle_delete_meal_request(request_body_dict, whatsapp_user)
-                return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
-
-            # Step 4: process the message as a food log
-            else:
-                logger.info("Normal message, attempting to analyze it as meal.")
-
-                message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
-                message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-
-                # Add the message to our database
-                whatsapp_message = WhatsappMessage.objects.create(
-                    whatsapp_user=whatsapp_user,
-                    whatsapp_message_id=message_id,
-                    content=message_text,
-                    direction='IN'
-                )
-                logger.info(whatsapp_message)
-
-                # Send the json payload to the lambda
-                send_to_lambda(request_body_dict)
-
-                # Notify users we're analyzing their meal
-                send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
-                return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
-
-        except KeyError as e:
-            logger.error(f"Missing key in webhook payload: {e}")
-            return JsonResponse({'error': 'Invalid payload structure'}, status=400)
-        except json.JSONDecodeError:
-            logger.error("Invalid JSON payload in webhook")
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        except Exception as e:
-            logger.error(f'Error processing webhook: {e}')
-            logger.error(e)
-            return JsonResponse({'error': 'Error processing webhook'}, status=400)
-        
     # If we got something other than POST or GET request
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+def _handle_whatsapp_webhook_get(request):
+    mode = request.GET.get('hub.mode')
+    token = request.GET.get('hub.verify_token')
+    challenge = request.GET.get('hub.challenge')
+    if mode == 'subscribe' and token == os.getenv('WHATSAPP_VERIFY_TOKEN'):
+        return HttpResponse(challenge, status=200)
+    else:
+        return HttpResponse('Forbidden', status=403)
+
+def _handle_whatsapp_webhook_post(request):
+    try:
+        # Step 1: parse the JSON payload
+        request_body_dict = json.loads(request.body)
+        logger.info("Message body:")
+        logger.info(request_body_dict)
+
+        # Step 2: test if this is a new user. If yes, onboard user
+        user_wa_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
+        whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=user_wa_id, whatsapp_id=user_wa_id)
+
+        if user_was_created:
+            logger.info("New user, I'm onboarding them.")
+            send_onboarding_message(user_wa_id)
+            return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
+        
+        # Step 3: test if this is a 'DELETE' message. If yes, delete requested meal
+        elif is_delete_request(request_body_dict):
+            logger.info("Request to delete, attempting to delete a meal.")
+            handle_delete_meal_request(request_body_dict, whatsapp_user)
+            return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
+
+        # Step 4: process the message as a food log
+        else:
+            logger.info("Normal message, attempting to analyze it as meal.")
+
+            message_text = str(request_body_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
+            message_id = str(request_body_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
+
+            # Add the message to our database
+            whatsapp_message = WhatsappMessage.objects.create(
+                whatsapp_user=whatsapp_user,
+                whatsapp_message_id=message_id,
+                content=message_text,
+                direction='IN'
+            )
+            logger.info(whatsapp_message)
+
+            # Send the json payload to the lambda
+            send_to_lambda(request_body_dict)
+
+            # Notify users we're analyzing their meal
+            send_whatsapp_message(user_wa_id, "I got your message and I'm calculating the nutritional content!")
+            return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
+
+    except KeyError as e:
+        logger.error(f"Missing key in webhook payload: {e}")
+        return JsonResponse({'error': 'Invalid payload structure'}, status=400)
+    except json.JSONDecodeError:
+        logger.error("Invalid JSON payload in webhook")
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        logger.error(f'Error processing webhook: {e}')
+        logger.error(e)
+        return JsonResponse({'error': 'Error processing webhook'}, status=400)
+
 
 # Sends a whatsapp message to a user, introducing them to Prepasto
 def send_onboarding_message(user_wa_id):
