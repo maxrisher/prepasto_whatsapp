@@ -71,7 +71,6 @@ def _handle_whatsapp_webhook_post(request):
         #unkknown message type
         return JsonResponse({'error': 'Invalid payload structure'}, status=400)
     
-
 # CATCH MESSAGES FROM LAMBDA
 # A webhook to receive processed meal information from the lambda
 @csrf_exempt

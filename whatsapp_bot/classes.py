@@ -1,4 +1,14 @@
+import json
+import logging
+
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.db import transaction
+
 from .utils import send_whatsapp_message
+from .models import WhatsappUser
+
+logger = logging.getLogger('whatsapp_bot')
 
 class PayloadFromWhatsapp:
     def __init__(self, raw_request):
