@@ -167,3 +167,6 @@ def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user
 
     #Step 4: send confirmation of meal deletion
     send_whatsapp_message(whatsapp_user.whatsapp_id, f'Got it. I am deleting this meal: {button_id}')
+
+    #Step 5: send updated daily total
+    meal_to_delete.diary.send_daily_total()

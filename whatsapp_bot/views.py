@@ -74,8 +74,8 @@ def _handle_whatsapp_webhook_post(request):
             payload_from_whatsapp.notify_message_sender_of_processing()
             return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
 
+        # This is what we return if we don't get a text or button message
         else:
-            #unkknown message type
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
         
     except Exception as e:
