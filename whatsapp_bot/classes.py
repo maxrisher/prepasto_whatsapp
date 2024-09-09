@@ -47,9 +47,11 @@ class PayloadFromWhatsapp:
     def is_whatsapp_text_message(self):
         _message_type = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['type']
         if _message_type == 'text':
-            logger.info("This message WAS a button press. It WAS delete request")
+            logger.info("This message WAS a 'text' type message.")
             return True
         else:
+            logger.info("This message was NOT a 'text' type message. It was instead: ")
+            logger.info(_message_type)
             return False
     
     def get_whatsapp_text_message_data(self):

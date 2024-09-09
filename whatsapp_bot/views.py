@@ -19,11 +19,11 @@ logger = logging.getLogger('whatsapp_bot')
 def listens_for_whatsapp_cloud_api_webhook(request):
     # This method is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
-        _handle_whatsapp_webhook_get(request)
+        return _handle_whatsapp_webhook_get(request)
     
     # This is where messages from users go
     if request.method == 'POST':
-        _handle_whatsapp_webhook_post(request)
+        return _handle_whatsapp_webhook_post(request)
 
     # If we got something other than POST or GET request
     else:
@@ -39,37 +39,42 @@ def _handle_whatsapp_webhook_get(request):
         return HttpResponse('Forbidden', status=403)
 
 def _handle_whatsapp_webhook_post(request):
-    payload_from_whatsapp = PayloadFromWhatsapp(request)
+    try:
+        payload_from_whatsapp = PayloadFromWhatsapp(request)
     
-    payload_from_whatsapp.get_whatsapp_wa_id()
-    payload_from_whatsapp.get_or_create_whatsapp_user_in_dj_db()
+        payload_from_whatsapp.get_whatsapp_wa_id()
+        payload_from_whatsapp.get_or_create_whatsapp_user_in_dj_db()
 
-    if payload_from_whatsapp.is_message_from_new_user:
-        payload_from_whatsapp.onboard_message_sender()
-        return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
-    
-    elif payload_from_whatsapp.is_delete_request():
-        #Delete logic
-        return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
-
-    elif payload_from_whatsapp.is_whatsapp_text_message():
-        payload_from_whatsapp.get_whatsapp_text_message_data()
-
-        WhatsappMessage.objects.create(
-                whatsapp_user=payload_from_whatsapp.prepasto_whatsapp_user_object,
-                whatsapp_message_id=payload_from_whatsapp.whatsapp_message_id,
-                content=payload_from_whatsapp.whatsapp_text_message_text,
-                direction='IN'
-            )
+        if payload_from_whatsapp.is_message_from_new_user:
+            payload_from_whatsapp.onboard_message_sender()
+            return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
         
-        send_to_lambda(payload_from_whatsapp.request_dict)
+        elif payload_from_whatsapp.is_delete_request():
+            #Delete logic
+            return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
-        payload_from_whatsapp.notify_message_sender_of_processing()
-        return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
+        elif payload_from_whatsapp.is_whatsapp_text_message():
+            payload_from_whatsapp.get_whatsapp_text_message_data()
 
-    else:
-        #unkknown message type
-        return JsonResponse({'error': 'Invalid payload structure'}, status=400)
+            WhatsappMessage.objects.create(
+                    whatsapp_user=payload_from_whatsapp.prepasto_whatsapp_user_object,
+                    whatsapp_message_id=payload_from_whatsapp.whatsapp_message_id,
+                    content=payload_from_whatsapp.whatsapp_text_message_text,
+                    direction='IN'
+                )
+            
+            send_to_lambda(payload_from_whatsapp.request_dict)
+
+            payload_from_whatsapp.notify_message_sender_of_processing()
+            return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
+
+        else:
+            #unkknown message type
+            return JsonResponse({'error': 'Invalid payload structure'}, status=400)
+    except Exception as e:
+            logger.error(f'Error processing webhook: {e}')
+            logger.error(e)
+            return JsonResponse({"error:" "Error processing webhook"}, status=400)
     
 # CATCH MESSAGES FROM LAMBDA
 # A webhook to receive processed meal information from the lambda
