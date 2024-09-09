@@ -61,8 +61,9 @@ def send_meal_whatsapp_message(recipient, meal_id):
         "Content-Type": "application/json",
     }
 
-    data = data = {
+    data = {
         "messaging_product": "whatsapp",
+        "recipient_type": "individual",
         "to": recipient,
         "type": "interactive",
         "interactive": button_dict,
