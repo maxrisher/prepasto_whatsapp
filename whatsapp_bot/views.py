@@ -15,7 +15,7 @@ logger = logging.getLogger('whatsapp_bot')
 # CATCH MESSAGES FROM WHATSAPP
 # A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
-def webhook(request):
+def listens_for_whatsapp_cloud_api_webhook(request):
     # This method is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
         mode = request.GET.get('hub.mode')

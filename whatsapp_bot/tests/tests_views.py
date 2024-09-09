@@ -10,7 +10,7 @@ from custom_users.models import CustomUser
 class WebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.url = reverse('webhook')
+        self.url = reverse('whatsapp-webhook')
 
     @unittest.skip("Costly test, skip it")
     def test_post_request_real_lambda(self):
