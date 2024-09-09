@@ -165,7 +165,8 @@ def handle_delete_meal_request(request_body_dict, whatsapp_user):
 
         #Step 3: try to delete the meal
         # TODO: delete associated meal object for the user
-        Meal.objects.delete(id=button_id)
+        meal_to_delete = Meal.objects.get(id=button_id)
+        meal_to_delete.delete()
         logger.info("Deleted meal:")
         logger.info(button_id)
 
