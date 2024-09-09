@@ -23,6 +23,10 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 
 # Testing
 
+# Creating a new feature
+- Change the railway url on AWS
+- Change the AWS alias on railway
+
 # TODOs:
 ## general
 - Update testing of main app models
