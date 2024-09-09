@@ -64,14 +64,19 @@ def send_meal_whatsapp_message(recipient, meal_id):
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": recipient,
+        "to": "+17204768288", #Testing with manually input phone number
         "type": "interactive",
         "interactive": button_dict,
     }
 
+    logger.info("Request:")
+    logger.info(headers)
+    logger.info(data)
+
     #STEP 2: send our message
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
 
+    logger.info("Response:")
     logger.info(response)
     logger.info(response.json())
 
