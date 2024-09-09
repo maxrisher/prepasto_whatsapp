@@ -13,11 +13,14 @@ logger = logging.getLogger('whatsapp_bot')
 class PayloadFromWhatsapp:
     def __init__(self, raw_request):
         self.request_dict = json.loads(raw_request.body)
+
         self.whatsapp_wa_id = None
         self.prepasto_whatsapp_user_object = None
         self.is_message_from_new_user = None
         self.whatsapp_text_message_text = None
         self.whatsapp_message_id = None
+        self.whatsapp_interactive_button_id = None
+        self.whatsapp_interactive_button_text = None
 
     def get_whatsapp_wa_id(self):
         self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
@@ -60,3 +63,8 @@ class PayloadFromWhatsapp:
 
     def notify_message_sender_of_processing(self):
         send_whatsapp_message(self.whatsapp_wa_id, "I got your message and I'm calculating the nutritional content!")
+
+    def get_whatsapp_interactive_button_data(self):
+        self.whatsapp_interactive_button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']
+        self.whatsapp_interactive_button_text = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
+        self.whatsapp_message_id = self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]

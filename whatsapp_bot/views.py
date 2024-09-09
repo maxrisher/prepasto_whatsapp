@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.db import transaction
 
-from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, send_meal_whatsapp_message
+from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, send_meal_whatsapp_message, handle_delete_meal_request
 from .models import WhatsappMessage, WhatsappUser
 from .classes import PayloadFromWhatsapp
 
@@ -50,7 +50,13 @@ def _handle_whatsapp_webhook_post(request):
             return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
         
         elif payload_from_whatsapp.is_delete_request():
-            #Delete logic
+            payload_from_whatsapp.get_whatsapp_interactive_button_data()
+
+            handle_delete_meal_request(payload_from_whatsapp.whatsapp_interactive_button_id, 
+                                       payload_from_whatsapp.whatsapp_interactive_button_text, 
+                                       payload_from_whatsapp.whatsapp_message_id, 
+                                       payload_from_whatsapp.prepasto_whatsapp_user_object)
+            
             return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
         elif payload_from_whatsapp.is_whatsapp_text_message():
@@ -71,6 +77,7 @@ def _handle_whatsapp_webhook_post(request):
         else:
             #unkknown message type
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
+        
     except Exception as e:
             logger.error(f'Error processing webhook: {e}')
             logger.error(e)
