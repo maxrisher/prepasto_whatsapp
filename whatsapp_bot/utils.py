@@ -71,6 +71,9 @@ def send_meal_whatsapp_message(recipient, meal_id):
     #STEP 2: send our message
     response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
 
+    logger.log(response)
+    logger.log(response.json())
+
     #Step 3: add our sent message to the database
     dict_response = response.json()
     sent_message_id = dict_response['messages'][0]['id']
