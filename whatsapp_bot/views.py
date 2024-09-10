@@ -9,7 +9,7 @@ from django.db import transaction
 
 from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, send_meal_whatsapp_message, handle_delete_meal_request
 from .models import WhatsappMessage, WhatsappUser
-from .classes import PayloadFromWhatsapp
+from .classes import PayloadFromWhatsapp, MealDataProcessor
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -92,48 +92,11 @@ def food_processing_lambda_webhook(request):
         api_key = request.headers.get('Authorization')
         if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
-    
-    #STEP 2: test for lambda internal errors
 
+        processor = MealDataProcessor(request)
+        processor.process()
 
-    #STEP 3: process the payload
-        payload = json.loads(request.body)
-        whatsapp_id = '17204768288'
-        message_id = 'some_message_id'
-        logger.warning("Payload received at lambda webhook:")
-        logger.warning(payload)
-
-        whatsapp_user = WhatsappUser.objects.get(whatsapp_id=whatsapp_id)
-
-    #STEP 4: if CustomUser model exists: 
-    # A) add meal to db 
-    # B) send button message 
-    # C) send updated daily total
-        if whatsapp_user.user is not None:
-            logger.info("I'm creating a new meal for a USER")
-            handle_user_new_meal(payload, whatsapp_user.user)
-    #STEP 5: else, send simple meal text message
-        else:
-            logger.info("I'm creating a new meal for a NON user")
-            handle_anonymous_new_meal(payload, whatsapp_id)
-    
         return JsonResponse({'message': 'OK'}, status=200)
+    
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-@transaction.atomic
-def handle_user_new_meal(payload, custom_user):
-    # A) gets or creates diary 
-    # B) creates meal
-    diary, meal = add_meal_to_db(payload, custom_user)
-
-    # Sends a whatsapp message with a 'delete' option
-    send_meal_whatsapp_message(custom_user.phone, meal.id)
-
-    # Sends a whatsapp message with the daily total nutrition
-    diary.send_daily_total()
-
-def handle_anonymous_new_meal(dict_from_lambda, whatsapp_id):
-    meal_totals = dict_from_lambda.get('total_nutrition')
-    calories = round(meal_totals.get('calories', 0))
-    send_whatsapp_message(whatsapp_id, f"DJANGO meal summary. Meal calories: {calories}")

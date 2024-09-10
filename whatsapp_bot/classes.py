@@ -1,11 +1,10 @@
 import json
 import logging
 
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.db import transaction
 
-from .utils import send_whatsapp_message
+from .utils import send_whatsapp_message, send_meal_whatsapp_message, add_meal_to_db
 from .models import WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
@@ -68,3 +67,56 @@ class PayloadFromWhatsapp:
         self.whatsapp_interactive_button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']
         self.whatsapp_interactive_button_text = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
         self.whatsapp_message_id = self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]
+
+class MealDataProcessor:
+    def __init__(self, request):
+        self.request = request
+        
+        self.payload = None
+        self.prepasto_whatsapp_user = None
+        self.custom_user = None
+
+    def process(self):
+        try:
+            self._decode_request()
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id='17204768288')
+            self.custom_user = self.prepasto_whatsapp_user.user
+
+            if self._lambda_had_error():
+                logger.error("Error processing meal!")
+                send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
+                return
+
+            if self.prepasto_whatsapp_user is not None:
+                self._create_meal_for_prepasto_user()
+            else:
+                self._create_meal_for_anonymous()
+            
+        except Exception as e:
+            logger.error("Error processing meal!")
+            send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
+
+    def _decode_request(self):
+        self.payload = json.loads(self.request.body)
+        logger.info("Payload decoded at lambda webhook: ")
+        logger.info(self.payload)
+
+    def _lambda_had_error(self):
+        return False
+    
+    @transaction.atomic
+    def _create_meal_for_prepasto_user(self):
+        logger.info("I'm creating a new meal for a USER")
+        diary, meal = add_meal_to_db(self.payload, self.custom_user)
+
+        # Sends a whatsapp message with a 'delete' option
+        send_meal_whatsapp_message(self.custom_user.phone, meal.id)
+
+        # Sends a whatsapp message with the daily total nutrition
+        diary.send_daily_total()
+
+    def _create_meal_for_anonymous(self):
+        meal_totals = self.payload.get('total_nutrition')
+        calories = round(meal_totals.get('calories', 0))
+        send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_id, f"DJANGO meal summary. Meal calories: {calories}")
+
