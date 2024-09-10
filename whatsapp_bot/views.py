@@ -1,14 +1,11 @@
-import json
 import os
 import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
-from django.db import transaction
 
-from .utils import send_whatsapp_message, add_meal_to_db, send_to_lambda, send_meal_whatsapp_message, handle_delete_meal_request
-from .models import WhatsappMessage, WhatsappUser
+from .utils import send_to_lambda, handle_delete_meal_request
+from .models import WhatsappMessage
 from .classes import PayloadFromWhatsapp, MealDataProcessor
 
 logger = logging.getLogger('whatsapp_bot')
