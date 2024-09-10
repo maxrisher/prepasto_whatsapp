@@ -13,7 +13,7 @@ from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
-def send_whatsapp_message(recipient, message):
+def send_whatsapp_message(recipient_phone_number, message):
     headers = {
         "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
         "Content-Type": "application/json",
@@ -21,7 +21,7 @@ def send_whatsapp_message(recipient, message):
 
     data = data = {
         "messaging_product": "whatsapp",
-        "to": recipient,
+        "to": recipient_phone_number,
         "type": "text",
         "text": {"body": message},
     }
@@ -31,7 +31,7 @@ def send_whatsapp_message(recipient, message):
     return response.json()
 
 @transaction.atomic
-def send_meal_whatsapp_message(recipient, meal_id):
+def send_meal_whatsapp_message(recipient_phone_number, meal_id):
     #STEP 1: Craft a message
     # fetch our site's whatsapp user object
     prepasto_user, whatsapp_user_created = WhatsappUser.objects.get_or_create(phone_number='14153476103')
@@ -64,7 +64,7 @@ def send_meal_whatsapp_message(recipient, meal_id):
     data = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": "+17204768288", #Testing with manually input phone number
+        "to": recipient_phone_number, #Testing with manually input phone number
         "type": "interactive",
         "interactive": button_dict,
     }

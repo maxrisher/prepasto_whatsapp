@@ -107,6 +107,9 @@ class MealDataProcessor:
     @transaction.atomic
     def _create_meal_for_prepasto_user(self):
         logger.info("I'm creating a new meal for a USER")
+        logger.info("Their phone number is:")
+        logger.info(self.custom_user.phone)
+
         diary, meal = add_meal_to_db(self.payload, self.custom_user)
 
         # Sends a whatsapp message with a 'delete' option
