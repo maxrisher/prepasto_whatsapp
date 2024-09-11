@@ -34,7 +34,7 @@ def send_whatsapp_message(recipient_phone_number, message):
 def send_meal_whatsapp_message(recipient_phone_number, meal_id):
     #STEP 1: Craft a message
     # fetch our site's whatsapp user object
-    prepasto_user, whatsapp_user_created = WhatsappUser.objects.get_or_create(phone_number='14153476103')
+    prepasto_user, whatsapp_user_created = WhatsappUser.objects.get_or_create(whatsapp_wa_id='14153476103')
 
     new_meal = Meal.objects.get(id=meal_id)
 

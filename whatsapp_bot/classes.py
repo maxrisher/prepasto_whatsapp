@@ -29,7 +29,7 @@ class PayloadFromWhatsapp:
         self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
 
     def get_or_create_whatsapp_user_in_dj_db(self):
-        whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(phone_number=self.whatsapp_wa_id, whatsapp_id=self.whatsapp_wa_id)
+        whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=self.whatsapp_wa_id)
 
         self.prepasto_whatsapp_user_object = whatsapp_user
         self.is_message_from_new_user = user_was_created
@@ -92,7 +92,7 @@ class MealDataProcessor:
     def process(self):
         try:
             self._decode_request()
-            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id=self.payload['meal_requester_whatsapp_wa_id'])
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.payload['meal_requester_whatsapp_wa_id'])
             self.custom_user = self.prepasto_whatsapp_user.user
 
             if 'errors' in self.payload and self.payload['errors']:

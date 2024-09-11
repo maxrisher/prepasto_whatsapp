@@ -184,7 +184,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
         }
 
         # Create an existing WhatsappUser
-        self.existing_user = WhatsappUser.objects.create(phone_number="17204761234", whatsapp_id="17204761234")
+        self.existing_user = WhatsappUser.objects.create(whatsapp_wa_id="17204761234")
 
     def test_delete_request(self):
         response = self.client.post(reverse('whatsapp-webhook'),
@@ -201,7 +201,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
         self.assertEqual(json.loads(response.content), {'status': 'success', 'message': 'sent onboarding message to user'})
 
         # Check the new user is created
-        self.assertTrue(WhatsappUser.objects.filter(whatsapp_id="13034761234").exists())
+        self.assertTrue(WhatsappUser.objects.filter(whatsapp_wa_id="13034761234").exists())
 
     @patch('whatsapp_bot.views.send_to_lambda')
     def test_text_message_existing_user(self, mock_send_to_lambda):
@@ -337,7 +337,7 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         self.existing_site_user.phone = '17204761234'
         self.existing_site_user.save()
 
-        self.existing_whatsapp_user = WhatsappUser.objects.create(phone_number="17204761234", whatsapp_id="17204761234", user=self.existing_site_user)
+        self.existing_whatsapp_user = WhatsappUser.objects.create(whatsapp_wa_id="17204761234", user=self.existing_site_user)
 
     # Make sure that authenticated requests work
     def test_lambda_webhook_auth(self):
@@ -357,7 +357,7 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
     @patch('whatsapp_bot.classes.send_whatsapp_message')
     def test_lambda_webhook_anonymous_user(self, mock_send_whatsapp_message):
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
-        self.anonymous_whatsapp_user = WhatsappUser.objects.create(phone_number="13034761234", whatsapp_id="13034761234")
+        self.anonymous_whatsapp_user = WhatsappUser.objects.create(whatsapp_wa_id="13034761234")
         anonymous_meal_dict = self.lambda_output.copy()
         anonymous_meal_dict['meal_requester_whatsapp_wa_id'] = '13034761234'
         response = self.client.post(path=self.url, data=json.dumps(anonymous_meal_dict), content_type='application/json', headers=headers)
