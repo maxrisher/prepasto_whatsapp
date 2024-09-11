@@ -15,7 +15,11 @@ class PayloadFromWhatsapp:
 
         self.whatsapp_wa_id = None
         self.prepasto_whatsapp_user_object = None
+
         self.is_message_from_new_user = None
+        self.is_delete_request = None
+        self.is_whatsapp_text_message = None
+
         self.whatsapp_text_message_text = None
         self.whatsapp_message_id = None
         self.whatsapp_interactive_button_id = None
@@ -29,33 +33,40 @@ class PayloadFromWhatsapp:
 
         self.prepasto_whatsapp_user_object = whatsapp_user
         self.is_message_from_new_user = user_was_created
-        
-    # Sends a whatsapp message to a user, introducing them to Prepasto
-    def onboard_message_sender(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "DJ: Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
 
-    def is_delete_request(self):
+    def determine_message_type(self):
+        self._test_if_delete_request()
+        self._test_if_whatsapp_text_message()
+        
+    def _test_if_delete_request(self):
         try:
-            _button_title = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
-            if _button_title == settings.MEAL_DELETE_BUTTON_TEXT:
+            button_title = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
+            if button_title == settings.MEAL_DELETE_BUTTON_TEXT:
                 logger.info("This message WAS a button press. It WAS delete request")
-                return True
+                self.is_delete_request = True
             else:
                 logger.info("This message WAS a button press. It was NOT a delete request")
         except KeyError as e:
             logger.info("This message was NOT a button press")
-        return False
+        self.is_delete_request = False
 
-    def is_whatsapp_text_message(self):
-        message_type = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['type']
-        if message_type == 'text':
-            logger.info("This message WAS a 'text' type message.")
-            return True
-        else:
-            logger.info("This message was NOT a 'text' type message. It was instead: ")
-            logger.info(message_type)
-            return False
+    def _test_if_whatsapp_text_message(self):
+        try:
+            message_type = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['type']
+            if message_type == 'text':
+                logger.info("This message WAS a 'text' type message.")
+                self.is_whatsapp_text_message = True
+            else:
+                logger.info("This message was NOT a 'text' type message. It was instead: ")
+                logger.info(message_type)
+        except KeyError as e:
+            logger.info("This message was NOT a 'text' type message.")
+        self.is_whatsapp_text_message = False
     
+    # Sends a whatsapp message to a user, introducing them to Prepasto
+    def onboard_message_sender(self):
+        send_whatsapp_message(self.whatsapp_wa_id, "DJ: Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
+
     def get_whatsapp_text_message_data(self):
         self.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
         self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])

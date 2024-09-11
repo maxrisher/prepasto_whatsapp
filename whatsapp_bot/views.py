@@ -41,12 +41,13 @@ def _handle_whatsapp_webhook_post(request):
     
         payload_from_whatsapp.get_whatsapp_wa_id()
         payload_from_whatsapp.get_or_create_whatsapp_user_in_dj_db()
+        payload_from_whatsapp.determine_message_type()
 
         if payload_from_whatsapp.is_message_from_new_user:
             payload_from_whatsapp.onboard_message_sender()
             return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
         
-        elif payload_from_whatsapp.is_delete_request():
+        elif payload_from_whatsapp.is_delete_request:
             payload_from_whatsapp.get_whatsapp_interactive_button_data()
 
             handle_delete_meal_request(payload_from_whatsapp.whatsapp_interactive_button_id, 
@@ -56,7 +57,7 @@ def _handle_whatsapp_webhook_post(request):
             
             return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
-        elif payload_from_whatsapp.is_whatsapp_text_message():
+        elif payload_from_whatsapp.is_whatsapp_text_message:
             payload_from_whatsapp.get_whatsapp_text_message_data()
 
             WhatsappMessage.objects.create(
