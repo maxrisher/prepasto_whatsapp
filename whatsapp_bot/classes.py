@@ -90,10 +90,10 @@ class MealDataProcessor:
     def process(self):
         try:
             self._decode_request()
-            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id='17204768288')
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id=self.payload.meal_requester)
             self.custom_user = self.prepasto_whatsapp_user.user
 
-            if self._lambda_had_error():
+            if 'errors' in self.payload and self.payload['errors']:
                 logger.error("Error processing meal!")
                 send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
                 return
@@ -111,9 +111,6 @@ class MealDataProcessor:
         self.payload = json.loads(self.request.body)
         logger.info("Payload decoded at lambda webhook: ")
         logger.info(self.payload)
-
-    def _lambda_had_error(self):
-        return False
     
     @transaction.atomic
     def _create_meal_for_prepasto_user(self):
