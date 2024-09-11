@@ -3,7 +3,7 @@ from django.utils import timezone
 
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
-from whatsapp_bot.utils import add_meal_to_db  # Adjust the import path as needed
+from whatsapp_bot.utils import add_meal_to_db 
 
 class AddMealToDbTests(TestCase):
     def setUp(self):
@@ -24,7 +24,7 @@ class AddMealToDbTests(TestCase):
 
     def test_add_meal_to_db(self):
         #Call the add_meal_to_db function
-        returned_calories = add_meal_to_db(self.sample_payload, "17204768288")
+        diary, meal = add_meal_to_db(self.sample_payload, self.user)
 
         # Assertions
         # Check that the diary entry was created
@@ -39,7 +39,7 @@ class AddMealToDbTests(TestCase):
         self.assertEqual(meal.protein, 35)
 
         # Check that the returned calories match the meal calories
-        self.assertEqual(returned_calories, 618)
+        self.assertEqual(diary.calories, 618)
 
     def test_full_day_nutrition_calc(self):
         self.diary = Diary.objects.create(
@@ -50,12 +50,13 @@ class AddMealToDbTests(TestCase):
         meal_1 = Meal.objects.create(
             custom_user = self.user,
             diary = self.diary,
+            local_date=self.user.current_date,
             calories=500,
             fat=70,
             carbs=250,
             protein=100
         )
 
-        returned_calories = add_meal_to_db(self.sample_payload, "17204768288")
+        diary, meal = add_meal_to_db(self.sample_payload, self.user)
 
-        self.assertEqual(returned_calories, 1118)
+        self.assertEqual(diary.calories, 1118)

@@ -8,12 +8,33 @@ from django.urls import reverse
 
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage
 from whatsapp_bot.views import listens_for_whatsapp_cloud_api_webhook
-from main_app.models import Meal
+from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
 
 class WhatsappWebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            email='fake@email.com',
+            password='testpass',
+        )
+        self.user.time_zone = 'America/New_York'
+
+        self.diary = Diary.objects.create(
+            custom_user=self.user,
+            local_date=self.user.current_date
+        )
+
+        self.meal = Meal.objects.create(
+            custom_user=self.user,
+            diary = self.diary,
+            local_date = self.user.current_date,
+            calories=2000,
+            fat=70,
+            carbs=250,
+            protein=100
+        )
+
         self.delete_payload = {
             "object": "whatsapp_business_account",
             "entry": [
@@ -48,7 +69,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
                                         "interactive": {
                                             "type": "button_reply",
                                             "button_reply": {
-                                                "id": "33553766-1083-4be1-b3f9-5ca5d79c2397",
+                                                "id": str(self.meal.id),
                                                 "title": "DELETE this meal."
                                             }
                                         }

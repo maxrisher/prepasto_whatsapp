@@ -142,12 +142,12 @@ def add_meal_to_db(dict_from_lambda, custom_user):
 @transaction.atomic
 def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user):
 
-    logger.info('whatsapp_user.whatsapp_id for the meal I am deleting')
-    logger.info(whatsapp_user.whatsapp_id)
+    logger.info('whatsapp_user.whatsapp_wa_id for the meal I am deleting')
+    logger.info(whatsapp_user.whatsapp_wa_id)
 
     #Step 1: test if the user has an account
     if whatsapp_user.user is None:
-        send_whatsapp_message(whatsapp_user.whatsapp_id, "You don't have an account. You cannot delete meals.")
+        send_whatsapp_message(whatsapp_user.whatsapp_wa_id, "You don't have an account. You cannot delete meals.")
         return
 
     #Step 2: log the incoming message in our database
@@ -166,7 +166,7 @@ def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user
     logger.info(button_id)
 
     #Step 4: send confirmation of meal deletion
-    send_whatsapp_message(whatsapp_user.whatsapp_id, f'Got it. I am deleting this meal: {button_id}')
+    send_whatsapp_message(whatsapp_user.whatsapp_wa_id, f'Got it. I am deleting this meal: {button_id}')
 
     #Step 5: send updated daily total
     meal_to_delete.diary.send_daily_total()

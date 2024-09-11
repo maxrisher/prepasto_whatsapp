@@ -131,5 +131,5 @@ class MealDataProcessor:
     def _create_meal_for_anonymous(self):
         meal_totals = self.payload.get('total_nutrition')
         calories = round(meal_totals.get('calories', 0))
-        send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_id, f"DJANGO meal summary. Meal calories: {calories}")
+        send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, f"DJANGO meal summary. Meal calories: {calories}")
 
