@@ -78,7 +78,7 @@ def _handle_whatsapp_webhook_post(request):
     except Exception as e:
             logger.error(f'Error processing webhook: {e}')
             logger.error(e)
-            return JsonResponse({"error:" "Error processing webhook"}, status=400)
+            return JsonResponse({"error": "Error processing webhook"}, status=400)
     
 # CATCH MESSAGES FROM LAMBDA
 # A webhook to receive processed meal information from the lambda
