@@ -11,7 +11,7 @@ Deployment:
 - Download docker and the 'aws sam' CLI
 - Run docker on your machine. 
 - from the top level directory run: sam build --use-container
-- run: sam build
+- run: sam deploy
 - go through the menus
 - You need to update the RAILWAY_PUBLIC_DOMAIN in the lambda to reflect either production or staging depending on what's needed
 
