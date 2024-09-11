@@ -90,7 +90,7 @@ class MealDataProcessor:
     def process(self):
         try:
             self._decode_request()
-            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id=self.payload.meal_requester)
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_id=self.payload['meal_requester_whatsapp_wa_id'])
             self.custom_user = self.prepasto_whatsapp_user.user
 
             if 'errors' in self.payload and self.payload['errors']:
@@ -98,7 +98,7 @@ class MealDataProcessor:
                 send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
                 return
 
-            if self.prepasto_whatsapp_user is not None:
+            if self.custom_user is not None:
                 self._create_meal_for_prepasto_user()
             else:
                 self._create_meal_for_anonymous()
