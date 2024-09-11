@@ -97,7 +97,7 @@ class MealDataProcessor:
 
             if 'errors' in self.payload and self.payload['errors']:
                 logger.error("Error processing meal!")
-                send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
+                send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
                 return
 
             if self.custom_user is not None:
@@ -107,7 +107,7 @@ class MealDataProcessor:
             
         except Exception as e:
             logger.error("Error processing meal!")
-            send_whatsapp_message(self.prepasto_whatsapp_user.phone_number, "I'm sorry, and error occurred. Please try again later.")
+            send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
 
     def _decode_request(self):
         self.payload = json.loads(self.request.body)
