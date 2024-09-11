@@ -71,7 +71,8 @@ def _handle_whatsapp_webhook_post(request):
                     direction='IN'
                 )
             
-            send_to_lambda(payload_from_whatsapp.request_dict)
+            send_to_lambda({'sender_whatsapp_wa_id': payload_from_whatsapp.whatsapp_wa_id,
+                            'sender_message': payload_from_whatsapp.whatsapp_text_message_text})
 
             payload_from_whatsapp.notify_message_sender_of_processing()
             return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
