@@ -237,7 +237,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
         self.assertTrue(WhatsappMessage.objects.filter(whatsapp_message_id="wamid.fake28=").exists())
 
         # Ensure that send_to_lambda was called with the correct payload
-        mock_send_to_lambda.assert_called_once_with(self.text_payload_existing_user)
+        mock_send_to_lambda.assert_called_once_with({'sender_whatsapp_wa_id': '17204761234', 'sender_message': 'One cup oatmeal'})
 
     def test_invalid_message_type(self):
         response = self.client.post(reverse('whatsapp-webhook'),
