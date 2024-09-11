@@ -27,9 +27,8 @@ def send_whatsapp_message(recipient, message):
 # This is the main function for the lambda!
 def lambda_handler(event, context):
 
-    message = event['entry'][0]['changes'][0]['value']['messages'][0]
-    sender = message['from']
-    text = message['text']['body']
+    text = event['sender_message']
+    sender = event['sender_whatsapp_wa_id']
     
     print(json.dumps(event))
 
@@ -53,7 +52,14 @@ def lambda_handler(event, context):
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
     
     send_whatsapp_message(sender, text_reply)
+
+    response['meal_requester_whatsapp_wa_id'] = sender
+    response['original_message'] = text
+    response['errors'] = []
+    response['processing_data'] = {}
+
     send_to_django(response)
+
     print('Tried to send meal message.')
 
     return {
