@@ -1,44 +1,162 @@
 import json
 import os
+from unittest.mock import patch, MagicMock
 import unittest
 
 from django.test import TestCase, Client
 from django.urls import reverse
 
+from whatsapp_bot.models import WhatsappUser, WhatsappMessage
+from whatsapp_bot.views import listens_for_whatsapp_cloud_api_webhook
+from main_app.models import Meal
 from custom_users.models import CustomUser
 
-class WebhookIntegrationTest(TestCase):
+class WhatsappWebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.url = reverse('whatsapp-webhook')
-
-    @unittest.skip("Costly test, skip it")
-    def test_post_request_real_lambda(self):
-        payload = {
-                    "entry": [
-                        {
-                        "changes": [
-                            {
-                            "value": {
-                                "messages": [
-                                {
-                                    "from": "+17204768288",
-                                    "text": {
-                                    "body": "One carrot with a packet of hot sauce!"
-                                    }
+        self.delete_payload = {
+            "object": "whatsapp_business_account",
+            "entry": [{
+                "id": "350132861527473",
+                "changes": [{
+                    "value": {
+                        "contacts": [{"wa_id": "17204761234"}],
+                        "messages": [{
+                            "interactive": {
+                                "type": "button_reply",
+                                "button_reply": {
+                                    "id": "33553766-1083-4be1-b3f9-5ca5d79c2397",
+                                    "title": "DELETE this meal."
                                 }
+                            },
+                            "id": "wamid.fake28="
+                        }]
+                    }
+                }]
+            }]
+        }
+
+        self.text_payload_new_user = {
+            "object": "whatsapp_business_account",
+            "entry": [{
+                "id": "350132861527473",
+                "changes": [{
+                    "value": {
+                        "contacts": [{"wa_id": "1234567890"}],
+                        "messages": [{
+                            "from": "1234567890",
+                            "id": "wamid.fake28=",
+                            "text": {"body": "One cup oatmeal"},
+                            "type": "text"
+                        }]
+                    }
+                }]
+            }]
+        }
+
+        self.text_payload_existing_user = {
+            "object": "whatsapp_business_account",
+            "entry": [{
+                "id": "350132861527473",
+                "changes": [{
+                    "value": {
+                        "contacts": [{"wa_id": "17204761234"}],
+                        "messages": [{
+                            "from": "17204761234",
+                            "id": "wamid.fake28=",
+                            "text": {"body": "One cup oatmeal"},
+                            "type": "text"
+                        }]
+                    }
+                }]
+            }]
+        }
+
+        self.invalid_payload = {
+            "object": "whatsapp_business_account",
+            "entry": [
+                {
+                    "id": "350132861527473",
+                    "changes": [
+                        {
+                            "value": {
+                                "messaging_product": "whatsapp",
+                                "metadata": {
+                                    "display_phone_number": "14153476103",
+                                    "phone_number_id": "428381170351556"
+                                },
+                                "statuses": [
+                                    {
+                                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI5OTlFNkU3ODI4NTU1Q0FERTgA",
+                                        "status": "sent",
+                                        "timestamp": "1725047266",
+                                        "recipient_id": "17204761234",
+                                        "conversation": {
+                                            "id": "74192aff111b1ff2355bc8a2875c3a8d",
+                                            "expiration_timestamp": "1725127260",
+                                            "origin": {
+                                                "type": "service"
+                                            }
+                                        },
+                                        "pricing": {
+                                            "billable": True,
+                                            "pricing_model": "CBP",
+                                            "category": "service"
+                                        }
+                                    }
                                 ]
-                            }
-                            }
-                        ]
+                            },
+                            "field": "messages"
                         }
                     ]
-                    }
-        response = self.client.post(self.url, json.dumps(payload), content_type='application/json')
+                }
+            ]
+        }
 
+        # Create an existing WhatsappUser
+        self.existing_user = WhatsappUser.objects.create(phone_number="17204761234", whatsapp_id="17204761234")
+
+    def test_delete_request(self):
+        response = self.client.post(reverse('whatsapp-webhook'),
+                                    content_type='application/json',
+                                    data=json.dumps(self.delete_payload))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'status': 'success', 'message': 'Handled delete meal request'})
 
-class LambdaWebhookTest(TestCase):
+    def test_text_message_new_user(self):
+        response = self.client.post(reverse('whatsapp-webhook'),
+                                    content_type='application/json',
+                                    data=json.dumps(self.text_payload_new_user))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'status': 'success', 'message': 'sent onboarding message to user'})
+
+        # Check the new user is created
+        self.assertTrue(WhatsappUser.objects.filter(whatsapp_id="1234567890").exists())
+
+    @patch('whatsapp_bot.views.send_to_lambda')
+    def test_text_message_existing_user(self, mock_send_to_lambda):
+        response = self.client.post(reverse('whatsapp-webhook'),
+                                    content_type='application/json',
+                                    data=json.dumps(self.text_payload_existing_user))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {'status': 'success', 'message': 'starting nutritional calculations'})
+
+        # Check that a message is saved to the database
+        self.assertTrue(WhatsappMessage.objects.filter(whatsapp_message_id="wamid.fake28=").exists())
+
+        # Ensure that send_to_lambda was called with the correct payload
+        mock_send_to_lambda.assert_called_once_with(self.text_payload_existing_user)
+
+    def test_invalid_message_type(self):
+        response = self.client.post(reverse('whatsapp-webhook'),
+                                    content_type='application/json',
+                                    data=json.dumps(self.invalid_payload))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.content), {'error': 'Invalid payload structure'})
+
+
+class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.url = reverse('lambda-webhook')
@@ -132,23 +250,60 @@ class LambdaWebhookTest(TestCase):
             ], 
             'llm_meal_slice': 'description of meal including details of preparation and similarities'
         }
-        self.user = CustomUser.objects.create_user(
+        self.existing_site_user = CustomUser.objects.create_user(
             email='fake@email.com',
             password='testpass',
         )
-        self.user.phone = '17204768288'
-        self.user.save()
+        self.existing_site_user.phone = '17204761234'
+        self.existing_site_user.save()
 
-    #Make sure that authenticated requests work
+        self.existing_whatsapp_user = WhatsappUser.objects.create(phone_number="17204761234", whatsapp_id="17204761234", user=self.existing_site_user)
+
+    # Make sure that authenticated requests work
     def test_lambda_webhook_auth(self):
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
         response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
 
         self.assertEqual(response.status_code, 200)
 
-    #Make sure that unauthenticated requests fail
+    # Make sure that unauthenticated requests fail
     def test_lambda_webhook_bad_auth(self):
         headers = {'Authorization': 'Bearer bad_key'}
         response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
 
         self.assertEqual(response.status_code, 403)
+
+    # If we get a request from an anonymous user, make sure we just send a WhatsApp message without saving a Meal object
+    @patch('whatsapp_bot.classes.send_whatsapp_message')
+    def test_lambda_webhook_anonymous_user(self, mock_send_whatsapp_message):
+        headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
+        anonymous_meal_dict = self.meal_dict.copy()
+        response = self.client.post(path=self.url, data=json.dumps(anonymous_meal_dict), content_type='application/json', headers=headers)
+
+        # Assert the response is successful
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that no Meal object was created in the database
+        self.assertFalse(Meal.objects.exists())
+
+        # Ensure WhatsApp message was sent to the anonymous user (mock send_whatsapp_message)
+        mock_send_whatsapp_message.assert_called_once_with("17204761234", "DJANGO meal summary. Meal calories: 618")
+
+    # If we get a request from a real user, make sure we save a meal object to the database
+    @patch('whatsapp_bot.classes.send_meal_whatsapp_message')
+    def test_lambda_webhook_real_user_saves_meal(self, mock_send_meal_whatsapp_message):
+        headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
+        response = self.client.post(path=self.url, data=json.dumps(self.meal_dict), content_type='application/json', headers=headers)
+
+        # Assert the response is successful
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that a Meal object was created for the user
+        self.assertTrue(Meal.objects.filter(custom_user=self.existing_site_user).exists())
+
+        created_meal = Meal.objects.filter(custom_user=self.existing_site_user).first()
+
+        print(created_meal)
+
+        # Ensure WhatsApp message was sent to the anonymous user (mock send_whatsapp_message)
+        mock_send_meal_whatsapp_message.assert_called_once_with("17204761234", created_meal.id)
