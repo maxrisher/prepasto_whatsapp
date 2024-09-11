@@ -44,6 +44,7 @@ class PayloadFromWhatsapp:
             if button_title == settings.MEAL_DELETE_BUTTON_TEXT:
                 logger.info("This message WAS a button press. It WAS delete request")
                 self.is_delete_request = True
+                return
             else:
                 logger.info("This message WAS a button press. It was NOT a delete request")
         except KeyError as e:
@@ -56,6 +57,7 @@ class PayloadFromWhatsapp:
             if message_type == 'text':
                 logger.info("This message WAS a 'text' type message.")
                 self.is_whatsapp_text_message = True
+                return
             else:
                 logger.info("This message was NOT a 'text' type message. It was instead: ")
                 logger.info(message_type)

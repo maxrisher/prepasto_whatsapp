@@ -16,60 +16,130 @@ class WhatsappWebhookIntegrationTest(TestCase):
         self.client = Client()
         self.delete_payload = {
             "object": "whatsapp_business_account",
-            "entry": [{
-                "id": "350132861527473",
-                "changes": [{
-                    "value": {
-                        "contacts": [{"wa_id": "17204761234"}],
-                        "messages": [{
-                            "interactive": {
-                                "type": "button_reply",
-                                "button_reply": {
-                                    "id": "33553766-1083-4be1-b3f9-5ca5d79c2397",
-                                    "title": "DELETE this meal."
-                                }
+            "entry": [
+                {
+                    "id": "350132861527473",
+                    "changes": [
+                        {
+                            "value": {
+                                "messaging_product": "whatsapp",
+                                "metadata": {
+                                    "display_phone_number": "14153476103",
+                                    "phone_number_id": "428381170351556"
+                                },
+                                "contacts": [
+                                    {
+                                        "profile": {
+                                            "name": "Max Risher"
+                                        },
+                                        "wa_id": "17204761234"
+                                    }
+                                ],
+                                "messages": [
+                                    {
+                                        "context": {
+                                            "from": "14153476103",
+                                            "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI3RDJGNjA2QzQzQTc2MTA1MjMA"
+                                        },
+                                        "from": "17204761234",
+                                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTQzQUU0QjY3RkE2RENFOTdGQwF=",
+                                        "timestamp": "1725898148",
+                                        "type": "interactive",
+                                        "interactive": {
+                                            "type": "button_reply",
+                                            "button_reply": {
+                                                "id": "33553766-1083-4be1-b3f9-5ca5d79c2397",
+                                                "title": "DELETE this meal."
+                                            }
+                                        }
+                                    }
+                                ]
                             },
-                            "id": "wamid.fake28="
-                        }]
-                    }
-                }]
-            }]
+                            "field": "messages"
+                        }
+                    ]
+                }
+            ]
         }
 
         self.text_payload_new_user = {
             "object": "whatsapp_business_account",
-            "entry": [{
-                "id": "350132861527473",
-                "changes": [{
-                    "value": {
-                        "contacts": [{"wa_id": "1234567890"}],
-                        "messages": [{
-                            "from": "1234567890",
-                            "id": "wamid.fake28=",
-                            "text": {"body": "One cup oatmeal"},
-                            "type": "text"
-                        }]
-                    }
-                }]
-            }]
+            "entry": [
+                {
+                    "id": "350132861527473",
+                    "changes": [
+                        {
+                            "value": {
+                                "messaging_product": "whatsapp",
+                                "metadata": {
+                                    "display_phone_number": "14153476103",
+                                    "phone_number_id": "428381170351556"
+                                },
+                                "contacts": [
+                                    {
+                                        "profile": {
+                                            "name": "Max Risher"
+                                        },
+                                        "wa_id": "13034761234"
+                                    }
+                                ],
+                                "messages": [
+                                    {
+                                        "from": "13034761234",
+                                        "id": "wamid.fake28=",
+                                        "timestamp": "1725047264",
+                                        "text": {
+                                            "body": "One cup oatmeal"
+                                        },
+                                        "type": "text"
+                                    }
+                                ]
+                            },
+                            "field": "messages"
+                        }
+                    ]
+                }
+            ]
         }
 
         self.text_payload_existing_user = {
             "object": "whatsapp_business_account",
-            "entry": [{
-                "id": "350132861527473",
-                "changes": [{
-                    "value": {
-                        "contacts": [{"wa_id": "17204761234"}],
-                        "messages": [{
-                            "from": "17204761234",
-                            "id": "wamid.fake28=",
-                            "text": {"body": "One cup oatmeal"},
-                            "type": "text"
-                        }]
-                    }
-                }]
-            }]
+            "entry": [
+                {
+                    "id": "350132861527473",
+                    "changes": [
+                        {
+                            "value": {
+                                "messaging_product": "whatsapp",
+                                "metadata": {
+                                    "display_phone_number": "14153476103",
+                                    "phone_number_id": "428381170351556"
+                                },
+                                "contacts": [
+                                    {
+                                        "profile": {
+                                            "name": "Max Risher"
+                                        },
+                                        "wa_id": "17204761234"
+                                    }
+                                ],
+                                "messages": [
+                                    {
+                                        "from": "17204761234",
+                                        "id": "wamid.fake28=",
+                                        "timestamp": "1725047264",
+                                        "text": {
+                                            "body": "One cup oatmeal"
+                                        },
+                                        "type": "text"
+                                    }
+                                ]
+                            },
+                            "field": "messages"
+                        }
+                    ]
+                }
+            ]
         }
 
         self.invalid_payload = {
@@ -131,7 +201,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
         self.assertEqual(json.loads(response.content), {'status': 'success', 'message': 'sent onboarding message to user'})
 
         # Check the new user is created
-        self.assertTrue(WhatsappUser.objects.filter(whatsapp_id="1234567890").exists())
+        self.assertTrue(WhatsappUser.objects.filter(whatsapp_id="13034761234").exists())
 
     @patch('whatsapp_bot.views.send_to_lambda')
     def test_text_message_existing_user(self, mock_send_to_lambda):
@@ -153,7 +223,7 @@ class WhatsappWebhookIntegrationTest(TestCase):
                                     content_type='application/json',
                                     data=json.dumps(self.invalid_payload))
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(json.loads(response.content), {'error': 'Invalid payload structure'})
+        self.assertEqual(json.loads(response.content), {'error': 'Error processing webhook'})
 
 
 class FoodProcessingLambdaWebhookIntegrationTest(TestCase):

@@ -38,6 +38,8 @@ def _handle_whatsapp_webhook_get(request):
 def _handle_whatsapp_webhook_post(request):
     try:
         payload_from_whatsapp = PayloadFromWhatsapp(request)
+
+        logger.info(payload_from_whatsapp.request_dict)
     
         payload_from_whatsapp.get_whatsapp_wa_id()
         payload_from_whatsapp.get_or_create_whatsapp_user_in_dj_db()
@@ -48,6 +50,8 @@ def _handle_whatsapp_webhook_post(request):
             return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
         
         elif payload_from_whatsapp.is_delete_request:
+            logger.info("processing delete request")
+
             payload_from_whatsapp.get_whatsapp_interactive_button_data()
 
             handle_delete_meal_request(payload_from_whatsapp.whatsapp_interactive_button_id, 
@@ -74,6 +78,7 @@ def _handle_whatsapp_webhook_post(request):
 
         # This is what we return if we don't get a text or button message
         else:
+            logger.error('Invalid payload structure')
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
         
     except Exception as e:
