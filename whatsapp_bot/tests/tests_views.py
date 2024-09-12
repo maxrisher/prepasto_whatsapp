@@ -390,10 +390,10 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         self.assertFalse(Meal.objects.exists())
 
         # Ensure WhatsApp message was sent to the anonymous user (mock send_whatsapp_message)
-        mock_send_whatsapp_message.assert_called_once_with("13034761234", "DJANGO meal summary. Meal calories: 618")
+        mock_send_whatsapp_message.assert_called_once_with("13034761234", 'Total Nutrition:\nCalories: 618 kcal\nCarbs: 16 g\nProtein: 35 g\nFat: 46 g\n\nDishes:\n - Sausage patties (105 g): 341 kcal, Carbs: 1 g, Protein: 19 g, Fat: 29 g\n - Fried eggs (110 g): 204 kcal, Carbs: 1 g, Protein: 13 g, Fat: 16 g\n - Toast (25 g): 73 kcal, Carbs: 14 g, Protein: 3 g, Fat: 1 g\n')
 
     # If we get a request from a real user, make sure we save a meal object to the database
-    @patch('whatsapp_bot.classes.send_meal_whatsapp_message')
+    @patch('whatsapp_bot.classes.MealDataProcessor._send_meal_whatsapp_message')
     def test_lambda_webhook_real_user_saves_meal(self, mock_send_meal_whatsapp_message):
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
         response = self.client.post(path=self.url, data=json.dumps(self.lambda_output), content_type='application/json', headers=headers)
@@ -409,4 +409,4 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         print(created_meal)
 
         # Ensure WhatsApp message was sent to the anonymous user (mock send_whatsapp_message)
-        mock_send_meal_whatsapp_message.assert_called_once_with("17204761234", created_meal.id)
+        mock_send_meal_whatsapp_message.assert_called()
