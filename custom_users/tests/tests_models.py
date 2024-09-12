@@ -5,7 +5,6 @@ import pytz
 from datetime import datetime
 
 class CustomUserTest(TestCase):
-
     def test_current_date_property(self):
         # Step 1: Create a user with a specific timezone
         user = CustomUser.objects.create(

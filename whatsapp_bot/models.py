@@ -4,8 +4,7 @@ from django.conf import settings
 from main_app.models import Meal
 
 class WhatsappUser(models.Model):
-    phone_number = models.CharField(max_length=20, unique=True)
-    whatsapp_id = models.CharField(max_length=255, unique=True, blank=True, null=True)
+    whatsapp_wa_id = models.CharField(max_length=20, unique=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -15,7 +14,7 @@ class WhatsappUser(models.Model):
     )
 
     def __str__(self):
-        return f"{self.phone_number}"
+        return f"{self.whatsapp_wa_id}"
     
 class WhatsappMessage(models.Model):
     DIRECTION_CHOICES = [

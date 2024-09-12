@@ -17,9 +17,41 @@ class Diary(models.Model):
         total_calories = self.meals.aggregate(total_calories=Sum('calories'))['total_calories'] or 0
         return total_calories
     
+    @property
+    def carbs(self):
+        total_carbs = self.meals.aggregate(total_carbs=Sum('carbs'))['total_carbs'] or 0
+        return total_carbs
+    
+    @property
+    def fat(self):
+        total_fat = self.meals.aggregate(total_fat=Sum('fat'))['total_fat'] or 0
+        return total_fat
+    
+    @property
+    def protein(self):
+        total_protein = self.meals.aggregate(total_protein=Sum('protein'))['total_protein'] or 0
+        return total_protein
+    
     def send_daily_total(self):
         from whatsapp_bot.utils import send_whatsapp_message
-        send_whatsapp_message(self.custom_user.phone, f"Your daily calorie total is: {self.calories}")
+        send_whatsapp_message(self.custom_user.phone, self._write_daily_total_message())
+
+    def _write_daily_total_message(self):
+        total_calories = self.calories
+        total_carbs = self.carbs
+        total_fat = self.fat
+        total_protein = self.protein
+
+        date_str = self.local_date.strftime("%-d %B, %Y") # Example: August 5, 2024
+        message = (
+            f"Daily Summary - {date_str}\n\n"
+            f"Calories\n{total_calories:,} kcal\n\n"
+            f"Macros\n"
+            f"Carbs: {total_carbs}g\n"
+            f"Fat: {total_fat}g\n"
+            f"Protein: {total_protein}g"
+        )
+        return message
 
 class Meal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
