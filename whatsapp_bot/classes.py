@@ -70,7 +70,7 @@ class PayloadFromWhatsapp:
     
     # Sends a whatsapp message to a user, introducing them to Prepasto
     def onboard_message_sender(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "DJ: Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
+        send_whatsapp_message(self.whatsapp_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
 
     def get_whatsapp_text_message_data(self):
         self.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
