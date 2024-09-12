@@ -7,23 +7,6 @@ from typing import List, Dict
 from llm_utils import dish_to_categories, select_food_code, get_food_grams, dish_list_from_log
 from helpers import calculate_nutrition, send_to_django
 
-def send_whatsapp_message(recipient, message):
-    headers = {
-        "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
-        "Content-Type": "application/json",
-    }
-
-    data = data = {
-        "messaging_product": "whatsapp",
-        "to": recipient,
-        "type": "text",
-        "text": {"body": message},
-    }
-
-    #The Whatsapp api url contains the phone number that we use to send messages to users
-    response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
-    return response.json()
-
 # This is the main function for the lambda!
 def lambda_handler(event, context):
 
@@ -32,8 +15,7 @@ def lambda_handler(event, context):
     
     print(json.dumps(event))
 
-    send_whatsapp_message(sender, "Got your message, I'm thinking on it!")
-    print('Tried to send confirmation message.')
+    # No longer send messages directly from the lambda
 
     response = analyze_meal(text)
 
@@ -51,7 +33,7 @@ def lambda_handler(event, context):
                         f"Protein: {round(dish['nutrition']['protein'])} g, "
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
     
-    send_whatsapp_message(sender, text_reply)
+    # No longer send messages directly from the lambda
 
     response['meal_requester_whatsapp_wa_id'] = sender
     response['original_message'] = text
