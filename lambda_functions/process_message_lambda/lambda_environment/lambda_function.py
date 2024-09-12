@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     
     print(json.dumps(event))
 
-    # No longer send messages directly from the lambda
+    #NB: No longer send messages directly from the lambda
 
     response = analyze_meal(text)
 
