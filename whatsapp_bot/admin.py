@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import WhatsappMessage, WhatsappUser
 
-# Register your models here.
+admin.site.register(WhatsappUser)
+admin.site.register(WhatsappMessage)
