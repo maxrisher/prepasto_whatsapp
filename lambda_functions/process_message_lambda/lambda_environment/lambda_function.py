@@ -33,7 +33,7 @@ def lambda_handler(event, context):
                         f"Protein: {round(dish['nutrition']['protein'])} g, "
                         f"Fat: {round(dish['nutrition']['fat'])} g\n")
     
-    # No longer send messages directly from the lambda
+    #NB No longer send messages directly from the lambda
 
     response['meal_requester_whatsapp_wa_id'] = sender
     response['original_message'] = text
