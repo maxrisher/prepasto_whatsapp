@@ -1,4 +1,5 @@
 # prepasto_whatsapp
+## whatsapp_bot
 
 # Django hosted on railway
 
@@ -10,7 +11,7 @@ Deployment:
 - Download docker and the 'aws sam' CLI
 - Run docker on your machine. 
 - from the top level directory run: sam build --use-container
-- run: sam build
+- run: sam deploy
 - go through the menus
 - You need to update the RAILWAY_PUBLIC_DOMAIN in the lambda to reflect either production or staging depending on what's needed
 
@@ -22,10 +23,17 @@ aws lambda list-versions-by-function --function-name prepasto-whatsapp-sam-app-P
 
 # Testing
 
+# Creating a new feature
+- Change the railway url on AWS
+- Change the AWS alias on railway
+
 # TODOs:
 ## general
+- Update testing of main app models
+- Rotate secrets
 - Handle users changing timezones
 - use dataclasses for dish objects "from dataclasses import dataclass, asdict"
+- index the direction and timestamp fields for better query performance of messages
 
 ## security
 - Turn off debug on production django site

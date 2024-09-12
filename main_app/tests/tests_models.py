@@ -19,17 +19,9 @@ class MealModelTest(TestCase):
         )
         self.user.time_zone = 'America/New_York'
 
-        user_time_zone_object = pytz.timezone(self.user.time_zone)
-        # Get the current time in UTC
-        current_utc_time = timezone.now()
-        # Convert the current UTC time to the user's time zone
-        user_local_time = current_utc_time.astimezone(user_time_zone_object)
-        # Extract the date part (year, month, day) from the localized time
-        user_local_date = user_local_time.date()
-
         self.diary = Diary.objects.create(
             custom_user=self.user,
-            local_date=user_local_date
+            local_date=self.user.current_date
         )
 
     def test_meal_creation(self):
@@ -37,6 +29,7 @@ class MealModelTest(TestCase):
         meal = Meal.objects.create(
             custom_user=self.user,
             diary = self.diary,
+            local_date = self.user.current_date,
             calories=2000,
             fat=70,
             carbs=250,
@@ -68,17 +61,10 @@ class MealTimezoneTest(TestCase):
             password='testpass',
         )
         self.user_gmt_minus_12.time_zone = 'Etc/GMT+12'  # A timezone 12 hours behind UTC
-        user_gmt_minus_12_time_zone_object = pytz.timezone(self.user_gmt_minus_12.time_zone)
-        # Get the current time in UTC
-        current_utc_time = timezone.now()
-        # Convert the current UTC time to the user's time zone
-        user_gmt_minus_12_local_time = current_utc_time.astimezone(user_gmt_minus_12_time_zone_object)
-        # Extract the date part (year, month, day) from the localized time
-        user_gmt_minus_12_local_date = user_gmt_minus_12_local_time.date()
 
         self.diary_gmtm12 = Diary.objects.create(
             custom_user=self.user_gmt_minus_12,
-            local_date=user_gmt_minus_12_local_date
+            local_date=self.user_gmt_minus_12.current_date
         )
 
         self.user_kiritimati = CustomUser.objects.create_user(
@@ -86,15 +72,10 @@ class MealTimezoneTest(TestCase):
             password='testpass',
         )
         self.user_kiritimati.time_zone = 'Pacific/Kiritimati'  # A timezone 14 hours ahead of UTC
-        u_kir_time_zone_object = pytz.timezone(self.user_kiritimati.time_zone)
-        # Convert the current UTC time to the user's time zone
-        u_kir_local_time = current_utc_time.astimezone(u_kir_time_zone_object)
-        # Extract the date part (year, month, day) from the localized time
-        u_kir_local_date = u_kir_local_time.date()
 
         self.diary_kir = Diary.objects.create(
             custom_user=self.user_kiritimati,
-            local_date=u_kir_local_date
+            local_date=self.user_kiritimati.current_date
         )
 
     def test_meal_dates_different_timezones(self):
@@ -104,30 +85,24 @@ class MealTimezoneTest(TestCase):
         logger.info(utc_time)
 
         # Create Meal instances without saving to DB initially
-        Meal_gmt_minus_12 = Meal(
+        Meal_gmt_minus_12 = Meal.objects.create(
             custom_user=self.user_gmt_minus_12,
             diary = self.diary_gmtm12,
+            local_date = self.user_gmt_minus_12.current_date,
             calories=2000,
             fat=70,
             carbs=250,
             protein=100
         )
-        Meal_kiritimati = Meal(
+        Meal_kiritimati = Meal.objects.create(
             custom_user=self.user_kiritimati,
             diary = self.diary_kir,
+            local_date = self.user_kiritimati.current_date,
             calories=1800,
             fat=60,
             carbs=220,
             protein=90
         )
-
-        # Manually set the created_at_utc attribute for both
-        Meal_gmt_minus_12.created_at_utc = utc_time
-        Meal_kiritimati.created_at_utc = utc_time
-
-        # Manually call the save method to trigger the local_date calculation
-        Meal_gmt_minus_12.save()
-        Meal_kiritimati.save()
 
         # Calculate expected local dates based on the UTC time and timezones
         gmt_minus_12_timezone = pytz.timezone("Etc/GMT+12")
@@ -153,9 +128,7 @@ class MealTimezoneTest(TestCase):
         # Also ensure that both diaries were saved correctly
         self.assertEqual(Meal.objects.count(), 2)
 
-# test diaries
-# test a unique diary constraint
-
+# test daily calorie total
 class DiaryModelTest(TestCase):
     def setUp(self):
         # Set up a user with a specific timezone
@@ -176,6 +149,7 @@ class DiaryModelTest(TestCase):
         meal1 = Meal.objects.create(
             custom_user=self.user,
             diary = self.diary,
+            local_date = self.user.current_date,
             calories=500,
             fat=70,
             carbs=250,
@@ -185,6 +159,7 @@ class DiaryModelTest(TestCase):
         meal2 = Meal.objects.create(
             custom_user=self.user,
             diary = self.diary,
+            local_date = self.user.current_date,
             calories=700,
             fat=70,
             carbs=250,
