@@ -32,7 +32,7 @@ class Meal:
           similar_dishes=single_dish["similar_dishes"]
       )
       for single_dish in dish_list]
-    self.llm_responses['dish_from_log'] = full_response
+    self.llm_responses['dish_list_from_log'] = full_response
     print(f"Created {len(self.dishes)} dishes")
 
   async def _process_dishes(self):

@@ -238,7 +238,7 @@ dish_schema = {
     "nutrition": {
       "type": ["object"],
       "additionalProperties": {
-        "type": "number"
+        "type": "integer"
       },
       "description": "A dictionary containing nutritional information, where keys are nutrient names and values are nutrient quantities"
     },

@@ -7,7 +7,8 @@ lambda_function_path = os.path.join(os.path.dirname(__file__), '..', 'lambda_fun
 # In our python path for searching for modules, put the lambda's path at the front
 # Convert the lambda's path into an absolute path -- remove any ambiguity of where it is.
 sys.path.insert(0, os.path.abspath(lambda_function_path))
-from lambda_function import lambda_handler
+
+from search_usda import google_search_usda_async
 
 @pytest.fixture
 def go_to_lambda_dir():
@@ -16,15 +17,11 @@ def go_to_lambda_dir():
     yield
     os.chdir(initial_dir)
 
-@pytest.fixture
-def mock_post_request_django(requests_mock):
-    requests_mock.post('https://127.0.0.1/bot/lambda_webhook/', json={'status': 'success'}, status_code = 200)
-    
-def test_lambda_full(go_to_lambda_dir, mock_post_request_django):
-    event = {'sender_message': "three sausage patties, two fried eggs, one slice of toast",
-             'sender_whatsapp_wa_id': 123456789}
-    context = ''
-    print("START")
-    response = lambda_handler(event, context)
-    assert response['statusCode'] == 200  # Ensure the response is happy
-    print("END")
+# Test function to ensure that the code 2341206 is in the food_data_central_code_list for "cheese sandwich"
+@pytest.mark.asyncio
+async def test_google_search_usda_cheese_sandwich(go_to_lambda_dir):
+    # Query for cheese sandwich
+    food_data_central_code_list = await google_search_usda_async("cheese sandwich")
+
+    # Check that 2341206 is one of the food codes
+    assert 2341206 in food_data_central_code_list, "Expected food code 2341206 not found in the results"

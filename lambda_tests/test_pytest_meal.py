@@ -34,39 +34,39 @@ def test_meal_process_flow(go_to_lambda_dir):
 
     # Assert
     assert meal.total_nutrition['calories'] > 0, "Total calories should be greater than 0"
-    assert 'dish_from_log' in meal.llm_responses, "'dish_from_log' should be in llm_responses"
-    # assert len(meal.llm_responses) == 4, "LLM responses should contain the dish response for 'Cheese sandwich'"
+    assert 'dish_list_from_log' in meal.llm_responses, "'dish_list_from_log' should be in llm_responses"
+    assert len(meal.llm_responses) == 2, "LLM responses should contain the meal response and the dict of dish responses for 'Cheese sandwich'"
+    assert len(meal.dishes[0].llm_responses) == 3, "LLM responses should contain the dish response for 'Cheese sandwich'"
     assert meal.errors == [], "There should be no errors"
 
     # Validate against JSON schema
     meal_dict = meal.to_dict()
     validate_against_schema(meal_dict)
 
-# def test_meal_creation_and_processing(go_to_lambda_dir):
-#     # Arrange
-#     meal = Meal("I had a cheese sandwich and an apple")
+def test_meal_creation_and_processing(go_to_lambda_dir):
+    # Arrange
+    meal = Meal("I had a cheese sandwich and an apple")
 
-#     # Act
-#     meal.process()
+    # Act
+    meal.process()
 
-#     # Assert
-#     assert len(meal.dishes) == 2, "There should be 2 dishes"
-#     assert meal.total_nutrition['calories'] > 0, "Total calories should be greater than 0"
-#     assert 'dish_from_log' in meal.llm_responses, "'dish_from_log' should be in llm_responses"
-#     # assert 'dish_responses_Cheese sandwich' in meal.llm_responses, "LLM responses should contain the dish response for 'Cheese sandwich'"
-#     # assert 'dish_responses_Apple' in meal.llm_responses, "LLM responses should contain the dish response for 'Apple'"
-#     assert meal.errors == [], "There should be no errors"
+    # Assert
+    assert len(meal.dishes) == 2, "There should be 2 dishes"
+    assert meal.total_nutrition['calories'] > 0, "Total calories should be greater than 0"
+    assert 'dish_list_from_log' in meal.llm_responses, "'dish_list_from_log' should be in llm_responses"
+    assert len(meal.llm_responses) == 3, "LLM responses should contain 1) the meal response 2) the dict of dish responses for 'Cheese sandwich' 3) the dict of dish responses for 'Apple'"
+    assert meal.errors == [], "There should be no errors"
 
-#     # Validate the final meal dictionary against the JSON schema
-#     meal_dict = meal.to_dict()
-#     validate_against_schema(meal_dict)
+    # Validate the final meal dictionary against the JSON schema
+    meal_dict = meal.to_dict()
+    validate_against_schema(meal_dict)
 
-#     # Ensure the final structure matches expected values
-#     expected_dict = {
-#         "description": "I had a cheese sandwich and an apple",
-#         "dishes": [dish.to_full_dict() for dish in meal.dishes],
-#         "total_nutrition": meal.total_nutrition,
-#         "errors": meal.errors,
-#         "llm_responses": meal.llm_responses
-#     }
-#     assert meal_dict == expected_dict, "The meal's dictionary representation should match the expected structure"
+    # Ensure the final structure matches expected values
+    expected_dict = {
+        "description": "I had a cheese sandwich and an apple",
+        "dishes": [dish.to_full_dict() for dish in meal.dishes],
+        "total_nutrition": meal.total_nutrition,
+        "errors": meal.errors,
+        "llm_responses": meal.llm_responses
+    }
+    assert meal_dict == expected_dict, "The meal's dictionary representation should match the expected structure"
