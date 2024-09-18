@@ -1,6 +1,5 @@
 <PortionReference>
-{portion_csv}
-</PortionReference>
+{portion_csv}</PortionReference>
 <FoodLog>
 Food: {name}
 Quantity: {amount}
