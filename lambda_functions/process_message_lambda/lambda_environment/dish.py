@@ -12,10 +12,10 @@ FOOD_CODES_LOOKUP = 'full_food_code_lookup_sep_16.csv'
 FNDDS_AND_SR_NUTRITION_CSV_PATH = '05_thalos_fndds_and_sr_nutrients.csv'
 
 class Dish:
-  def __init__(self, name: str, usual_ing: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):
+  def __init__(self, name: str, usual_ingredients: List[str], state: str, qualifiers: List[str], confirmed_ing: List[str], amount: str, similar_dishes: List[str]):
     # Attributes to set on initialization
     self.name = name
-    self.usual_ing = usual_ing
+    self.usual_ingredients= usual_ingredients
     self.state = state
     self.qualifiers = qualifiers
     self.confirmed_ing = confirmed_ing
@@ -118,7 +118,7 @@ class Dish:
   def to_simple_dict(self):
     return {
       'name': self.name,
-      'usual_ingredients': self.usual_ing,
+      'usual_ingredients': self.usual_ingredients,
       'state': self.state,
       'qualifiers': self.qualifiers,
       'confirmed_ingredients': self.confirmed_ing,
@@ -128,7 +128,7 @@ class Dish:
   def to_full_dict(self):
     return {
         'name': self.name,
-        'usual_ingredients': self.usual_ing,
+        'usual_ingredients': self.usual_ingredients,
         'state': self.state,
         'qualifiers': self.qualifiers,
         'confirmed_ingredients': self.confirmed_ing,
@@ -158,7 +158,7 @@ dish_schema = {
       "type": "string",
       "description": "A short and general description of the food. If we're lucky, there will be a FNDDS dish with the same name. E.g., 'Shepherd's pie'."
     },
-    "common_ingredients": {
+    "usual_ingredients": {
       "type": "array",
       "items": {
         "type": "string"
@@ -206,28 +206,57 @@ dish_schema = {
       "description": "List of errors encountered during processing"
     },
     "candidate_thalos_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
+      "type": "object",
+      "properties": {
+        "fndds_category_search_results": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "fndds_and_sr_legacy_google_search_results": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
       },
-      "description": "List of candidate food codes for the dish"
+      "description": "List of candidate food codes for the dish."
     },
     "matched_thalos_id": {
+      "type": ["integer"],
+      "description": "The matched food code"
+    },
+    "usda_food_data_central_id": {
       "type": ["integer", "null"],
-      "description": "The matched food code, or null if none is matched"
+      "description": "USDA Food Data Central ID for the matched food, or null if not found."
     },
     "grams": {
-      "type": ["number", "null"],
+      "type": ["integer"],
       "description": "The weight of the dish in grams, or null if not specified"
     },
     "nutrition": {
-      "type": ["object", "null"],
+      "type": ["object"],
       "additionalProperties": {
         "type": "number"
       },
       "description": "A dictionary containing nutritional information, where keys are nutrient names and values are nutrient quantities"
+    },
+    "fndds_categories": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "description": "FNDDS categories matched for the dish."
+    },
+    "google_search_queries_usda_site": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of Google search queries used to search the USDA site."
     }
   },
-  "required": ["name", "common_ingredients", "state", "amount", "similar_dishes", "llm_responses", "errors", "candidate_thalos_ids", "matched_thalos_id", "grams", "nutrition"],
+  "required": ["name", "usual_ingredients", "state", "qualifiers", "confirmed_ingredients", "amount", "similar_dishes", "llm_responses", "errors", "candidate_thalos_ids", "matched_thalos_id", "usda_food_data_central_id", "grams", "nutrition", "fndds_categories", "google_search_queries_usda_site"],
   "additionalProperties": False
 }

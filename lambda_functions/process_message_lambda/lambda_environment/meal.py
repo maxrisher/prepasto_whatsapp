@@ -23,7 +23,7 @@ class Meal:
     dish_list, full_response = dish_list_from_log(self.description)
     self.dishes = [
       Dish(name=single_dish["name"],
-          usual_ing=single_dish["common_ingredients"],
+          usual_ingredients=single_dish["common_ingredients"],
           state=single_dish["state"],
           qualifiers=single_dish["qualifiers"],
           confirmed_ing=single_dish["confirmed_ingredients"],
