@@ -57,7 +57,7 @@ class Dish:
     await asyncio.gather(category_matching_task, google_search_task, return_exceptions=False)
 
   async def _fndds_codes_from_category_filtering(self):
-    llm_call_dict = await dish_dict_to_fndds_categories(self.to_dict())
+    llm_call_dict = await dish_dict_to_fndds_categories(self.to_simple_dict())
     self.llm_responses['dish_to_categories'] = llm_call_dict['llm_response']
     self.fndds_categories = llm_call_dict['fndds_categories']
 
@@ -78,7 +78,7 @@ class Dish:
 
     most_likely_food_codes = self._create_usda_code_shortlist()
 
-    best_code_dict = await FoodDescriptionDataset("fndds_and_sr_legacy_foods", FNDDS_AND_SR_LEGACY_DESCRIPTIONS_CSV_PATH).pick_best_entry(self.to_dict(), most_likely_food_codes)
+    best_code_dict = await FoodDescriptionDataset("fndds_and_sr_legacy_foods", FNDDS_AND_SR_LEGACY_DESCRIPTIONS_CSV_PATH).pick_best_entry(self.to_simple_dict(), most_likely_food_codes)
 
     self.matched_thalos_id = best_code_dict['final_food_code']
     self.llm_responses['best_food_code'] = best_code_dict['llm_response']
@@ -98,7 +98,7 @@ class Dish:
     self.usda_food_data_central_id = FoodCodeLookup("food codes lookup", FOOD_CODES_LOOKUP).get_usda_food_data_central_id(self.matched_thalos_id)
   
   async def _estimate_food_quantity(self):
-    gram_estimate_dict = await FoodPortionDataset("fndds_and_sr_legacy_portions", FNDDS_AND_SR_LEGACY_PORTIONS_CSV_PATH).estimate_food_quantity(self.to_dict(), self.matched_thalos_id)
+    gram_estimate_dict = await FoodPortionDataset("fndds_and_sr_legacy_portions", FNDDS_AND_SR_LEGACY_PORTIONS_CSV_PATH).estimate_food_quantity(self.to_simple_dict(), self.matched_thalos_id)
     self.grams = gram_estimate_dict['grams']
     self.llm_responses['grams_estimate'] = gram_estimate_dict['llm_response']
   
@@ -115,7 +115,7 @@ class Dish:
                       'fat': fat,
                       'protein': protein}
 
-  def to_dict(self):
+  def to_simple_dict(self):
     return {
       'name': self.name,
       'usual_ingredients': self.usual_ing,
@@ -125,6 +125,26 @@ class Dish:
       'amount': self.amount,
       'similar_dishes': self.similar_dishes}
   
+  def to_full_dict(self):
+    return {
+        'name': self.name,
+        'usual_ingredients': self.usual_ing,
+        'state': self.state,
+        'qualifiers': self.qualifiers,
+        'confirmed_ingredients': self.confirmed_ing,
+        'amount': self.amount,
+        'similar_dishes': self.similar_dishes,
+        'llm_responses': self.llm_responses,
+        'errors': self.errors,
+        'candidate_thalos_ids': self.candidate_thalos_ids,
+        'matched_thalos_id': self.matched_thalos_id,
+        'usda_food_data_central_id': self.usda_food_data_central_id,
+        'grams': self.grams,
+        'nutrition': self.nutrition,
+        'fndds_categories': self.fndds_categories,
+        'google_search_queries_usda_site': self.google_search_queries_usda_site
+    }
+
   def __repr__(self):
     return self.name
   

@@ -71,7 +71,7 @@ class Meal:
   def to_dict(self):
     return {
       "description": self.description,
-      "dishes": self.dishes,
+      "dishes": [dish.to_full_dict() for dish in self.dishes],
       "total_nutrition": self.total_nutrition,
       "errors": self.errors,
       "llm_responses": self.llm_responses
