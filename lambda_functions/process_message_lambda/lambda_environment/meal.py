@@ -32,6 +32,7 @@ class Meal:
       )
       for single_dish in dish_list]
     self.llm_responses['dish_from_log'] = full_response
+    print(f"Created f{len(self.dishes)} dishes")
 
   async def _process_dishes(self):
     # for each dish, process it independently. No need to create_tasks() here on the dish.process() coroutines because we're gathering immediately.

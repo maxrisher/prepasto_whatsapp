@@ -16,10 +16,16 @@ def go_to_lambda_dir():
     yield
     os.chdir(initial_dir)
 
-def test_lambda_full(go_to_lambda_dir):
+@pytest.fixture
+def mock_post_request_django(requests_mock):
+    requests_mock.post('https://127.0.0.1/bot/lambda_webhook/', json={'status': 'success'}, status_code = 200)
+    
+
+def test_lambda_full(go_to_lambda_dir, mock_post_request_django):
     event = {'sender_message': "three sausage patties, two fried eggs, one slice of toast",
              'sender_whatsapp_wa_id': 123456789}
+    context = ''
     print("START")
     response = lambda_handler(event, context)
-    assert response.statusCode == 200  # Ensure the response happy
+    assert response['statusCode'] == 200  # Ensure the response is happy
     print("END")

@@ -44,8 +44,11 @@ class Dish:
       self._get_usda_food_data_central_id() #No web requests, no need to async
       await self._estimate_food_quantity()
       self._calculate_nutrition() #No web requests, no need to async
+      print(f"Dish nutrition for {self.name}:")
+      print(self.nutrition)
     except Exception as e:
       self.errors.append(str(e))
+      raise
 
   async def _get_candidate_database_matches(self):
     category_matching_task = self._fndds_codes_from_category_filtering()
