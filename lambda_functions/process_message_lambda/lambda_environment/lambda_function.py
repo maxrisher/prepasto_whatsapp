@@ -24,14 +24,14 @@ def lambda_handler(event, context):
     }
 
     #Do heavy lifting
-    # try:
-    new_meal = Meal(text)
-    new_meal.process()
-    response_data['meal_data'] = new_meal.to_dict()
+    try:
+        new_meal = Meal(text)
+        new_meal.process()
+        response_data['meal_data'] = new_meal.to_dict()
 
     #catch any unhandled errors and send to django
-    # except Exception as e:
-    #     response_data['unhandled_errors'] = str(e)
+    except Exception as e:
+        response_data['unhandled_errors'] = str(e)
 
     #Log performance
     end_time = time.time()
