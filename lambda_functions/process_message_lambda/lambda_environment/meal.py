@@ -1,7 +1,7 @@
 from typing import List, Dict
 import asyncio
 
-from dish import Dish
+from dish import Dish, dish_schema
 from llm_calls import dish_list_from_log
 
 class Meal:
@@ -18,6 +18,7 @@ class Meal:
     self._calculate_total_nutrition()
     self._get_dish_llm_responses()
     self._get_dish_errors()
+    print(self.to_dict())
 
   def _create_dishes(self):
     dish_list, full_response = dish_list_from_log(self.description)
@@ -32,7 +33,7 @@ class Meal:
       )
       for single_dish in dish_list]
     self.llm_responses['dish_from_log'] = full_response
-    print(f"Created f{len(self.dishes)} dishes")
+    print(f"Created {len(self.dishes)} dishes")
 
   async def _process_dishes(self):
     # for each dish, process it independently. No need to create_tasks() here on the dish.process() coroutines because we're gathering immediately.
@@ -90,9 +91,7 @@ meal_schema = {
     },
     "dishes": {
       "type": "array",
-      "items": {
-        "$ref": "https://thalos.fit/dish.schema.json"
-      },
+      "items": dish_schema,
       "description": "A list of Dish objects that are part of this meal."
     },
     "total_nutrition": {
@@ -112,9 +111,6 @@ meal_schema = {
     },
     "llm_responses": {
       "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      },
       "description": "Responses from the language model from dish extraction."
     }
   },

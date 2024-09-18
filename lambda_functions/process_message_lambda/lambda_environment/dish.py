@@ -65,12 +65,12 @@ class Dish:
 
   async def _usda_codes_from_usda_google_search(self):
     self._generate_google_search_queries()
-    food_data_central_codes = await google_search_usda_async(self.google_search_queries_usda_site)
+    food_data_central_codes = await google_search_usda_async(self.google_search_queries_usda_site[0])
 
     self.candidate_thalos_ids['fndds_and_sr_legacy_google_search_results'] = FoodCodeLookup("food codes lookup", FOOD_CODES_LOOKUP).get_thalos_id_list(food_data_central_codes)
   
   def _generate_google_search_queries(self):
-    self.google_search_queries_usda_site = self.name
+    self.google_search_queries_usda_site = [self.name]
 
   async def _pick_final_database_match(self):
     # in the master database, filter down to just the candidate matches
