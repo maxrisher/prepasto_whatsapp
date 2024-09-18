@@ -15,20 +15,29 @@ def lambda_handler(event, context):
     print("New event received:")
     print(json.dumps(event))
 
+    response_data = {
+        'meal_requester_whatsapp_wa_id': sender,
+        'original_message': text,
+        'meal_data': None,
+        'unhandled_errors': None,
+        'seconds_elapsed': None,
+    }
+
     #Do heavy lifting
-    new_meal = Meal(text)
-    new_meal.process()
+    try:
+        new_meal = Meal(text)
+        new_meal.process()
+        response_data['meal_data'] = new_meal.to_dict()
+
+    #catch any unhandled errors and send to django
+    except Exception as e:
+        response_data['unhandled_error'] = e
 
     #Log performance
     end_time = time.time()
     seconds_elapsed = end_time - start_time
 
-    response_data = {
-        'meal_requester_whatsapp_wa_id': sender,
-        'original_message': text,
-        'meal_data': new_meal.to_dict(),
-        'seconds_elapsed': seconds_elapsed,
-    }
+    response_data['seconds_elapsed'] = seconds_elapsed
 
     send_to_django(response_data)
 
