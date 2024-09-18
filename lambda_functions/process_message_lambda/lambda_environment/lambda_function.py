@@ -39,6 +39,9 @@ def lambda_handler(event, context):
 
     response_data['seconds_elapsed'] = seconds_elapsed
 
+    print("full response data:")
+    print(response_data)
+
     send_to_django(response_data)
 
     print('Tried to send meal object to django.')
