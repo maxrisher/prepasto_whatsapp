@@ -40,10 +40,12 @@ class FoodDescriptionDataset(Dataset):
 
 class FoodCodeLookup(Dataset):
   def get_usda_food_data_central_id(self, thalos_id: int):
-    fdc_id = self.data_frame.loc[self.data_frame['thalos_id'] == thalos_id, 'fdc_id'].values[0]
+    fdc_id_and_name = self.data_frame.loc[self.data_frame['thalos_id'] == thalos_id, ['fdc_id', 'name']].values[0]
+    fdc_id = fdc_id_and_name[0]
+    food_name = fdc_id_and_name[1]
     if pd.isna(fdc_id):
-      return None
-    return int(fdc_id)
+      return None, food_name
+    return int(fdc_id), food_name
   
   def get_thalos_id_list(self, food_data_central_id_list: List[int]):
     filtered_food_codes = self.data_frame[self.data_frame['fdc_id'].isin(food_data_central_id_list)]

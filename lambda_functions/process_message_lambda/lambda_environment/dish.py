@@ -31,6 +31,7 @@ class Dish:
                                                        'fndds_and_sr_legacy_google_search_results': []}
     self.matched_thalos_id: int = None
     self.usda_food_data_central_id: int = None
+    self.usda_food_data_central_food_name: str = None
     self.grams: float = None
     self.nutrition: Dict[str, float] = None
     self.fndds_categories: List[int] = [] # FNDDS: Food and Nutrient Database for Dietary Studies
@@ -95,7 +96,10 @@ class Dish:
     return most_likely_food_codes
   
   def _get_usda_food_data_central_id(self):
-    self.usda_food_data_central_id = FoodCodeLookup("food codes lookup", FOOD_CODES_LOOKUP).get_usda_food_data_central_id(self.matched_thalos_id)
+    usda_code, usda_food_name = FoodCodeLookup("food codes lookup", FOOD_CODES_LOOKUP).get_usda_food_data_central_id(self.matched_thalos_id)
+
+    self.usda_food_data_central_id = usda_code
+    self.usda_food_data_central_food_name = usda_food_name
   
   async def _estimate_food_quantity(self):
     gram_estimate_dict = await FoodPortionDataset("fndds_and_sr_legacy_portions", FNDDS_AND_SR_LEGACY_PORTIONS_CSV_PATH).estimate_food_quantity(self.to_simple_dict(), self.matched_thalos_id)
@@ -231,6 +235,10 @@ dish_schema = {
       "type": ["integer", "null"],
       "description": "USDA Food Data Central ID for the matched food, or null if not found."
     },
+    "usda_food_data_central_food_name": {
+      "type": ["string"],
+      "description": "USDA Food Data Central name for the matched food"
+    },
     "grams": {
       "type": ["integer"],
       "description": "The weight of the dish in grams, or null if not specified"
@@ -257,6 +265,6 @@ dish_schema = {
       "description": "List of Google search queries used to search the USDA site."
     }
   },
-  "required": ["name", "usual_ingredients", "state", "qualifiers", "confirmed_ingredients", "amount", "similar_dishes", "llm_responses", "errors", "candidate_thalos_ids", "matched_thalos_id", "usda_food_data_central_id", "grams", "nutrition", "fndds_categories", "google_search_queries_usda_site"],
+  "required": ["name", "usual_ingredients", "state", "qualifiers", "confirmed_ingredients", "amount", "similar_dishes", "llm_responses", "errors", "candidate_thalos_ids", "matched_thalos_id", "usda_food_data_central_id", "usda_food_data_central_food_name", "grams", "nutrition", "fndds_categories", "google_search_queries_usda_site"],
   "additionalProperties": False
 }
