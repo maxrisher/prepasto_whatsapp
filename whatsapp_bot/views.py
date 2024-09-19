@@ -6,7 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .utils import send_to_lambda, handle_delete_meal_request
 from .models import WhatsappMessage
-from .classes import PayloadFromWhatsapp, MealDataProcessor
+from .payload_from_whatsapp import PayloadFromWhatsapp
+from .meal_data_processor import MealDataProcessor
 
 logger = logging.getLogger('whatsapp_bot')
 

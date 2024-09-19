@@ -298,7 +298,7 @@
         </SubGroup>
     </Group>
 </WweiaCategories>
-
+<Instructions>
 You are on a team that assigns "What We Eat in America" (WWEIA) codes to food from participant food diaries. Each participant food log (<FoodLog>) must be matched to one (just one!) of over 5,000 WWEIA codes. To facilitate this matching, your job is to narrow down the WWEIA food database to the proper WWEIA food category (in <WweiaCategories>) where we might find our match. Each WWEIA food category (in <WweiaCategory>) has about 40 WWEIA codes inside it. After you output your list of WWEIA categories, we will retreive all food codes in these categories and send them to an LLM to pick the single best WWEIA code for the participant food log (<FoodLog>). Although the <FoodLog> can only be assigned a single WWEIA code, we will ask you to give one or more possible WWEIA categories. This is beacause the LLM will only be able to look for WWEIA codes in the categories it's given. We don't want to omit a category which has the best WWEIA code for the <FoodLog>.
 
 You are given food logs (<FoodLog>). These are descriptions of dishes (a term for any food or beverage) which have been generated from participant food diaries. 
@@ -311,96 +311,96 @@ Step 4: output all likely <WweiaCategory> items from steps 1, 2 and 3 as your an
 Note 1: If there is any ambiguity in steps 1, 2, or 3 about which <WweiaCategory> is most likely, explain it. In your explanation, reference all <WweiaCategory> items in consideration.
 Note 2: For dishes that are very common in the United States, it is safe to only pass on one or two <WweiaCategory> items. For uncommon dishes, consider a wider range of possible <WweiaCategory> items.
 Note 3: Output your thinking within <Thinking> tags. Output your answer as <WweiaCategory> tags within an <Answer> tag.
-
+</Instructions>
 <Examples>
     <Example>
         <FoodLog>
-            {
-                "name": "toast with almond butter",
-                "common_ingredients": [
-                "bread",
-                "almond butter"
-                ],
-                "state": "toasted",
-                "qualifiers": null,
-                "confirmed_ingredients": [
-                "sourdough bread",
-                "almond butter"
-                ],
-                "amount": "one open-faced sandwich (one thick slice of sourdough bread, standard portion of almond butter)",
-                "similar_dishes": [
-                "peanut butter toast",
-                "peanut butter and jelly sandwich",
-                "toast with nutella",
-                "toast with avocado"
-                ]
-            }
+        {
+            "name": "toast with almond butter",
+            "common_ingredients": [
+            "bread",
+            "almond butter"
+            ],
+            "state": "toasted",
+            "qualifiers": null,
+            "confirmed_ingredients": [
+            "sourdough bread",
+            "almond butter"
+            ],
+            "amount": "one open-faced sandwich (one thick slice of sourdough bread, standard portion of almond butter)",
+            "similar_dishes": [
+            "peanut butter toast",
+            "peanut butter and jelly sandwich",
+            "toast with nutella",
+            "toast with avocado"
+            ]
+        }
         </FoodLog>
         <Thinking> 
-            Step 1: The dish "Toast with almond butter" includes both bread and almond butter, making it a type of sandwich or perhaps a category of spreads on bread. Given this, our main consideration should be:
-            - <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>, as this dish explicitly includes spreads on bread. Though it calls out peanut butter and jelly, other similar nut butter-based sandwiches may logically fit here.
-            
-            Step 2: Similar dishes listed ("Peanut butter toast," "Peanut butter and jelly sandwich," "Toast with Nutella," and "Toast with avocado") also point toward the sandwich category. A couple of considerations include the following:
-            - "Peanut butter toast" and "Peanut butter and jelly sandwich are captured under <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>. However, "Toast with avocado" is not. Therefore, "Toast with avocado" might be covered by "<WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory>.
-            
-            Step 3: The major ingredient in the dish is "Sourdough bread," and the most relevant category considering sourdough bread:
-            - <WweiaCategory code="4202">Yeast breads</WweiaCategory>, as this includes sourdough bread.
+        Step 1: The dish "Toast with almond butter" includes both bread and almond butter, making it a type of sandwich or perhaps a category of spreads on bread. Given this, our main consideration should be:
+        - <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>, as this dish explicitly includes spreads on bread. Though it calls out peanut butter and jelly, other similar nut butter-based sandwiches may logically fit here.
+        
+        Step 2: Similar dishes listed ("Peanut butter toast," "Peanut butter and jelly sandwich," "Toast with Nutella," and "Toast with avocado") also point toward the sandwich category. A couple of considerations include the following:
+        - "Peanut butter toast" and "Peanut butter and jelly sandwich are captured under <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory>. However, "Toast with avocado" is not. Therefore, "Toast with avocado" might be covered by "<WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory>.
+        
+        Step 3: The major ingredient in the dish is "Sourdough bread," and the most relevant category considering sourdough bread:
+        - <WweiaCategory code="4202">Yeast breads</WweiaCategory>, as this includes sourdough bread.
         </Thinking> 
         <Answer> 
-            <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory> 
-            <WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory> 
-            <WweiaCategory code="4202">Yeast breads</WweiaCategory> 
+        <WweiaCategory code="3722">Peanut butter and jelly sandwiches</WweiaCategory> 
+        <WweiaCategory code="3744">Vegetable sandwiches/burgers</WweiaCategory> 
+        <WweiaCategory code="4202">Yeast breads</WweiaCategory> 
         </Answer>
     </Example>
     <Example>
         <FoodLog>
-            {
-                "name": "Fish Fragrant Eggplant",
-                "common_ingredients": [
-                    "eggplant",
-                    "garlic",
-                    "ginger",
-                    "scallions",
-                    "soy sauce",
-                    "vinegar",
-                    "sugar",
-                    "chili paste"
-                ],
-                "state": "stir-fried",
-                "qualifiers": null,
-                "confirmed_ingredients": [
-                    "eggplant",
-                    "garlic",
-                    "ginger",
-                    "soy sauce"
-                ],
-                "amount": "not specified",
-                "similar_dishes": [
-                    "ratatouille",
-                    "spicy barbecue roasted vegetables",
-                    "cajun-spiced vegetables",
-                    "vegetable stir-fry with sweet and sour sauce"
-                ]
-            }
+        {
+            "name": "Fish Fragrant Eggplant",
+            "common_ingredients": [
+                "eggplant",
+                "garlic",
+                "ginger",
+                "scallions",
+                "soy sauce",
+                "vinegar",
+                "sugar",
+                "chili paste"
+            ],
+            "state": "stir-fried",
+            "qualifiers": null,
+            "confirmed_ingredients": [
+                "eggplant",
+                "garlic",
+                "ginger",
+                "soy sauce"
+            ],
+            "amount": "not specified",
+            "similar_dishes": [
+                "ratatouille",
+                "spicy barbecue roasted vegetables",
+                "cajun-spiced vegetables",
+                "vegetable stir-fry with sweet and sour sauce"
+            ]
+        }
         </FoodLog>
         <Thinking> 
-            Step 1: The dish "Fish Fragrant Eggplant" is a stir-fried vegetable dish primarily featuring eggplant and flavored with garlic, ginger, soy sauce, and other seasonings. This is not a very common dish in the USA, so I need to consider many categories. The most relevant WWEIA category for this dish would be:
-            - <WweiaCategory code="3104">Vegetable dishes</WweiaCategory>, as it encompasses a variety of vegetable-based dishes, including stir-fried vegetables.
-            
-            Step 2: The similar dishes listed ("ratatouille," "spicy barbecue roasted vegetables," "cajun-spiced vegetables," "vegetable stir-fry with sweet and sour sauce") also point towards vegetable-based dishes. Additional considerations include:
-            - <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory>, as this category includes dishes that are stir-fried and use soy-based sauces, which aligns with the preparation and ingredients of "Fish Fragrant Eggplant."
-            - <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>, since it includes other Asian-style stir-fried dishes, although it primarily focuses on rice and noodles.
-            - <WweiaCategory code="6430">Fried vegetables</WweiaCategory>, as this category includes various fried vegetable dishes, which could encompass stir-fried eggplant.
-            
-            Step 3: The major ingredient in the dish is "eggplant," and the most relevant category considering eggplant as a vegetable:
-            - <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory>, as this category includes various vegetables and combinations, which would cover eggplant-based dishes.
+        Step 1: The dish "Fish Fragrant Eggplant" is a stir-fried vegetable dish primarily featuring eggplant and flavored with garlic, ginger, soy sauce, and other seasonings. This is not a very common dish in the USA, so I need to consider many categories. The most relevant WWEIA category for this dish would be:
+        - <WweiaCategory code="3104">Vegetable dishes</WweiaCategory>, as it encompasses a variety of vegetable-based dishes, including stir-fried vegetables.
+        
+        Step 2: The similar dishes listed ("ratatouille," "spicy barbecue roasted vegetables," "cajun-spiced vegetables," "vegetable stir-fry with sweet and sour sauce") also point towards vegetable-based dishes. Additional considerations include:
+        - <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory>, as this category includes dishes that are stir-fried and use soy-based sauces, which aligns with the preparation and ingredients of "Fish Fragrant Eggplant."
+        - <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>, since it includes other Asian-style stir-fried dishes, although it primarily focuses on rice and noodles.
+        - <WweiaCategory code="6430">Fried vegetables</WweiaCategory>, as this category includes various fried vegetable dishes, which could encompass stir-fried eggplant.
+        
+        Step 3: The major ingredient in the dish is "eggplant," and the most relevant category considering eggplant as a vegetable:
+        - <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory>, as this category includes various vegetables and combinations, which would cover eggplant-based dishes.
         </Thinking> 
         <Answer> 
-            <WweiaCategory code="3104">Vegetable dishes</WweiaCategory> 
-            <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory> 
-            <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>
-            <WweiaCategory code="6430">Fried vegetables</WweiaCategory>
-            <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory> 
+        <WweiaCategory code="3104">Vegetable dishes</WweiaCategory> 
+        <WweiaCategory code="3404">Stir-fry and soy-based sauce mixtures</WweiaCategory> 
+        <WweiaCategory code="3402">Fried rice and lo/chow mein</WweiaCategory>
+        <WweiaCategory code="6430">Fried vegetables</WweiaCategory>
+        <WweiaCategory code="6420">Other vegetables and combinations</WweiaCategory> 
         </Answer>
     </Example>
 </Examples>
