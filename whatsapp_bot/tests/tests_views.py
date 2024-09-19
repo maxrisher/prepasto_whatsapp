@@ -1,7 +1,6 @@
 import json
 import os
-from unittest.mock import patch, MagicMock
-import unittest
+from unittest.mock import patch
 
 from django.test import TestCase, Client
 from django.urls import reverse
