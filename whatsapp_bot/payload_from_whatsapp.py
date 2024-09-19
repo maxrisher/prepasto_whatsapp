@@ -1,14 +1,10 @@
 import json
 import logging
-import requests
-import os
 
 from django.conf import settings
-from django.db import transaction
 
 from .utils import send_whatsapp_message
-from .models import WhatsappUser, WhatsappMessage
-from main_app.models import Meal, Diary
+from .models import WhatsappUser, 
 
 logger = logging.getLogger('whatsapp_bot')
 
