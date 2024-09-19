@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 
 from .utils import send_whatsapp_message
-from .models import WhatsappUser, 
+from .models import WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
