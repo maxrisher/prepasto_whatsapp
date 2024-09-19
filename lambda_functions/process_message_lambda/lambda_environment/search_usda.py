@@ -39,7 +39,7 @@ def extract_food_codes(urls):
 
 # Asynchronous function to perform USDA food code search
 async def google_search_usda_async(food_name):
-    # Craft search query excluding branded food
+    # Craft search query, excluding branded food
     query_exclude_branded = f"{food_name} -\"Data Type:Branded Food\""
 
     # Perform asynchronous Google search
