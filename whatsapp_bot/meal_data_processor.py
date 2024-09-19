@@ -2,6 +2,7 @@ import json
 import logging
 import requests
 import os
+from jsonschema import validate, RefResolver, ValidationError
 
 from django.conf import settings
 from django.db import transaction
@@ -9,6 +10,9 @@ from django.db import transaction
 from .utils import send_whatsapp_message
 from .models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Diary
+from .schemas.meal_schema import meal_schema
+from .schemas.dish_schema import dish_schema
+from .schemas.food_processing_lambda_webhook_schema import new_meal_from_lambda_payload_schema
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -34,6 +38,8 @@ class MealDataProcessor:
                 logger.error("Lambda returned an error!")
                 send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
                 return
+            
+            self._validate_payload()
 
             if self.custom_user is not None:
                 self._create_meal_for_prepasto_user()
@@ -48,6 +54,18 @@ class MealDataProcessor:
         self.payload = json.loads(self.request.body)
         logger.info("Payload decoded at lambda webhook: ")
         logger.info(self.payload)
+
+    def _validate_payload(self):
+        schema_path_resolver = RefResolver(base_uri="https://thalos.fit/", referrer=new_meal_from_lambda_payload_schema, store={
+            "https://thalos.fit/meal.schema.json": meal_schema,
+            "https://thalos.fit/dish.schema.json": dish_schema
+        })
+
+        try:
+            validate(instance=data, schema=new_meal_from_lambda_payload_schema, resolver=schema_path_resolver)
+        except ValidationError as e:
+            logger.error("Failed to validate payload from meal processing lambda: "+str(e))
+            raise
 
     def _create_meal_for_anonymous(self):
         meal_totals = self.payload.get('total_nutrition')
