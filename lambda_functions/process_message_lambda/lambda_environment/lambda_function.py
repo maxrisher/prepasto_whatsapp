@@ -6,7 +6,6 @@ from helpers import send_to_django
 
 # This is the main function for the lambda!
 def lambda_handler(event, context):
-    #Log performance
     start_time = time.time()
 
     text = event['sender_message']
