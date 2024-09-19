@@ -55,6 +55,6 @@ async def google_search_usda_async(food_name):
     else:
         food_data_central_code_list = []
 
-    print("Google search extracted food codes:")
+    print("Google search extracted food codes: ")
     print(food_data_central_code_list)
     return food_data_central_code_list
