@@ -102,7 +102,7 @@ class MealDataProcessor:
             self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
             self.custom_user = self.prepasto_whatsapp_user.user
 
-            if 'errors' in self.payload and self.payload['errors']:
+            if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
                 logger.error("Lambda returned an error!")
                 send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
                 return
