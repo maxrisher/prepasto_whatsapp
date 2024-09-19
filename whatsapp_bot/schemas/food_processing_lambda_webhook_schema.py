@@ -16,14 +16,14 @@ new_meal_from_lambda_payload_schema = {
         "$ref": "https://thalos.fit/meal.schema.json" # Reference the meal schema by its ID
     },
     "unhandled_errors": {
-      "type": "array",
+      "type": ["array", "null"],
       "items": {
         "type": "string"
       },
       "description": "A list of any errors that were not caught within a dish or a meal"
     },
     "seconds_elapsed": {
-      "type": ["number"],
+      "type": "number",
       "description": "The time the lambda took to run",
       }
   },

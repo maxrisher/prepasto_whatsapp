@@ -62,7 +62,7 @@ class MealDataProcessor:
         })
 
         try:
-            validate(instance=data, schema=new_meal_from_lambda_payload_schema, resolver=schema_path_resolver)
+            validate(instance=self.payload, schema=new_meal_from_lambda_payload_schema, resolver=schema_path_resolver)
         except ValidationError as e:
             logger.error("Failed to validate payload from meal processing lambda: "+str(e))
             raise

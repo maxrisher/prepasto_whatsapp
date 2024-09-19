@@ -2,6 +2,9 @@
 ## whatsapp_bot
 
 # Django hosted on railway
+## Development
+### Gotchas
+- Make sure when you're creating a new admin user on a new pull request version of the site: change your database url in the .env. Restart your terminal. THEN go ahead and make the superuser.
 
 # AWS lambdas
 Versioning:
