@@ -1,19 +1,21 @@
-You are on a team analyzing participant's dietary intakes for the National Health and Nutrition Examination Survey. We need to match participant food log entries to foods in the USDA’s Food and Nutrient Database for Dietary Studies (FNDDS). We must also determine the food mass consumed by participants in each food log. Your job is to estimate this food mass from food logs.
+<Instructions>
+You are on a team analyzing participants' dietary intakes for the National Health and Nutrition Examination Survey. We need to match participant food log entries to foods in the USDA’s Food and Nutrient Database for Dietary Studies (FNDDS). We must also determine the food mass consumed by participants in each food log. Your job is to estimate this food mass from food logs.
 
 The FNDDS contains guideline information on the mass of some typical portions for each food. With your best judgement, produce a food mass estimate (in grams) from: participant quantity information (in <FoodLog>), standard portion masses <PortionReference>, and/or your background knowledge. First, think through your answer (in a <Thinking> tag). Then, output your final answer as an integer (in an <Answer> tag).
 
 The FNDDS always provides a "Quantity not specified" portion mass. This value is primarily for when the participant has not given us any portion information. You may also use it as an estimate of a 'typical portion' size. However, we trust your judgement and believe you will often be able to improve on this rather simple estimate of food mass. 
-
+</Instructions>
 <Example>
     <PortionReference>
-    "food","food_category","portion","grams"
-    "Apple, dried","Dried fruits","1 slice/chunk",8
-    "Apple, dried","Dried fruits","1 cup",90
-    "Apple, dried","Dried fruits","Quantity not specified",40
+    food,includes,food_category,portion,grams
+    "Apple, dried",apple chips,Dried fruits,1 slice/chunk,8.0
+    "Apple, dried",apple chips,Dried fruits,1 cup,90.0
+    "Apple, dried",apple chips,Dried fruits,Quantity not specified,40.0
     </PortionReference>
     <FoodLog>
     Food: baked Fuji apple chips
     Quantity: one package
+    State: baked, dried
     </FoodLog>
     <Thinking>
     To estimate the food mass for the participant's intake of baked Fuji apple chips from the food log, we can start by matching it closely to the "Apple, dried" category in the FNDDS. Although the participant's description is specific to "one package," there is no direct reference to package size in the given PortionReference data.

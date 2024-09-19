@@ -1,0 +1,64 @@
+<Instructions>
+You are on a team that assigns USDA food codes (in <USDAFoodCodes>) to food from participant food diaries. Each participant food log (<FoodLog>) must be matched to one (just one!) of the <USDAFoodCodes>. You have been given a shortlist of <USDAFoodCodes> to pick from.
+
+A good match will be as nutritionally similar to the participant diary as possible. Overlap in preparation methods and primary ingredients are crucial for a good match.
+
+NFS means "not further specified".
+NS means "not specified".
+
+You must output one and only one USDAFoodCode as your final answer. Even if none of the food codes seem to be a good match, pick the best one.
+
+First, think about the best food code. Write your thinking in a <Thinking> tag. Second, output the USDA code of your answer in an <Answer> tag.
+</Instructions>
+<Example>
+    <USDAFoodCodes>
+    usda_code,food,includes,category
+    103813,"Dried, fruit, NFS",fruit mixture,Dried fruits
+    103814,"Apple, dried",apple chips,Dried fruits
+    103815,"Apricot, dried",,Dried fruits
+    103816,"Blueberries, dried",,Dried fruits
+    103817,"Cherries, dried",sweetened,Dried fruits
+    103818,Banana chips,,Dried fruits
+    103819,"Currants, dried",,Dried fruits
+    103820,"Cranberries, dried","Craisins; cranberries, NFS; all flavors",Dried fruits
+    103821,Date,,Dried fruits
+    103822,"Fig, dried",,Dried fruits
+    103823,"Mango, dried",,Dried fruits
+    103824,"Papaya, dried",,Dried fruits
+    103825,"Peach, dried","nectarine, dried",Dried fruits
+    103826,"Pear, dried",,Dried fruits
+    103827,"Persimmon, dried",,Dried fruits
+    103828,"Pineapple, dried",,Dried fruits
+    103829,"Prune, dried",dried plum,Dried fruits
+    103830,Raisins,,Dried fruits
+    103831,"Fruit, NFS",,Other fruits and fruit salads
+    103832,"Fruit, pickled",all kinds,Other fruits and fruit salads
+    </USDAFoodCodes>
+    <FoodLog>
+    {
+        "name": "baked apple chips",
+        "usual_ingredients": [
+            "apples"
+        ],
+        "state": "baked, dried",
+        "qualifiers": null,
+        "confirmed_ingredients": [
+            "Fuji apples"
+        ],
+        "amount": "one bag",
+        "similar_dishes": [
+            "dried apple slices",
+            "baked apple slices",
+            "apple crisps",
+            "dried fruit mix",
+            "banana chips"
+        ]
+    }
+    </FoodLog>
+    <Thinking>
+    The food log specifies "baked apple chips," which are essentially dried apples that have been baked. The most appropriate match from the <USDAFoodCodes> is 103814, labeled "Apple, dried," which includes apple chips. This code accurately reflects the dried and baked nature of the apple chips described in the food log.
+    </Thinking>
+    <Answer>
+    103814
+    </Answer>
+</Example>
