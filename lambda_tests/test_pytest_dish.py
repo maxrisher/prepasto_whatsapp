@@ -53,8 +53,11 @@ async def test_dish_processing(go_to_lambda_dir, test_dish):
     assert test_dish.matched_thalos_id > 0, "matched_thalos_id should be positive"
 
     # Assert that the USDA ID is set and valid
-    assert isinstance(test_dish.usda_food_data_central_id, int), "usda_food_data_central_id should be an integer"
-    assert test_dish.usda_food_data_central_id > 0, "usda_food_data_central_id should be positive"
+    assert isinstance(test_dish.usda_food_data_central_id, int), "usda_food_data_central_id should often be an integer"
+    assert test_dish.usda_food_data_central_id > 0, "usda_food_data_central_id should often be positive"
+
+    # Assert that the USDA food name is set and valid
+    assert isinstance(test_dish.usda_food_data_central_food_name, str), "usda_food_data_central_id should be a string"
 
     # Assert that the grams value is valid
     assert isinstance(test_dish.grams, (int, float)), "grams should be an integer or float"
