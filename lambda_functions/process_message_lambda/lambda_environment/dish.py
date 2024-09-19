@@ -143,6 +143,7 @@ class Dish:
         'candidate_thalos_ids': self.candidate_thalos_ids,
         'matched_thalos_id': self.matched_thalos_id,
         'usda_food_data_central_id': self.usda_food_data_central_id,
+        'usda_food_data_central_food_name': self.usda_food_data_central_food_name,
         'grams': self.grams,
         'nutrition': self.nutrition,
         'fndds_categories': self.fndds_categories,
