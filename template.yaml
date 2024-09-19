@@ -13,7 +13,14 @@ Resources:
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
       Timeout: 60      # Number of seconds before the lambda times out
-      AutoPublishAlias: stagingAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
+      AutoPublishAlias: pullRequestAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
+
+  ProductionProcessMessageAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref ProcessMessageFunction # This points to the lambda function the thing we're aliasing
+      FunctionVersion: 23 # IMPORTANT: this is a manual toggle to determine which version of the lambda is the 'staging version'.
+      Name: stagingAlias
 
   ProductionProcessMessageAlias:
     Type: AWS::Lambda::Alias
