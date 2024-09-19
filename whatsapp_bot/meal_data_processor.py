@@ -2,6 +2,7 @@ import json
 import logging
 import requests
 import os
+from jsonschema import validate, RefResolver, ValidationError
 
 from django.conf import settings
 from django.db import transaction
@@ -9,80 +10,11 @@ from django.db import transaction
 from .utils import send_whatsapp_message
 from .models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Diary
+from .schemas.meal_schema import meal_schema
+from .schemas.dish_schema import dish_schema
+from .schemas.food_processing_lambda_webhook_schema import new_meal_from_lambda_payload_schema
 
 logger = logging.getLogger('whatsapp_bot')
-
-class PayloadFromWhatsapp:
-    def __init__(self, raw_request):
-        self.request_dict = json.loads(raw_request.body)
-
-        self.whatsapp_wa_id = None
-        self.prepasto_whatsapp_user_object = None
-
-        self.is_message_from_new_user = None
-        self.is_delete_request = None
-        self.is_whatsapp_text_message = None
-
-        self.whatsapp_text_message_text = None
-        self.whatsapp_message_id = None
-        self.whatsapp_interactive_button_id = None
-        self.whatsapp_interactive_button_text = None
-
-    def get_whatsapp_wa_id(self):
-        self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
-
-    def get_or_create_whatsapp_user_in_dj_db(self):
-        whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=self.whatsapp_wa_id)
-
-        self.prepasto_whatsapp_user_object = whatsapp_user
-        self.is_message_from_new_user = user_was_created
-
-    def determine_message_type(self):
-        self._test_if_delete_request()
-        self._test_if_whatsapp_text_message()
-        
-    def _test_if_delete_request(self):
-        try:
-            button_title = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
-            if button_title == settings.MEAL_DELETE_BUTTON_TEXT:
-                logger.info("This message WAS a button press. It WAS delete request")
-                self.is_delete_request = True
-                return
-            else:
-                logger.info("This message WAS a button press. It was NOT a delete request")
-        except KeyError as e:
-            logger.info("This message was NOT a button press")
-        self.is_delete_request = False
-
-    def _test_if_whatsapp_text_message(self):
-        try:
-            message_type = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['type']
-            if message_type == 'text':
-                logger.info("This message WAS a 'text' type message.")
-                self.is_whatsapp_text_message = True
-                return
-            else:
-                logger.info("This message was NOT a 'text' type message. It was instead: ")
-                logger.info(message_type)
-        except KeyError as e:
-            logger.info("This message was NOT a 'text' type message.")
-        self.is_whatsapp_text_message = False
-    
-    # Sends a whatsapp message to a user, introducing them to Prepasto
-    def onboard_message_sender(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
-
-    def get_whatsapp_text_message_data(self):
-        self.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
-        self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-
-    def notify_message_sender_of_processing(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "I got your message and I'm calculating the nutritional content!")
-
-    def get_whatsapp_interactive_button_data(self):
-        self.whatsapp_interactive_button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']
-        self.whatsapp_interactive_button_text = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['title']
-        self.whatsapp_message_id = self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"]
 
 class MealDataProcessor:
     def __init__(self, request):
@@ -102,10 +34,12 @@ class MealDataProcessor:
             self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
             self.custom_user = self.prepasto_whatsapp_user.user
 
-            if 'errors' in self.payload and self.payload['errors']:
+            if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
                 logger.error("Lambda returned an error!")
                 send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
                 return
+            
+            self._validate_payload()
 
             if self.custom_user is not None:
                 self._create_meal_for_prepasto_user()
@@ -120,6 +54,18 @@ class MealDataProcessor:
         self.payload = json.loads(self.request.body)
         logger.info("Payload decoded at lambda webhook: ")
         logger.info(self.payload)
+
+    def _validate_payload(self):
+        schema_path_resolver = RefResolver(base_uri="https://thalos.fit/", referrer=new_meal_from_lambda_payload_schema, store={
+            "https://thalos.fit/meal.schema.json": meal_schema,
+            "https://thalos.fit/dish.schema.json": dish_schema
+        })
+
+        try:
+            validate(instance=self.payload, schema=new_meal_from_lambda_payload_schema, resolver=schema_path_resolver)
+        except ValidationError as e:
+            logger.error("Failed to validate payload from meal processing lambda: "+str(e))
+            raise
 
     def _create_meal_for_anonymous(self):
         meal_totals = self.payload.get('total_nutrition')
@@ -144,11 +90,11 @@ class MealDataProcessor:
     # C) adds it to a custom_user's diary
     # Returns the diary and meal.
     def _add_meal_to_db(self):
-        meal_totals = self.payload.get('total_nutrition')
-        calories = round(meal_totals.get('calories', 0))
-        fat = round(meal_totals.get('fat', 0))
-        carbs = round(meal_totals.get('carbs', 0))
-        protein = round(meal_totals.get('protein', 0))
+        meal_totals = self.payload['meal_data']['total_nutrition']
+        calories = meal_totals.get('calories', 0)
+        fat = meal_totals.get('fat', 0)
+        carbs = meal_totals.get('carbs', 0)
+        protein = meal_totals.get('protein', 0)
 
         # logger.info(custom_user)
         # logger.info(custom_user.current_date)
@@ -227,13 +173,15 @@ class MealDataProcessor:
                                         meal=self.meal)
 
     def _meal_payload_to_text_message(self):
-        text_message = f"Total Nutrition:\nCalories: {round(self.payload['total_nutrition']['calories'])} kcal\nCarbs: {round(self.payload['total_nutrition']['carbs'])} g\nProtein: {round(self.payload['total_nutrition']['protein'])} g\nFat: {round(self.payload['total_nutrition']['fat'])} g\n\nDishes:\n"
+        meal_dict = self.payload['meal_data']
 
-        for dish in self.payload['dishes']:
-            text_message += (f" - {dish['name'].capitalize()} ({round(dish['grams'])} g): "
-                        f"{round(dish['nutrition']['calories'])} kcal, "
-                        f"Carbs: {round(dish['nutrition']['carbs'])} g, "
-                        f"Protein: {round(dish['nutrition']['protein'])} g, "
-                        f"Fat: {round(dish['nutrition']['fat'])} g\n")
+        text_message = f"Total Nutrition:\nCalories: {meal_dict['total_nutrition']['calories']} kcal\nCarbs: {meal_dict['total_nutrition']['carbs']} g\nProtein: {meal_dict['total_nutrition']['protein']} g\nFat: {meal_dict['total_nutrition']['fat']} g\n\nDishes:\n"
+
+        for dish in meal_dict['dishes']:
+            text_message += (f" - {dish['name'].capitalize()} ({dish['usda_food_data_central_food_name']}), {dish['grams']} g: "
+                        f"{dish['nutrition']['calories']} kcal, "
+                        f"Carbs: {dish['nutrition']['carbs']} g, "
+                        f"Protein: {dish['nutrition']['protein']} g, "
+                        f"Fat: {dish['nutrition']['fat']} g\n")
             
         return text_message
