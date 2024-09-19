@@ -85,6 +85,7 @@ async def test_dish_processing(go_to_lambda_dir, test_dish):
 def test_calculate_nutrition(go_to_lambda_dir, test_dish):
     # Manually set required attributes for nutrition calculation
     test_dish.matched_thalos_id = 100412  # Example ID
+    test_dish.usda_food_data_central_food_name = "cheese sammie" # example name
     test_dish.grams = 102  # Example weight
     
     test_dish._calculate_nutrition()
