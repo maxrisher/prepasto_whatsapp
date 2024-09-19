@@ -36,6 +36,7 @@ def _handle_whatsapp_webhook_get(request):
     else:
         return HttpResponse('Forbidden', status=403)
 
+#make better
 def _handle_whatsapp_webhook_post(request):
     try:
         payload_from_whatsapp = PayloadFromWhatsapp(request)
