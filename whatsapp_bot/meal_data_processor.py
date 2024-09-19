@@ -90,11 +90,11 @@ class MealDataProcessor:
     # C) adds it to a custom_user's diary
     # Returns the diary and meal.
     def _add_meal_to_db(self):
-        meal_totals = self.payload.get('total_nutrition')
-        calories = round(meal_totals.get('calories', 0))
-        fat = round(meal_totals.get('fat', 0))
-        carbs = round(meal_totals.get('carbs', 0))
-        protein = round(meal_totals.get('protein', 0))
+        meal_totals = self.payload['meal_data']['total_nutrition']
+        calories = meal_totals.get('calories', 0)
+        fat = meal_totals.get('fat', 0)
+        carbs = meal_totals.get('carbs', 0)
+        protein = meal_totals.get('protein', 0)
 
         # logger.info(custom_user)
         # logger.info(custom_user.current_date)
@@ -173,13 +173,15 @@ class MealDataProcessor:
                                         meal=self.meal)
 
     def _meal_payload_to_text_message(self):
-        text_message = f"Total Nutrition:\nCalories: {round(self.payload['total_nutrition']['calories'])} kcal\nCarbs: {round(self.payload['total_nutrition']['carbs'])} g\nProtein: {round(self.payload['total_nutrition']['protein'])} g\nFat: {round(self.payload['total_nutrition']['fat'])} g\n\nDishes:\n"
+        meal_dict = self.payload['meal_data']
 
-        for dish in self.payload['dishes']:
-            text_message += (f" - {dish['name'].capitalize()} ({round(dish['grams'])} g): "
-                        f"{round(dish['nutrition']['calories'])} kcal, "
-                        f"Carbs: {round(dish['nutrition']['carbs'])} g, "
-                        f"Protein: {round(dish['nutrition']['protein'])} g, "
-                        f"Fat: {round(dish['nutrition']['fat'])} g\n")
+        text_message = f"Total Nutrition:\nCalories: {meal_dict['total_nutrition']['calories']} kcal\nCarbs: {meal_dict['total_nutrition']['carbs']} g\nProtein: {meal_dict['total_nutrition']['protein']} g\nFat: {meal_dict['total_nutrition']['fat']} g\n\nDishes:\n"
+
+        for dish in meal_dict['dishes']:
+            text_message += (f" - {dish['name'].capitalize()} ({dish['usda_food_data_central_food_name']}), {dish['grams']} g: "
+                        f"{dish['nutrition']['calories']} kcal, "
+                        f"Carbs: {dish['nutrition']['carbs']} g, "
+                        f"Protein: {dish['nutrition']['protein']} g, "
+                        f"Fat: {dish['nutrition']['fat']} g\n")
             
         return text_message
