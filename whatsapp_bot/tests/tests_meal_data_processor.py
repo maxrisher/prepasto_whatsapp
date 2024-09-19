@@ -4,7 +4,7 @@ from django.http import JsonResponse
 
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
-from whatsapp_bot.classes import MealDataProcessor
+from whatsapp_bot.meal_data_processor import MealDataProcessor
 from whatsapp_bot.models import WhatsappUser
 
 import json
