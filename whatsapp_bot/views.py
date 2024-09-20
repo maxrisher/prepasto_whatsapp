@@ -78,7 +78,7 @@ def _handle_anonymous(payload):
     if payload.message_type.value == 'Timezone Confirmation':
         _handle_timezone_confirmation(payload)
     
-    #Case 3: Anonymous sent us any text message
+    #Case 3: Anonymous sent us any message at all
     else:
         #This is a completely fresh user
         WhatsappMessageSender(payload.whatsapp_wa_id).onboard_new_user()
@@ -88,7 +88,6 @@ def _handle_location_share(payload):
     user_timezone_str = user_timezone_from_lat_long(payload.location_latitude, payload.location_longitude)
     WhatsappMessageSender(payload.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
     return JsonResponse({'status': 'success', 'message': 'Handled location data share from user to our platform.'}, status=200)
-
 
 def _handle_timezone_confirmation(payload):
     #Case 1: User says the TZ is wrong
