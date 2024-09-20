@@ -1,8 +1,8 @@
-import requests
 import os
 import boto3
 import logging
 import json
+from timezonefinder import TimezoneFinder
 
 from django.conf import settings
 from django.db import transaction
@@ -29,10 +29,18 @@ def send_to_lambda(request_body_dict):
     )
     return
 
-#TODO
 def user_timezone_from_lat_long(latitude, longitude):
-    logger.warning("Implement timezone from lat long!")
-    return 'America/Denver'
+    lat = float(latitude)
+    lng = float(longitude)
+    tf = TimezoneFinder()
+    
+    timezone_name = tf.timezone_at(lng=lng, lat=lat)
+    
+    if timezone_name is None:
+        logger.error("Timezone not found! Defaulting to LA time zone")
+        return 'America/Los_Angeles'
+    
+    return timezone_name
 
 # This finds a meal object referenced by a user and deletes it
 # The database operations here are all or nothing
