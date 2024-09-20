@@ -41,37 +41,3 @@ def user_timezone_from_lat_long(latitude, longitude):
         return 'America/Los_Angeles'
     
     return timezone_name
-
-# This finds a meal object referenced by a user and deletes it
-# The database operations here are all or nothing
-@transaction.atomic
-def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user):
-
-    logger.info('whatsapp_user.whatsapp_wa_id for the meal I am deleting')
-    logger.info(whatsapp_user.whatsapp_wa_id)
-
-    #Step 1: test if the user has an account
-    if whatsapp_user.user is None:
-        WhatsappMessageSender(whatsapp_user.whatsapp_wa_id).send_text_message("You don't have an account. You cannot delete meals.")
-        return
-
-    #Step 2: log the incoming message in our database
-    WhatsappMessage.objects.create(
-        whatsapp_user=whatsapp_user,
-        whatsapp_message_id=message_id,
-        content=button_text,
-        direction='IN',
-    )
-
-    #Step 3: try to delete the meal
-    meal_to_delete = Meal.objects.get(id=button_id)
-    meal_to_delete.delete()
-
-    logger.info("Deleted meal:")
-    logger.info(button_id)
-
-    #Step 4: send confirmation of meal deletion
-    WhatsappMessageSender(whatsapp_user.whatsapp_wa_id).send_text_message('Got it. I am deleting the meal.')
-
-    #Step 5: send updated daily total
-    meal_to_delete.diary.send_daily_total()

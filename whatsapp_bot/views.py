@@ -6,11 +6,12 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from .utils import send_to_lambda, handle_delete_meal_request, user_timezone_from_lat_long
+from .utils import send_to_lambda, user_timezone_from_lat_long
 from .models import WhatsappMessage, WhatsappUser
 from .payload_from_whatsapp import PayloadFromWhatsapp
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_sender import WhatsappMessageSender
+from main_app.models import Meal
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -111,6 +112,30 @@ def _handle_delete_request(payload):
                                 payload.whatsapp_message_id, 
                                 payload.prepasto_whatsapp_user_object)
     
+def _handle_delete_meal_request(payload):
+    """
+    This finds a meal object referenced by a user and deletes it
+    """
+    logger.info('whatsapp_user.whatsapp_wa_id for the meal I am deleting')
+    logger.info(payload.whatsapp_wa_id)
+
+    #Step 1: try to delete the meal
+    meal_to_delete = Meal.objects.get(id=payload.whatsapp_interactive_button_id)
+
+    if meal_to_delete is None:
+        return JsonResponse({'error': 'Meal not found'}, status=404)
+
+    diary_to_change = meal_to_delete.diary
+    meal_to_delete.delete()
+
+    logger.info("Deleted meal:")
+    logger.info(meal_to_delete.description)
+
+    #Step 2: send confirmation of meal deletion
+    WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Got it. I deleted the meal",
+                                                                    db_message_type='PREPASTO_MEAL_DELETED_TEXT')
+    #Step 3: send updated daily total
+    WhatsappMessageSender(payload.whatsapp_wa_id).send_diary_message(diary_to_change)
     return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
 def _handle_text_message(payload):

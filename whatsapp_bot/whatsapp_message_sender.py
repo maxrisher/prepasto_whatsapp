@@ -23,7 +23,7 @@ class WhatsappMessageSender:
 
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
-        WhatsappMessage.objects.create(whatsapp_user="14153476103", 
+        WhatsappMessage.objects.create(whatsapp_user=settings.WHATSAPP_BOT_WHATSAPP_WA_ID, 
                                        whatsapp_message_id=sent_message_whatsapp_wamid, 
                                        direction='Outgoing', 
                                        message_type=db_message_type,
@@ -129,7 +129,7 @@ class WhatsappMessageSender:
 
         self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_MEAL_BUTTON')
     
-    def _meal_to_text_message(new_meal_object, new_dishes_objects):
+    def _meal_to_text_message(self, new_meal_object, new_dishes_objects):
         text_message = f"Total Nutrition:\nCalories: {new_meal_object.calories} kcal\nCarbs: {new_meal_object.carbs} g\nProtein: {new_meal_object.protein} g\nFat: {new_meal_object.fat} g\n\nDishes:\n"
         
         for dish in new_dishes_objects:
