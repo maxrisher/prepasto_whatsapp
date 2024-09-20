@@ -1,37 +1,45 @@
+from dataclasses import dataclass, field
+from typing import Dict, Optional
 import json
 import logging
 
 from django.conf import settings
+from django.http import HttpRequest
 
 from .utils import send_whatsapp_message
 from .models import WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
+@dataclass
 class PayloadFromWhatsapp:
-    def __init__(self, raw_request):
-        self.request_dict = json.loads(raw_request.body)
+    raw_request: HttpRequest
+    request_dict: Dict = field(init=False)
+    whatsapp_wa_id: Optional[str] = None
+    prepasto_whatsapp_user_object: Optional[WhatsappUser] = None
+    is_message_from_new_user: Optional[bool] = None
+    is_delete_request: Optional[bool] = None
+    is_whatsapp_text_message: Optional[bool] = None
+    whatsapp_text_message_text: Optional[str] = None
+    whatsapp_message_id: Optional[str] = None
+    whatsapp_interactive_button_id: Optional[str] = None
+    whatsapp_interactive_button_text: Optional[str] = None
 
-        self.whatsapp_wa_id = None
-        self.prepasto_whatsapp_user_object = None
+    def __post_init__(self):
+        self.request_dict = json.loads(self.raw_request.body)
 
-        self.is_message_from_new_user = None
-        self.is_delete_request = None
-        self.is_whatsapp_text_message = None
-
-        self.whatsapp_text_message_text = None
-        self.whatsapp_message_id = None
-        self.whatsapp_interactive_button_id = None
-        self.whatsapp_interactive_button_text = None
-
-    def get_whatsapp_wa_id(self):
+    def identify_sender(self):
+        """
+        Grab the sender's wa_id
+        Try to find their WhatsappUser model in the db
+        If no WhatsappUser model, they are a new user
+        """
         self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
-
-    def get_or_create_whatsapp_user_in_dj_db(self):
-        whatsapp_user, user_was_created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=self.whatsapp_wa_id)
-
-        self.prepasto_whatsapp_user_object = whatsapp_user
-        self.is_message_from_new_user = user_was_created
+        self.prepasto_whatsapp_user_object = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+        if self.prepasto_whatsapp_user_object is None:
+            self.is_message_from_new_user = True
+        else:
+            self.is_message_from_new_user = False
 
     def determine_message_type(self):
         self._test_if_delete_request()
@@ -64,16 +72,9 @@ class PayloadFromWhatsapp:
             logger.info("This message was NOT a 'text' type message.")
         self.is_whatsapp_text_message = False
     
-    # Sends a whatsapp message to a user, introducing them to Prepasto
-    def onboard_message_sender(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "Welcome to Prepasto! Simply send me any message describing something you ate, and I'll tell you the calories.")
-
     def get_whatsapp_text_message_data(self):
         self.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
         self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-
-    def notify_message_sender_of_processing(self):
-        send_whatsapp_message(self.whatsapp_wa_id, "I got your message and I'm calculating the nutritional content!")
 
     def get_whatsapp_interactive_button_data(self):
         self.whatsapp_interactive_button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']

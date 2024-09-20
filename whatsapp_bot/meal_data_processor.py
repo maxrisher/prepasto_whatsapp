@@ -13,6 +13,7 @@ from main_app.models import Meal, Diary
 from .schemas.meal_schema import meal_schema
 from .schemas.dish_schema import dish_schema
 from .schemas.food_processing_lambda_webhook_schema import new_meal_from_lambda_payload_schema
+from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -36,7 +37,7 @@ class MealDataProcessor:
 
             if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
                 logger.error("Lambda returned an error!")
-                send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
+                WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_text_message("I'm sorry, and error occurred. Please try again later.")
                 return
             
             self._validate_payload()
@@ -48,7 +49,7 @@ class MealDataProcessor:
             
         except Exception as e:
             logger.error("Error processing meal!")
-            send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, "I'm sorry, and error occurred. Please try again later.")
+            WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_text_message("I'm sorry, and error occurred. Please try again later.")
 
     def _decode_request(self):
         self.payload = json.loads(self.request.body)
@@ -69,7 +70,7 @@ class MealDataProcessor:
 
     def _create_meal_for_anonymous(self):
         meal_totals = self.payload.get('total_nutrition')
-        send_whatsapp_message(self.prepasto_whatsapp_user.whatsapp_wa_id, self._meal_payload_to_text_message())
+        WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_text_message(self._meal_payload_to_text_message())
 
     @transaction.atomic
     def _create_meal_for_prepasto_user(self):

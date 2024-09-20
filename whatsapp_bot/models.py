@@ -4,7 +4,7 @@ from django.conf import settings
 from main_app.models import Meal
 
 class WhatsappUser(models.Model):
-    whatsapp_wa_id = models.CharField(max_length=20, unique=True)
+    whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

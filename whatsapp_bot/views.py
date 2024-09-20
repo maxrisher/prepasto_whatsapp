@@ -8,6 +8,7 @@ from .utils import send_to_lambda, handle_delete_meal_request
 from .models import WhatsappMessage
 from .payload_from_whatsapp import PayloadFromWhatsapp
 from .meal_data_processor import MealDataProcessor
+from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -42,8 +43,7 @@ def _handle_whatsapp_webhook_post(request):
         payload = PayloadFromWhatsapp(request)
         logger.info(payload.request_dict)
     
-        payload.get_whatsapp_wa_id()
-        # payload.get_or_create_whatsapp_user_in_dj_db()
+        payload.identify_sender()
         payload.determine_message_type()
 
         if payload.is_message_from_new_user:
@@ -52,8 +52,7 @@ def _handle_whatsapp_webhook_post(request):
             return _handle_delete_request(payload)
         elif payload.is_whatsapp_text_message:
             return _handle_text_message(payload)
-        # This is what we return if we don't get a text or button message
-        else:
+        else: # This is what we return if we don't get a text or button message
             logger.error('Invalid payload structure')
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
         
@@ -63,7 +62,7 @@ def _handle_whatsapp_webhook_post(request):
         return JsonResponse({"error": "Error processing webhook"}, status=400)
     
 def _handle_new_user(payload):
-    payload.onboard_message_sender()
+    WhatsappMessageSender(payload.whatsapp_wa_id).onboard_new_user()
     return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
 
 def _handle_delete_request(payload):
@@ -89,7 +88,7 @@ def _handle_text_message(payload):
     send_to_lambda({'sender_whatsapp_wa_id': payload.whatsapp_wa_id,
                     'sender_message': payload.whatsapp_text_message_text})
 
-    payload.notify_message_sender_of_processing()
+    WhatsappMessageSender(payload.whatsapp_wa_id).notify_message_sender_of_processing()
     return JsonResponse({'status': 'success', 'message': 'starting nutritional calculations'}, status=200)
 
 # CATCH MESSAGES FROM LAMBDA

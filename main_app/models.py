@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models import Sum
 
 from custom_users.models import CustomUser
+from whatsapp_bot.whatsapp_message_sender import WhatsappMessageSender
 
 class Diary(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='diaries')
@@ -33,8 +34,7 @@ class Diary(models.Model):
         return total_protein
     
     def send_daily_total(self):
-        from whatsapp_bot.utils import send_whatsapp_message
-        send_whatsapp_message(self.custom_user.phone, self._write_daily_total_message())
+        WhatsappMessageSender(self.custom_user.phone).send_text_message(self._write_daily_total_message())
 
     def _write_daily_total_message(self):
         total_calories = self.calories

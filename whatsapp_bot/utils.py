@@ -10,25 +10,9 @@ from django.db import transaction
 from main_app.models import Meal, Diary
 from custom_users.models import CustomUser
 from .models import WhatsappMessage, WhatsappUser
+from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
-
-def send_whatsapp_message(recipient_phone_number, message):
-    headers = {
-        "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
-        "Content-Type": "application/json",
-    }
-
-    data = data = {
-        "messaging_product": "whatsapp",
-        "to": recipient_phone_number,
-        "type": "text",
-        "text": {"body": message},
-    }
-
-    response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=headers, json=data)
-    logger.warning(response.json())
-    return response.json()
 
 def send_to_lambda(request_body_dict):
     json_payload = json.dumps(request_body_dict)
@@ -55,7 +39,7 @@ def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user
 
     #Step 1: test if the user has an account
     if whatsapp_user.user is None:
-        send_whatsapp_message(whatsapp_user.whatsapp_wa_id, "You don't have an account. You cannot delete meals.")
+        WhatsappMessageSender(whatsapp_user.whatsapp_wa_id).send_text_message("You don't have an account. You cannot delete meals.")
         return
 
     #Step 2: log the incoming message in our database
@@ -74,7 +58,7 @@ def handle_delete_meal_request(button_id, button_text, message_id, whatsapp_user
     logger.info(button_id)
 
     #Step 4: send confirmation of meal deletion
-    send_whatsapp_message(whatsapp_user.whatsapp_wa_id, f'Got it. I am deleting the meal.')
+    WhatsappMessageSender(whatsapp_user.whatsapp_wa_id).send_text_message('Got it. I am deleting the meal.')
 
     #Step 5: send updated daily total
     meal_to_delete.diary.send_daily_total()
