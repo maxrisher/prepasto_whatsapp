@@ -1,9 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.utils import timezone
-from django.conf import settings
-
-import pytz
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -39,10 +35,6 @@ class CustomUser(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    # These can be in a range of acceptable formats, but they should be international (https://developers.facebook.com/docs/whatsapp/cloud-api/reference/phone-numbers/#whatsapp-user-phone-number-formats)
-    phone = models.CharField(max_length=15, blank=True, null=True)
-    #This will default to our application's default TIME_ZONE unless a session calls timezone.activate()
-    time_zone = models.CharField(max_length=50, default=settings.TIME_ZONE)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -70,9 +62,3 @@ class CustomUser(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
     
-    @property
-    def current_date(self):
-        user_tz = pytz.timezone(self.time_zone)
-        now = timezone.now()
-        now_date = now.astimezone(user_tz).date()
-        return now_date
