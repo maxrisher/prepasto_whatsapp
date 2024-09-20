@@ -7,7 +7,7 @@ from django.conf import settings
 class WhatsappUser(models.Model):
     whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
     time_zone_name = models.CharField(max_length=50)
-    user = models.OneToOneField(
+    custom_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
