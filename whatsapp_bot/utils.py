@@ -22,7 +22,7 @@ def send_to_lambda(request_body_dict):
                                     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
                                     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'))
     lambda_client.invoke(
-        FunctionName='prepasto-whatsapp-sam-app-ProcessMessageFunction-ARnDrJlrXR28',
+        FunctionName=os.getenv('LAMBDA_FUNCTION_NAME'),
         InvocationType='Event',
         Payload=json_payload,
         Qualifier=os.getenv('LAMBDA_ALIAS')

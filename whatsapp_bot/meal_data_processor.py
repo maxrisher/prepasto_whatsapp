@@ -37,7 +37,7 @@ class MealDataProcessor:
                 return
             
             self._validate_payload()
-            self.diary, created = Diary.objects.get_or_create(custom_user=self.prepasto_whatsapp_user, local_date=self.prepasto_whatsapp_user.current_date)
+            self.diary, created = Diary.objects.get_or_create(whatsapp_user=self.prepasto_whatsapp_user, local_date=self.prepasto_whatsapp_user.current_date)
             self._create_meal()
             self._create_dishes()
             messenger = WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id)

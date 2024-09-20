@@ -106,12 +106,6 @@ def _handle_timezone_confirmation(payload):
         WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
         return JsonResponse({'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'}, status=200)
     
-def _handle_delete_request(payload):
-    handle_delete_meal_request(payload.whatsapp_interactive_button_id, 
-                                payload.whatsapp_interactive_button_text, 
-                                payload.whatsapp_message_id, 
-                                payload.prepasto_whatsapp_user_object)
-    
 def _handle_delete_meal_request(payload):
     """
     This finds a meal object referenced by a user and deletes it
