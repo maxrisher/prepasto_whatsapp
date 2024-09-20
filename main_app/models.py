@@ -27,8 +27,8 @@ class Diary(models.Model):
 
 class Meal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='meals')
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='meals')
+    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='user_meals')
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name='day_meals')
     created_at_utc = models.DateTimeField(auto_now_add=True)
     local_date = models.DateField(editable=False)
     calories = models.IntegerField(validators=[MinValueValidator(0)])
@@ -42,8 +42,8 @@ class Meal(models.Model):
         return "Calories in meal: "+str(self.calories)
     
 class Dish(models.Model):
-    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='meals')
-    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='dishes')
+    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='user_dishes')
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='meal_dishes')
     name = models.CharField(max_length=255)
     matched_thalos_id = models.PositiveIntegerField(max_length=100)
     usda_food_data_central_id = models.PositiveIntegerField(null=True, blank=True)

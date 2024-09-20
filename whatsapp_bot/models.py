@@ -60,8 +60,8 @@ class WhatsappMessage(models.Model):
     whatsapp_message_id = models.CharField(max_length=255, primary_key=True)
     whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='messages')
     timestamp = models.DateTimeField(auto_now_add=True)
-    direction = models.CharField(max_length=3, choices=DIRECTION_CHOICES)
-    message_type = models.CharField(max_length=100, choices=MESSAGE_TYPE_CHOICES, default='UNKNOWN')
+    direction = models.CharField(max_length=8, choices=DIRECTION_CHOICES)
+    message_type = models.CharField(max_length=32, choices=MESSAGE_TYPE_CHOICES, default='UNKNOWN')
     
     content = models.TextField()
     in_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
