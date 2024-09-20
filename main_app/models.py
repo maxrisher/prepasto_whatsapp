@@ -45,7 +45,7 @@ class Dish(models.Model):
     whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='user_dishes')
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='meal_dishes')
     name = models.CharField(max_length=255)
-    matched_thalos_id = models.PositiveIntegerField(max_length=100)
+    matched_thalos_id = models.PositiveIntegerField()
     usda_food_data_central_id = models.PositiveIntegerField(null=True, blank=True)
     usda_food_data_central_food_name = models.CharField(max_length=255)
     
