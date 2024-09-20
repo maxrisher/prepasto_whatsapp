@@ -1,7 +1,8 @@
+import pytz
+
+from django.utils import timezone
 from django.db import models
 from django.conf import settings
-
-from main_app.models import Meal
 
 class WhatsappUser(models.Model):
     whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
@@ -13,6 +14,13 @@ class WhatsappUser(models.Model):
         blank=True,
         related_name='whatsapp_user'
     )
+
+    @property
+    def current_date(self):
+        user_tz = pytz.timezone(self.time_zone_name)
+        now = timezone.now()
+        now_date = now.astimezone(user_tz).date()
+        return now_date
 
     def __str__(self):
         return f"{self.whatsapp_wa_id}"
