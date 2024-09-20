@@ -23,22 +23,6 @@ class Diary(models.Model):
             fat=Sum('fat'),
             protein=Sum('protein')
         )
-    
-    def send_daily_total(self):
-        from whatsapp_bot.whatsapp_message_sender import WhatsappMessageSender
-        WhatsappMessageSender(self.custom_user.phone).send_text_message(self._write_daily_total_message())
-
-    def _write_daily_total_message(self):
-        totals = self.total_nutrition
-        date_str = self.local_date.strftime("%-d %B, %Y")
-        return (
-            f"Daily Summary - {date_str}\n\n"
-            f"Calories: {totals['calories'] or 0:,} kcal\n\n"
-            f"Macros\n"
-            f"Carbs: {totals['carbs'] or 0}g\n"
-            f"Fat: {totals['fat'] or 0}g\n"
-            f"Protein: {totals['protein'] or 0}g"
-        )
 
 class Meal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

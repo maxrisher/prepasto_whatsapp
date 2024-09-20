@@ -1,5 +1,6 @@
 import os
 import logging
+import json
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -135,11 +136,14 @@ def food_processing_lambda_webhook(request):
         api_key = request.headers.get('Authorization')
         if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
+        
+        payload_dict = json.loads(request.body)
 
-        processor = MealDataProcessor(request)
+        logger.info("Payload decoded at lambda webhook: ")
+        logger.info(payload_dict)
+        
+        processor = MealDataProcessor(payload_dict)
         processor.process()
-
         return JsonResponse({'message': 'OK'}, status=200)
-    
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
