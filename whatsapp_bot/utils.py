@@ -29,6 +29,11 @@ def send_to_lambda(request_body_dict):
     )
     return
 
+#TODO
+def user_timezone_from_lat_long(latitude, longitude):
+    logger.warning("Implement timezone from lat long!")
+    return 'America/Denver'
+
 # This finds a meal object referenced by a user and deletes it
 # The database operations here are all or nothing
 @transaction.atomic

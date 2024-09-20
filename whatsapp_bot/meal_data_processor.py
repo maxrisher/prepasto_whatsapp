@@ -7,7 +7,6 @@ from jsonschema import validate, RefResolver, ValidationError
 from django.conf import settings
 from django.db import transaction
 
-from .utils import send_whatsapp_message
 from .models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Diary
 from .schemas.meal_schema import meal_schema

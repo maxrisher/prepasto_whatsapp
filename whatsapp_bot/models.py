@@ -5,6 +5,7 @@ from main_app.models import Meal
 
 class WhatsappUser(models.Model):
     whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
+    time_zone = models.CharField(max_length=50)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

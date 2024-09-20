@@ -63,3 +63,37 @@ class WhatsappMessageSender:
             }
         }
         self._send_message(data_for_whatsapp_api, db_record_content="requested location")
+
+    def send_location_confirmation_buttons(self, user_timezone_string):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": self.destination_whatsapp_wa_id,
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": f"It looks like your timezone is '{user_timezone_string}'. Is that right?"
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": f"CONFIRM_TZ_{user_timezone_string}",
+                                "title": "Yes"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": "CANCEL_TZ",
+                                "title": "No, let's try again"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+        self._send_message(data_for_whatsapp_api, db_record_content="sent location confirmation")

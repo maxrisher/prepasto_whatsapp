@@ -3,9 +3,10 @@ import logging
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
-from .utils import send_to_lambda, handle_delete_meal_request
-from .models import WhatsappMessage
+from .utils import send_to_lambda, handle_delete_meal_request, user_timezone_from_lat_long
+from .models import WhatsappMessage, WhatsappUser
 from .payload_from_whatsapp import PayloadFromWhatsapp
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_sender import WhatsappMessageSender
@@ -41,18 +42,25 @@ def _handle_whatsapp_webhook_get(request):
 def _handle_whatsapp_webhook_post(request):
     try:
         payload = PayloadFromWhatsapp(request)
-        logger.info(payload.request_dict)
-    
-        payload.identify_sender()
         payload.determine_message_type()
+        
+        #ignore whatsapp status updates for now
+        if payload.message_type.value == 'Status Update':
+            return JsonResponse({'success': 'Status update received.'}, status=200)
 
-        if payload.is_message_from_new_user:
-            return _handle_new_user(payload)
-        elif payload.is_delete_request:
+        logger.info(payload.request_dict)
+        payload.identify_sender_and_message()
+        payload.extract_relevant_message_data()
+        payload.record_message_in_db()
+
+        if payload.prepasto_whatsapp_user_object is None:
+            return _handle_anonymous(payload)
+        elif payload.message_type.value == 'Delete Request':
             return _handle_delete_request(payload)
-        elif payload.is_whatsapp_text_message:
+        elif payload.message_type.value == 'Text':
             return _handle_text_message(payload)
-        else: # This is what we return if we don't get a text or button message
+        else: 
+            # This is what we return if we don't get a text or button message
             logger.error('Invalid payload structure')
             return JsonResponse({'error': 'Invalid payload structure'}, status=400)
         
@@ -61,13 +69,43 @@ def _handle_whatsapp_webhook_post(request):
         logger.error(e)
         return JsonResponse({"error": "Error processing webhook"}, status=400)
     
-def _handle_new_user(payload):
-    WhatsappMessageSender(payload.whatsapp_wa_id).onboard_new_user()
-    return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
+def _handle_anonymous(payload):
+    #Case 1: Anonymous just shared their location
+    if payload.message_type.value == 'Location Share':
+        _handle_location_share(payload)
 
+    #Case 2: Anonymous just confirmed/canceled their suggested timezone
+    if payload.message_type.value == 'Timezone Confirmation':
+        _handle_timezone_confirmation(payload)
+    
+    #Case 3: Anonymous sent us any text message
+    else:
+        #This is a completely fresh user
+        WhatsappMessageSender(payload.whatsapp_wa_id).onboard_new_user()
+        return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
+
+def _handle_location_share(payload):
+    user_timezone_str = user_timezone_from_lat_long(payload.location_latitude, payload.location_longitude)
+    WhatsappMessageSender(payload.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
+    return JsonResponse({'status': 'success', 'message': 'Handled location data share from user to our platform.'}, status=200)
+
+
+def _handle_timezone_confirmation(payload):
+    #Case 1: User says the TZ is wrong
+    if payload.whatsapp_interactive_button_id == settings.CANCEL_TIMEZONE_BUTTON_ID:
+        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
+        WhatsappMessageSender(payload.whatsapp_wa_id).request_location()
+        return JsonResponse({'status': 'success', 'message': 'Handled cancel suggested timezone and retry request.'}, status=200)
+    
+    #Case 2: User says the TZ is correct
+    else:
+        user_timezone_str = payload.whatsapp_interactive_button_id.split("CONFIRM_TZ_")[1]
+        WhatsappUser.objects.create(whatsapp_wa_id=payload.whatsapp_wa_id,
+                                    time_zone = user_timezone_str)
+        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
+        return JsonResponse({'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'}, status=200)
+    
 def _handle_delete_request(payload):
-    payload.get_whatsapp_interactive_button_data()
-
     handle_delete_meal_request(payload.whatsapp_interactive_button_id, 
                                 payload.whatsapp_interactive_button_text, 
                                 payload.whatsapp_message_id, 
@@ -76,8 +114,6 @@ def _handle_delete_request(payload):
     return JsonResponse({'status': 'success', 'message': 'Handled delete meal request'}, status=200)
 
 def _handle_text_message(payload):
-    payload.get_whatsapp_text_message_data()
-
     WhatsappMessage.objects.create(
             whatsapp_user=payload.prepasto_whatsapp_user_object,
             whatsapp_message_id=payload.whatsapp_message_id,
