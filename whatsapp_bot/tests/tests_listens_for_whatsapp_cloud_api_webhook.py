@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
+from django.conf import settings
+
 from unittest.mock import patch
 import json
 from datetime import datetime
@@ -25,35 +27,54 @@ class WhatsappWebhookTestCase(TestCase):
         )
 
     def create_existing_user_setup(self):
-        self.user = WhatsappUser.objects.create(
+        self.whatsapp_user = WhatsappUser.objects.create(
             whatsapp_wa_id='17204768288',
             time_zone_name='America/Denver'
         )
-        self.meal = Meal.objects.create(
-            user=self.user,
-            description='Test Meal',
-            calories=500,
-            protein=20,
-            carbs=60,
-            fat=25
-        )
-        self.dish = Dish.objects.create(
-            meal=self.meal,
-            name='Test Dish',
-            usda_food_data_central_food_name='Test Food',
-            grams=100,
-            calories=250,
-            protein=10,
-            carbs=30,
-            fat=12
-        )
+
         self.diary = Diary.objects.create(
-            user=self.user,
-            local_date=timezone.now().date()
+            whatsapp_user=self.whatsapp_user,
+            local_date=self.whatsapp_user.current_date
         )
+
+        # Create a mock Meal associated with the Diary and user
+        self.meal = Meal.objects.create(
+            whatsapp_user=self.whatsapp_user,
+            diary=self.diary,
+            local_date=self.whatsapp_user.current_date,
+            calories=500,
+            carbs=60,
+            fat=20,
+            protein=30,
+            description="A meal description, e.g., Grilled chicken with rice and veggies"
+        )
+
+        # Create a mock Dish associated with the Meal and user
+        self.dish = Dish.objects.create(
+            whatsapp_user=self.whatsapp_user,
+            meal=self.meal,
+            name='Grilled Chicken',
+            matched_thalos_id=12345,
+            usda_food_data_central_id=67890,
+            usda_food_data_central_food_name="Chicken, broilers or fryers, breast, meat only, cooked, grilled",
+            grams=150,
+            calories=200,
+            carbs=0,
+            fat=5,
+            protein=40,
+            usual_ingredients=['Chicken breast', 'Salt', 'Pepper'],
+            state='grilled',
+            qualifiers='no skin',
+            confirmed_ingredients=['Chicken breast'],
+            amount='150 grams',
+            similar_dishes=['Roasted Chicken', 'Fried Chicken'],
+            fndds_categories=[100],
+            fndds_and_sr_legacy_google_search_results=[123456]
+        )
+
         WhatsappMessage.objects.create(
             whatsapp_message_id='test_meal_button',
-            whatsapp_user=self.user,
+            whatsapp_user=self.whatsapp_user,
             direction='OUTGOING',
             message_type='PREPASTO_MEAL_BUTTON',
             content='Test meal button content'
@@ -72,6 +93,19 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
 
+        # Check if messages were recorded in the database
+        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        self.assertEqual(messages.count(), 2)
+        self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
+
+    def test_reaction_message_user(self):
+        self.create_existing_user_setup()
+        data = mock_whatsapp_webhooks.whatsapp_webhook_user_reacts_to_message
+        response = self.send_webhook_post(data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'error': 'Invalid payload structure'})
+
     def test_normal_text_message_new_user(self):
         data = mock_whatsapp_webhooks.create_meal_for_user_text
         response = self.send_webhook_post(data)
@@ -80,7 +114,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
         
         # Check if messages were recorded in the database
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id='17204768288')
+        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
         self.assertEqual(messages.count(), 2)
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
@@ -92,7 +126,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'Handled cancel suggested timezone and retry request.'})
         
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id='17204768288')
+        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
         self.assertEqual(messages.count(), 2)
         self.assertEqual(messages[0].content, "Sorry about that! Let's try again.")
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
@@ -133,7 +167,7 @@ class WhatsappWebhookTestCase(TestCase):
         with self.assertRaises(Meal.DoesNotExist):
             Meal.objects.get(id=self.meal.id)
         
-        messages = WhatsappMessage.objects.filter(whatsapp_user=self.user).order_by('-timestamp')
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.whatsapp_user).order_by('-timestamp')
         self.assertEqual(messages[0].message_type, 'PREPASTO_DIARY_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_MEAL_DELETED_TEXT')
         self.assertEqual(messages[1].content, "Got it. I deleted the meal")
@@ -174,7 +208,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'starting nutritional calculations'})
         
-        message = WhatsappMessage.objects.filter(whatsapp_user=self.user).order_by('-timestamp').first()
+        message = WhatsappMessage.objects.filter(whatsapp_user=self.whatsapp_user).order_by('-timestamp').first()
         self.assertEqual(message.direction, 'IN')
         self.assertEqual(message.content, 'Peach')
         
@@ -183,6 +217,6 @@ class WhatsappWebhookTestCase(TestCase):
             'sender_message': 'Peach'
         })
         
-        notification_message = WhatsappMessage.objects.filter(whatsapp_user=self.user, message_type='PREPASTO_CREATING_MEAL_TEXT').first()
+        notification_message = WhatsappMessage.objects.filter(whatsapp_user=self.whatsapp_user, message_type='PREPASTO_CREATING_MEAL_TEXT').first()
         self.assertIsNotNone(notification_message)
         self.assertEqual(notification_message.content, "I got your message and I'm calculating the nutritional content!")
