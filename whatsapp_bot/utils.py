@@ -25,8 +25,12 @@ def user_timezone_from_lat_long(latitude, longitude):
     lng = float(longitude)
     tf = TimezoneFinder()
     
-    timezone_name = tf.timezone_at(lng=lng, lat=lat)
-    
+    try:
+        timezone_name = tf.timezone_at(lng=lng, lat=lat)
+    except ValueError:
+        logger.error("Lat and Long are out of bounds!")
+        return 'America/Los_Angeles'
+
     if timezone_name is None:
         logger.error("Timezone not found! Defaulting to LA time zone")
         return 'America/Los_Angeles'

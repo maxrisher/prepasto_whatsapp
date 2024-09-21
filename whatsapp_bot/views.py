@@ -18,7 +18,7 @@ logger = logging.getLogger('whatsapp_bot')
 # CATCH MESSAGES FROM WHATSAPP
 # A webhook to receive messages from whatsapp and hand them off to the lambda
 @csrf_exempt
-def listens_for_whatsapp_cloud_api_webhook(request):
+def whatsapp_cloud_api_webhook(request):
     # This method is just for letting facebook know that we have control over this webhook
     if request.method == 'GET':
         return _handle_whatsapp_webhook_get(request)
@@ -150,17 +150,24 @@ def _handle_text_message(payload):
 def food_processing_lambda_webhook(request):
     #STEP 1: make sure the request is POST AND AUTHENTICATED
     if request.method == 'POST':
-        api_key = request.headers.get('Authorization')
-        if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
-            return JsonResponse({'error': 'Invalid API key'}, status=403)
-        
-        payload_dict = json.loads(request.body)
+        _validate_lambda_webhook_auth(request)
+        try:
+            payload_dict = json.loads(request.body)
 
-        logger.info("Payload decoded at lambda webhook: ")
-        logger.info(payload_dict)
-        
-        processor = MealDataProcessor(payload_dict)
-        processor.process()
-        return JsonResponse({'message': 'OK'}, status=200)
+            logger.info("Payload decoded at lambda webhook: ")
+            logger.info(payload_dict)
+            
+            processor = MealDataProcessor(payload_dict)
+            processor.process()
+            return JsonResponse({'message': 'OK'}, status=200)
+        except Exception as e:
+            logger.error(f'Error at food_processing_lambda_webhook: {e}')
+            logger.error(e)
+            return JsonResponse({"error": "Error processing webhook"}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+def _validate_lambda_webhook_auth(request):
+    api_key = request.headers.get('Authorization')
+    if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
+        return JsonResponse({'error': 'Invalid API key'}, status=403)

@@ -118,7 +118,7 @@ class WhatsappMessageSender:
                         "type": "reply",
                         "reply": {
                             #We need to convert our meal object UID into string format to send it as JSON
-                                "id": str(self.new_meal_object.id),
+                                "id": str(new_meal_object.id),
                                 "title": settings.MEAL_DELETE_BUTTON_TEXT
                             }
                         }
@@ -155,6 +155,9 @@ class WhatsappMessageSender:
         )
     
         self.send_text_message(message_text=formatted_text, db_message_type='PREPASTO_DIARY_TEXT')
+
+    def send_meal_error_message(self):
+        self.send_text_message("I'm sorry, and error occurred. Please try again later.")
     
 
     
