@@ -166,5 +166,10 @@ SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
 # Railway forces https already. Trust headers from the reverse proxy.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-#Constants for the site
+#Constants for the whatsapp buttons we send to users
 MEAL_DELETE_BUTTON_TEXT = 'DELETE this meal.'
+CONFIRM_TIMEZONE_BUTTON_ID_PREFIX = 'CONFIRM_TZ'
+CANCEL_TIMEZONE_BUTTON_ID = 'CANCEL_TZ'
+
+#How we record messages sent by us in the db
+WHATSAPP_BOT_WHATSAPP_WA_ID = "14153476103"
