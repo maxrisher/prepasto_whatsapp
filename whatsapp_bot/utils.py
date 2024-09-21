@@ -4,14 +4,6 @@ import logging
 import json
 from timezonefinder import TimezoneFinder
 
-from django.conf import settings
-from django.db import transaction
-
-from main_app.models import Meal, Diary
-from custom_users.models import CustomUser
-from .models import WhatsappMessage, WhatsappUser
-from .whatsapp_message_sender import WhatsappMessageSender
-
 logger = logging.getLogger('whatsapp_bot')
 
 def send_to_lambda(request_body_dict):
@@ -27,7 +19,6 @@ def send_to_lambda(request_body_dict):
         Payload=json_payload,
         Qualifier=os.getenv('LAMBDA_ALIAS')
     )
-    return
 
 def user_timezone_from_lat_long(latitude, longitude):
     lat = float(latitude)
