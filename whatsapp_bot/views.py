@@ -58,7 +58,7 @@ def _handle_whatsapp_webhook_post(request):
         if payload.prepasto_whatsapp_user_object is None:
             return _handle_anonymous(payload)
         elif payload.message_type.value == 'Delete Request':
-            return _handle_delete_request(payload)
+            return _handle_delete_meal_request(payload)
         elif payload.message_type.value == 'Text':
             return _handle_text_message(payload)
         else: 
