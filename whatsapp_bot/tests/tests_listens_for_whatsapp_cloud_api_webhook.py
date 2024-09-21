@@ -8,7 +8,7 @@ import uuid
 
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Dish, Diary
-from whatsapp_bot.tests import mock_whatsapp_webhooks
+from whatsapp_bot.tests import mock_whatsapp_webhook_data
 
 class WhatsappWebhookTestCase(TestCase):
     def setUp(self):
@@ -79,14 +79,14 @@ class WhatsappWebhookTestCase(TestCase):
         )
 
     def test_status_update(self):
-        data = mock_whatsapp_webhooks.message_status_update_sent
+        data = mock_whatsapp_webhook_data.message_status_update_sent
         response = self.send_webhook_post(data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'success': 'Status update received.'})
 
     def test_reaction_message_anonymous(self):
         # Create mock reaction message data
-        data = mock_whatsapp_webhooks.whatsapp_webhook_user_reacts_to_message
+        data = mock_whatsapp_webhook_data.whatsapp_webhook_user_reacts_to_message
         response = self.send_webhook_post(data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
@@ -99,13 +99,13 @@ class WhatsappWebhookTestCase(TestCase):
 
     def test_reaction_message_user(self):
         self.create_existing_user_setup()
-        data = mock_whatsapp_webhooks.whatsapp_webhook_user_reacts_to_message
+        data = mock_whatsapp_webhook_data.whatsapp_webhook_user_reacts_to_message
         response = self.send_webhook_post(data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'error': 'Invalid payload structure'})
 
     def test_normal_text_message_new_user(self):
-        data = mock_whatsapp_webhooks.create_meal_for_user_text
+        data = mock_whatsapp_webhook_data.create_meal_for_user_text
         response = self.send_webhook_post(data)
         
         self.assertEqual(response.status_code, 200)
@@ -118,7 +118,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     def test_timezone_cancel(self):
-        data = mock_whatsapp_webhooks.location_cancel
+        data = mock_whatsapp_webhook_data.location_cancel
         response = self.send_webhook_post(data)
         
         self.assertEqual(response.status_code, 200)
@@ -130,7 +130,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     def test_timezone_confirm(self):
-        data = mock_whatsapp_webhooks.location_confirmation
+        data = mock_whatsapp_webhook_data.location_confirmation
         response = self.send_webhook_post(data)
         
         self.assertEqual(response.status_code, 200)
@@ -143,7 +143,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(message.message_type, "UNKNOWN")
 
     def test_location_sharing(self):
-        data = mock_whatsapp_webhooks.location_share
+        data = mock_whatsapp_webhook_data.location_share
         response = self.send_webhook_post(data)
         
         self.assertEqual(response.status_code, 200)
@@ -154,7 +154,7 @@ class WhatsappWebhookTestCase(TestCase):
 
     def test_delete_meal_exists(self):
         self.create_existing_user_setup()
-        data = mock_whatsapp_webhooks.delete_existing_meal_button_press
+        data = mock_whatsapp_webhook_data.delete_existing_meal_button_press
         data['entry'][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id'] = str(self.meal.id)
         
         response = self.send_webhook_post(data)
@@ -172,7 +172,7 @@ class WhatsappWebhookTestCase(TestCase):
 
     def test_delete_meal_does_not_exist(self):
         self.create_existing_user_setup()
-        data = mock_whatsapp_webhooks.delete_existing_meal_button_press
+        data = mock_whatsapp_webhook_data.delete_existing_meal_button_press
         data['entry'][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id'] = str(uuid.uuid4()) # a random uuid which does not exist
         
         response = self.send_webhook_post(data)
@@ -182,7 +182,7 @@ class WhatsappWebhookTestCase(TestCase):
 
     def test_delete_meal_from_anonymous(self):
         self.create_existing_user_setup()
-        data = mock_whatsapp_webhooks.delete_existing_meal_button_press
+        data = mock_whatsapp_webhook_data.delete_existing_meal_button_press
         data['entry'][0]['changes'][0]['value']['contacts'][0]['wa_id'] = '11111111111'  # New wa_id
         data['entry'][0]['changes'][0]['value']['messages'][0]['from'] = '11111111111'  # New wa_id
         
@@ -199,7 +199,7 @@ class WhatsappWebhookTestCase(TestCase):
     @patch('whatsapp_bot.views.send_to_lambda')
     def test_text_message_from_user(self, mock_send_to_lambda):
         self.create_existing_user_setup()
-        data = mock_whatsapp_webhooks.create_meal_for_user_text
+        data = mock_whatsapp_webhook_data.create_meal_for_user_text
         
         response = self.send_webhook_post(data)
         
