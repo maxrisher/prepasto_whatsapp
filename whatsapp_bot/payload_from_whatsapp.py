@@ -26,7 +26,8 @@ class MessageType(Enum):
     DELETE_REQUEST = "Delete Request"
     TEXT = "Text"
     LOCATION_SHARE = "Location Share"
-    TIMEZONE_CONFIRMATION = "Timezone Confirmation"
+    TIMEZONE_CONFIRMATION = "CONFIRM timezone"
+    TIMEZONE_CANCELLATION = "CANCEL timezone"
     STATUS_UPDATE = "Status Update"
 
 @dataclass
@@ -69,6 +70,8 @@ class PayloadFromWhatsapp:
             self.message_type = MessageType.LOCATION_SHARE
         elif self._test_if_timezone_confirmation():
             self.message_type = MessageType.TIMEZONE_CONFIRMATION
+        elif self._test_if_timezone_cancellation():
+            self.message_type = MessageType.TIMEZONE_CANCELLATION        
         elif self._test_if_whatsapp_status_update():
             self.message_type = MessageType.STATUS_UPDATE
         logger.info("Message is a: " + self.message_type.value)
@@ -109,10 +112,17 @@ class PayloadFromWhatsapp:
     def _test_if_timezone_confirmation(self):
         try:
             button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']
-            return button_id.startswith("CONFIRM_TZ_") or button_id == settings.CANCEL_TIMEZONE_BUTTON_ID
+            return button_id.startswith("CONFIRM_TZ_")
         except KeyError:
             return False
-
+        
+    def _test_if_timezone_cancellation(self):
+        try:
+            button_id = self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id']
+            return button_id == settings.CANCEL_TIMEZONE_BUTTON_ID
+        except KeyError:
+            return False
+        
     def _test_if_whatsapp_status_update(self):
         try:
             return "statuses" in self.request_dict["entry"][0]["changes"][0]["value"]

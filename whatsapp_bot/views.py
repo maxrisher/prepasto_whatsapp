@@ -40,7 +40,6 @@ def _handle_whatsapp_webhook_get(request):
     else:
         return HttpResponse('Forbidden', status=403)
 
-#make better
 def _handle_whatsapp_webhook_post(request):
     try:
         payload = PayloadFromWhatsapp(request)
@@ -55,12 +54,18 @@ def _handle_whatsapp_webhook_post(request):
         payload.extract_relevant_message_data()
         payload.record_message_in_db()
 
+
+        #Branch 1: the message is NOT from a whatsapp user
         if payload.prepasto_whatsapp_user is None:
             return _handle_anonymous(payload)
+        
+        #Branch 2: the message IS from a whatsapp user
         elif payload.message_type.value == 'Delete Request':
             return _handle_delete_meal_request(payload)
         elif payload.message_type.value == 'Text':
             return _handle_text_message(payload)
+        
+        #Branch 3: the message IS from a whatsapp user but it's not recognized
         else: 
             # This is what we return if we don't get a text or button message
             logger.error('Invalid payload structure')
@@ -74,37 +79,30 @@ def _handle_whatsapp_webhook_post(request):
 def _handle_anonymous(payload):
     #Case 1: Anonymous just shared their location
     if payload.message_type.value == 'Location Share':
-        _handle_location_share(payload)
+        user_timezone_str = user_timezone_from_lat_long(payload.location_latitude, payload.location_longitude)
+        WhatsappMessageSender(payload.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
+        return JsonResponse({'status': 'success', 'message': 'Handled location data share from user to our platform.'}, status=200)
 
-    #Case 2: Anonymous just confirmed/canceled their suggested timezone
-    if payload.message_type.value == 'Timezone Confirmation':
-        _handle_timezone_confirmation(payload)
+    #Case 2: Anonymous just CONFIRMed their suggested timezone
+    if payload.message_type.value == 'CONFIRM timezone':
+        user_timezone_str = payload.whatsapp_interactive_button_id.split("CONFIRM_TZ_")[1]
+        WhatsappUser.objects.create(whatsapp_wa_id=payload.whatsapp_wa_id,
+                                    time_zone_name=user_timezone_str)
+        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
+        return JsonResponse({'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'}, status=200)
+        
+    #Case 3: Anonymous just CANCELed their suggested timezone
+    if payload.message_type.value == 'CANCEL timezone':
+        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
+        WhatsappMessageSender(payload.whatsapp_wa_id).request_location()
+        logger.info("I'm about to send a json response!")
+        return JsonResponse({'status': 'success', 'message': 'Handled cancel suggested timezone and retry request.'}, status=200)
     
-    #Case 3: Anonymous sent us any message at all
+    #Case 4: Anonymous sent us any message at all
     else:
         #This is a completely fresh user
         WhatsappMessageSender(payload.whatsapp_wa_id).onboard_new_user()
         return JsonResponse({'status': 'success', 'message': 'sent onboarding message to user'}, status=200)
-
-def _handle_location_share(payload):
-    user_timezone_str = user_timezone_from_lat_long(payload.location_latitude, payload.location_longitude)
-    WhatsappMessageSender(payload.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
-    return JsonResponse({'status': 'success', 'message': 'Handled location data share from user to our platform.'}, status=200)
-
-def _handle_timezone_confirmation(payload):
-    #Case 1: User says the TZ is wrong
-    if payload.whatsapp_interactive_button_id == settings.CANCEL_TIMEZONE_BUTTON_ID:
-        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
-        WhatsappMessageSender(payload.whatsapp_wa_id).request_location()
-        return JsonResponse({'status': 'success', 'message': 'Handled cancel suggested timezone and retry request.'}, status=200)
-    
-    #Case 2: User says the TZ is correct
-    else:
-        user_timezone_str = payload.whatsapp_interactive_button_id.split("CONFIRM_TZ_")[1]
-        WhatsappUser.objects.create(whatsapp_wa_id=payload.whatsapp_wa_id,
-                                    time_zone = user_timezone_str)
-        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
-        return JsonResponse({'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'}, status=200)
     
 def _handle_delete_meal_request(payload):
     """

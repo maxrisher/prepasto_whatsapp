@@ -18,7 +18,7 @@ class Diary(models.Model):
     
     @property
     def total_nutrition(self):
-        return self.meals.aggregate(
+        return self.day_meals.aggregate(
             calories=Sum('calories'),
             carbs=Sum('carbs'),
             fat=Sum('fat'),

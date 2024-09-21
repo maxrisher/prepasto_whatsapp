@@ -228,7 +228,7 @@ location_cancel = {
                                 "interactive": {
                                     "type": "button_reply",
                                     "button_reply": {
-                                        "id": "CANCEL",
+                                        "id": "CANCEL_TZ",
                                         "title": "No, let's try again",
                                     },
                                 },

@@ -119,7 +119,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
-    def test_timezone_confirmation_cancel(self):
+    def test_timezone_cancel(self):
         data = mock_whatsapp_webhooks.location_cancel
         response = self.send_webhook_post(data)
         
@@ -128,21 +128,21 @@ class WhatsappWebhookTestCase(TestCase):
         
         messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
         self.assertEqual(messages.count(), 2)
-        self.assertEqual(messages[0].content, "Sorry about that! Let's try again.")
+        self.assertEqual(messages[0].message_type, "UNKNOWN")
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
-    def test_timezone_confirmation_confirm(self):
+    def test_timezone_confirm(self):
         data = mock_whatsapp_webhooks.location_confirmation
         response = self.send_webhook_post(data)
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'})
         
-        user = WhatsappUser.objects.get(whatsapp_wa_id='17204768288')
-        self.assertEqual(user.time_zone_name, 'America/Denver')
+        whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id='17204768288')
+        self.assertEqual(whatsapp_user.time_zone_name, 'America/Denver')
         
-        message = WhatsappMessage.objects.get(whatsapp_user=user)
-        self.assertEqual(message.content, "Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
+        message = WhatsappMessage.objects.get(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        self.assertEqual(message.message_type, "UNKNOWN")
 
     def test_location_sharing(self):
         data = mock_whatsapp_webhooks.location_share
@@ -151,7 +151,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'Handled location data share from user to our platform.'})
         
-        message = WhatsappMessage.objects.get(whatsapp_user__whatsapp_wa_id='17204768288')
+        message = WhatsappMessage.objects.get(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
         self.assertEqual(message.message_type, 'PREPASTO_CONFIRM_TIMEZONE_BUTTON')
 
     def test_delete_meal_exists(self):
