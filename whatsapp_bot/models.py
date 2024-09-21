@@ -63,7 +63,7 @@ class WhatsappMessage(models.Model):
     direction = models.CharField(max_length=8, choices=DIRECTION_CHOICES)
     message_type = models.CharField(max_length=32, choices=MESSAGE_TYPE_CHOICES, default='UNKNOWN')
     
-    content = models.TextField()
+    content = models.TextField(null=True, blank=True)
     in_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
 
     def __str__(self):

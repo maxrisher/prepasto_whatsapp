@@ -4,7 +4,7 @@ import logging
 
 from django.conf import settings
 
-from .models import WhatsappMessage
+from .models import WhatsappMessage, WhatsappUser
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -23,7 +23,7 @@ class WhatsappMessageSender:
 
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
-        WhatsappMessage.objects.create(whatsapp_user=settings.WHATSAPP_BOT_WHATSAPP_WA_ID, 
+        WhatsappMessage.objects.create(whatsapp_user=WhatsappUser.objects.get(pk=settings.WHATSAPP_BOT_WHATSAPP_WA_ID), #this is the user object for our bot
                                        whatsapp_message_id=sent_message_whatsapp_wamid, 
                                        direction='Outgoing', 
                                        message_type=db_message_type,
