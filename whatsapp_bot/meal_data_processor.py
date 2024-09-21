@@ -29,11 +29,7 @@ class MealDataProcessor:
     def process(self):
         try:
             self.meal_requester_whatsapp_wa_id = self.payload['meal_requester_whatsapp_wa_id']
-            
-            try:
-                self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
-            except WhatsappUser.DoesNotExist:
-                self.prepasto_whatsapp_user = None 
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
 
             if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
                 logger.error("Lambda returned an error!")

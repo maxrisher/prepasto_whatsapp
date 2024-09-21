@@ -35,7 +35,7 @@ class PayloadFromWhatsapp:
     request_dict: Dict = field(init=False)
     whatsapp_wa_id: Optional[str] = None
     whatsapp_message_id: Optional[str] = None
-    prepasto_whatsapp_user_object: Optional[WhatsappUser] = None
+    prepasto_whatsapp_user: Optional[WhatsappUser] = None
     message_type: MessageType = MessageType.UNKNOWN
 
     whatsapp_text_message_text: Optional[str] = None
@@ -55,7 +55,10 @@ class PayloadFromWhatsapp:
         """
         self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
         self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-        self.prepasto_whatsapp_user_object = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+        try:
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+        except WhatsappUser.DoesNotExist:
+            self.prepasto_whatsapp_user = None 
 
     def determine_message_type(self):
         if self._test_if_delete_request():

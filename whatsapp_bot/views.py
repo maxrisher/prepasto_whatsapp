@@ -55,7 +55,7 @@ def _handle_whatsapp_webhook_post(request):
         payload.extract_relevant_message_data()
         payload.record_message_in_db()
 
-        if payload.prepasto_whatsapp_user_object is None:
+        if payload.prepasto_whatsapp_user is None:
             return _handle_anonymous(payload)
         elif payload.message_type.value == 'Delete Request':
             return _handle_delete_meal_request(payload)
@@ -134,7 +134,7 @@ def _handle_delete_meal_request(payload):
 
 def _handle_text_message(payload):
     WhatsappMessage.objects.create(
-            whatsapp_user=payload.prepasto_whatsapp_user_object,
+            whatsapp_user=payload.prepasto_whatsapp_user,
             whatsapp_message_id=payload.whatsapp_message_id,
             content=payload.whatsapp_text_message_text,
             direction='IN'
