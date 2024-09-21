@@ -112,9 +112,9 @@ def _handle_delete_meal_request(payload):
     logger.info(payload.whatsapp_wa_id)
 
     #Step 1: try to delete the meal
-    meal_to_delete = Meal.objects.get(id=payload.whatsapp_interactive_button_id)
-
-    if meal_to_delete is None:
+    try:
+        meal_to_delete = Meal.objects.get(id=payload.whatsapp_interactive_button_id)
+    except Meal.DoesNotExist:
         return JsonResponse({'error': 'Meal not found'}, status=404)
 
     diary_to_change = meal_to_delete.diary

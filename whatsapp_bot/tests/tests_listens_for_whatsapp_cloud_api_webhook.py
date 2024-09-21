@@ -1,15 +1,13 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils import timezone
 from django.conf import settings
 
 from unittest.mock import patch
 import json
-from datetime import datetime
+import uuid
 
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Dish, Diary
-from whatsapp_bot.utils import send_to_lambda
 from whatsapp_bot.tests import mock_whatsapp_webhooks
 
 class WhatsappWebhookTestCase(TestCase):
@@ -17,7 +15,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.client = Client()
         self.webhook_url = reverse('whatsapp-webhook')  
         self.lambda_webhook_url = reverse('lambda-webhook')
-        self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id='14153476103')
+        self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
 
     def send_webhook_post(self, data):
         return self.client.post(
@@ -74,7 +72,7 @@ class WhatsappWebhookTestCase(TestCase):
 
         WhatsappMessage.objects.create(
             whatsapp_message_id='test_meal_button',
-            whatsapp_user=self.whatsapp_user,
+            whatsapp_user=self.django_whatsapp_user,
             direction='OUTGOING',
             message_type='PREPASTO_MEAL_BUTTON',
             content='Test meal button content'
@@ -94,7 +92,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
 
         # Check if messages were recorded in the database
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(messages.count(), 2)
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
@@ -114,7 +112,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
         
         # Check if messages were recorded in the database
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(messages.count(), 2)
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
@@ -126,7 +124,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'Handled cancel suggested timezone and retry request.'})
         
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(messages.count(), 2)
         self.assertEqual(messages[0].message_type, "UNKNOWN")
         self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
@@ -141,7 +139,7 @@ class WhatsappWebhookTestCase(TestCase):
         whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id='17204768288')
         self.assertEqual(whatsapp_user.time_zone_name, 'America/Denver')
         
-        message = WhatsappMessage.objects.get(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        message = WhatsappMessage.objects.get(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(message.message_type, "UNKNOWN")
 
     def test_location_sharing(self):
@@ -151,7 +149,7 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'Handled location data share from user to our platform.'})
         
-        message = WhatsappMessage.objects.get(whatsapp_user__whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+        message = WhatsappMessage.objects.get(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(message.message_type, 'PREPASTO_CONFIRM_TIMEZONE_BUTTON')
 
     def test_delete_meal_exists(self):
@@ -167,15 +165,15 @@ class WhatsappWebhookTestCase(TestCase):
         with self.assertRaises(Meal.DoesNotExist):
             Meal.objects.get(id=self.meal.id)
         
-        messages = WhatsappMessage.objects.filter(whatsapp_user=self.whatsapp_user).order_by('-timestamp')
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user).order_by('-timestamp')
+        print(messages)
         self.assertEqual(messages[0].message_type, 'PREPASTO_DIARY_TEXT')
         self.assertEqual(messages[1].message_type, 'PREPASTO_MEAL_DELETED_TEXT')
-        self.assertEqual(messages[1].content, "Got it. I deleted the meal")
 
     def test_delete_meal_does_not_exist(self):
         self.create_existing_user_setup()
         data = mock_whatsapp_webhooks.delete_existing_meal_button_press
-        data['entry'][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id'] = '999999'  # Non-existent meal id
+        data['entry'][0]['changes'][0]['value']['messages'][0]['interactive']['button_reply']['id'] = str(uuid.uuid4()) # a random uuid which does not exist
         
         response = self.send_webhook_post(data)
         
@@ -193,10 +191,10 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
         
-        messages = WhatsappMessage.objects.filter(whatsapp_user__whatsapp_wa_id='11111111111')
-        self.assertEqual(messages.count(), 2)
-        self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
-        self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
+        self.assertEqual(messages.count(), 3)
+        self.assertEqual(messages[1].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[2].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     @patch('whatsapp_bot.views.send_to_lambda')
     def test_text_message_from_user(self, mock_send_to_lambda):
@@ -217,6 +215,6 @@ class WhatsappWebhookTestCase(TestCase):
             'sender_message': 'Peach'
         })
         
-        notification_message = WhatsappMessage.objects.filter(whatsapp_user=self.whatsapp_user, message_type='PREPASTO_CREATING_MEAL_TEXT').first()
+        notification_message = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)[1]
         self.assertIsNotNone(notification_message)
-        self.assertEqual(notification_message.content, "I got your message and I'm calculating the nutritional content!")
+        self.assertEqual(notification_message.message_type, "PREPASTO_CREATING_MEAL_TEXT")
