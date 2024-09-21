@@ -19,7 +19,7 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref ProcessMessageFunction # This points to the lambda function the thing we're aliasing
-      FunctionVersion: 29 # IMPORTANT: this is a manual toggle to determine which version of the lambda is the 'staging version'.
+      FunctionVersion: 32 # IMPORTANT: this is a manual toggle to determine which version of the lambda is the 'staging version'.
       Name: stagingAlias
 
   ProductionProcessMessageAlias:
