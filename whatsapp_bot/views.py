@@ -150,7 +150,10 @@ def _handle_text_message(payload):
 def food_processing_lambda_webhook(request):
     #STEP 1: make sure the request is POST AND AUTHENTICATED
     if request.method == 'POST':
-        _validate_lambda_webhook_auth(request)
+        api_key = request.headers.get('Authorization')
+        if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
+            return JsonResponse({'error': 'Invalid API key'}, status=403)
+        
         try:
             payload_dict = json.loads(request.body)
 
@@ -167,7 +170,3 @@ def food_processing_lambda_webhook(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
-def _validate_lambda_webhook_auth(request):
-    api_key = request.headers.get('Authorization')
-    if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
-        return JsonResponse({'error': 'Invalid API key'}, status=403)

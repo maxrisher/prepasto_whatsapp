@@ -12,8 +12,8 @@ class WhatsappMessageSender:
     def __init__(self, whatsapp_wa_id):
         self.destination_whatsapp_wa_id = whatsapp_wa_id
         self.whatsapp_post_request_headers = {
-            "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
-            "Content-Type": "application/json"
+                "Authorization": f"Bearer {os.getenv('WHATSAPP_TOKEN')}",
+                "Content-Type": "application/json"
             }
 
     def _send_message(self, data_for_whatsapp_api, db_message_type='UNKNOWN', db_record_content=None, in_reply_to=None):
@@ -25,7 +25,7 @@ class WhatsappMessageSender:
 
         WhatsappMessage.objects.create(whatsapp_user=WhatsappUser.objects.get(pk=settings.WHATSAPP_BOT_WHATSAPP_WA_ID), #this is the user object for our bot
                                        whatsapp_message_id=sent_message_whatsapp_wamid, 
-                                       direction='Outgoing', 
+                                       direction='OUTGOING', 
                                        message_type=db_message_type,
                                        content=db_record_content,
                                        in_reply_to=in_reply_to)
