@@ -32,5 +32,6 @@ __pycache__/
 # Finder folder attributes
 .DS_Store
 
-#
+# static
 /staticfiles/
+/static/
