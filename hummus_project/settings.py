@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'main_app',
     'whatsapp_bot',
     'custom_users',
+    'tailwind',
+    'theme',
 ]
 
 MIDDLEWARE = [
@@ -60,8 +62,8 @@ ROOT_URLCONF = 'hummus_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'], #custom destination -- also look in the base directory for a templates folder
+        'APP_DIRS': True, #Look for templates within each app's 'templates' dir
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -173,3 +175,11 @@ CANCEL_TIMEZONE_BUTTON_ID = 'CANCEL_TZ'
 
 #How we record messages sent by us in the db
 WHATSAPP_BOT_WHATSAPP_WA_ID = "14153476103"
+
+#Register the new tailwind app
+TAILWIND_APP_NAME = 'theme'
+
+#For tailwind
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
