@@ -28,7 +28,9 @@ DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-ALLOWED_HOSTS = [os.getenv('RAILWAY_PUBLIC_DOMAIN')]
+ALLOWED_HOSTS = [os.getenv('RAILWAY_PUBLIC_DOMAIN'),
+                 'prepasto.com',
+                 'www.prepasto.com',]
 
 # Application definition
 
