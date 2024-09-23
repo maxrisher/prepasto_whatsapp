@@ -28,7 +28,9 @@ DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-ALLOWED_HOSTS = [os.getenv('RAILWAY_PUBLIC_DOMAIN')]
+ALLOWED_HOSTS = [os.getenv('RAILWAY_PUBLIC_DOMAIN'),
+                 'prepasto.com',
+                 'www.prepasto.com',]
 
 # Application definition
 
@@ -42,6 +44,9 @@ INSTALLED_APPS = [
     'main_app',
     'whatsapp_bot',
     'custom_users',
+    'tailwind',
+    'theme',
+    'django_browser_reload',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'hummus_project.urls'
@@ -60,8 +66,8 @@ ROOT_URLCONF = 'hummus_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'], #custom destination -- also look in the base directory for a templates folder
+        'APP_DIRS': True, #Look for templates within each app's 'templates' dir
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -173,3 +179,11 @@ CANCEL_TIMEZONE_BUTTON_ID = 'CANCEL_TZ'
 
 #How we record messages sent by us in the db
 WHATSAPP_BOT_WHATSAPP_WA_ID = "14153476103"
+
+#Register the new tailwind app
+TAILWIND_APP_NAME = 'theme'
+
+#For tailwind
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

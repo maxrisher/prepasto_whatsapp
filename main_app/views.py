@@ -6,7 +6,7 @@ logger = logging.getLogger('main_app')
 
 def index(request):
     logger.warning("Someone accessed the index page.")
-    return render(request, 'main_app/home.html')
+    return render(request, 'main_app/index.html')
 
 # Login screen / authentication
 

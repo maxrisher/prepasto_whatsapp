@@ -3,11 +3,18 @@
 
 # Django hosted on railway
 ## Development
+### Hacking
+Tailwind command
+python manage.py tailwind start
+
 ### Deployment
 Make a whatsapp user for the site:
 from whatsapp_bot.models import WhatsappUser
 whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id='14153476103')
 print(created)
+
+Tailwind
+- python manage.py tailwind build
 ### Gotchas
 - Make sure when you're creating a new admin user on a new pull request version of the site: change your database url in the .env. Restart your terminal. THEN go ahead and make the superuser.
 
