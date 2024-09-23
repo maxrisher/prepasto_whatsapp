@@ -48,7 +48,7 @@ class WhatsappMessageSender:
         self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", db_message_type='PREPASTO_CREATING_MEAL_TEXT')
 
     def request_location(self):
-        request_text = "First, we will need to determine your timezone. (So that we can help you track what you eat each day).\nPlease share your one-time location, so that we can determine your timezone. If you prefer, you can instead share any address in your local timezone. (We delete your location data as soon as we calculate your timezone)"
+        request_text = "To track your daily calories and macros, we need to know your timezone.\n\nPlease click below to send us your location or any coordinates in your local timezone.\n\n(We do not store your location data)"
 
         data_for_whatsapp_api = {
             "messaging_product": "whatsapp",
