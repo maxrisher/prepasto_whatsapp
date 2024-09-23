@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 ALLOWED_HOSTS = [os.getenv('RAILWAY_PUBLIC_DOMAIN'),
                  'prepasto.com',
-                 'www.prepasto.com',]
+                 'www.prepasto.com',
+                 'prepastowhatsapp-production.up.railway.app',]
 
 # Application definition
 
