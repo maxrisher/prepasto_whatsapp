@@ -147,7 +147,7 @@ class WhatsappMessageSender:
                 f"> {dish.usda_food_data_central_food_name} (USDA)\n"
                 f"- {dish.calories} kcal\n"
                 f"- {dish.protein} g protein\n"
-                f"- {dish.fat} g fat\n\n"
+                f"- {dish.fat} g fat\n"
                 f"- {dish.carbs} g carbs\n\n"
             )
         
