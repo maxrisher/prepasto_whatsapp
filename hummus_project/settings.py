@@ -165,7 +165,10 @@ LOGGING = {
 
 AUTH_USER_MODEL = 'custom_users.CustomUser'
 
-CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN')]
+CSRF_TRUSTED_ORIGINS = ["https://"+os.getenv('RAILWAY_PUBLIC_DOMAIN'),
+                        'https://prepasto.com',
+                        'https://www.prepasto.com',
+                        'https://prepastowhatsapp-staging.up.railway.app',]
 
 # Checks for the ssl redirect setting. Defaults to enforcing SSL. 
 SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
