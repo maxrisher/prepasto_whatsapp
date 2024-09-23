@@ -128,30 +128,40 @@ class WhatsappMessageSender:
         }
 
         self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_MEAL_BUTTON')
-    
+
     def _meal_to_text_message(self, new_meal_object, new_dishes_objects):
-        text_message = f"Total Nutrition:\nCalories: {new_meal_object.calories} kcal\nCarbs: {new_meal_object.carbs} g\nProtein: {new_meal_object.protein} g\nFat: {new_meal_object.fat} g\n\nDishes:\n"
+        # Format the total nutrition section
+        text_message = (
+            f"*Nutrition:*\n"
+            f"{new_meal_object.calories} kcal\n"
+            f"{new_meal_object.protein} g protein\n"
+            f"{new_meal_object.fat} g fat\n"
+            f"{new_meal_object.carbs} g carbs\n\n"
+            f"*Items:*\n"
+        )
         
-        for dish in new_dishes_objects:
+        # Format the individual dish sections
+        for index, dish in enumerate(new_dishes_objects, start=1):
             text_message += (
-                f" - {dish.name.capitalize()} ({dish.usda_food_data_central_food_name}), {dish.grams} g: "
-                f"{dish.calories} kcal, "
-                f"Carbs: {dish.carbs} g, "
-                f"Protein: {dish.protein} g, "
-                f"Fat: {dish.fat} g\n"
+                f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
+                f"> {dish.usda_food_data_central_food_name} (USDA)\n"
+                f"- {dish.calories} kcal\n"
+                f"- {dish.protein} g protein\n"
+                f"- {dish.fat} g fat\n\n"
+                f"- {dish.carbs} g carbs\n\n"
             )
-        return text_message
+        
+        return text_message.strip()  # Strip any trailing whitespace or newline
 
     def send_diary_message(self, diary):
         nutrition_totals_dict = diary.total_nutrition
-        date_str = diary.local_date.strftime("%-d %B, %Y")
+        date_str = diary.local_date.strftime("%-d %B %Y")
         formatted_text = (
-            f"Daily Summary - {date_str}\n\n"
-            f"Calories: {nutrition_totals_dict['calories'] or 0:,} kcal\n\n"
-            f"Macros\n"
-            f"Carbs: {nutrition_totals_dict['carbs'] or 0}g\n"
-            f"Fat: {nutrition_totals_dict['fat'] or 0}g\n"
-            f"Protein: {nutrition_totals_dict['protein'] or 0}g"
+            f"*{date_str}*\n"
+            f"{nutrition_totals_dict['calories'] or 0} kcal ⚡️\n"
+            f"{nutrition_totals_dict['protein'] or 0}g protein 🥩\n"
+            f"{nutrition_totals_dict['fat'] or 0}g fat 🧈\n"
+            f"{nutrition_totals_dict['carbs'] or 0}g carbs 🥖"
         )
     
         self.send_text_message(message_text=formatted_text, db_message_type='PREPASTO_DIARY_TEXT')
