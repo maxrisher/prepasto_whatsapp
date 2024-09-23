@@ -2,19 +2,42 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-    <title>Django Tailwind</title>
+    <title>Prepasto</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<meta name="facebook-domain-verification" content="i1uu4wlxcfqipon3jfdmd6p2bhtux2" />
 		{% tailwind_css %}
 	</head>
-
-	<body class="bg-gray-50 font-serif leading-normal tracking-normal">
-		<div class="container mx-auto">
-			<section class="flex items-center justify-center h-screen">
-				<h1 class="text-5xl">Django + Tailwind = ❤️</h1>
-			</section>
-		</div>
+	<body class="font-sans">     <!-- Setting the font for our page -->
+		<!-- Navigation bar -->
+		<header class="bg-white">
+			<!-- Container for the navigation bar elements -->
+			<nav class="container mx-auto px-4 py-4 flex justify-between items-center border-b">
+				<!-- Prepasto logo -->
+				<div class="flex items-center">
+					<img src={% static 'images/prepasto_logo.svg' %} alt="Prepasto Logo" class="h-8 w-auto min-w-20">
+				</div>
+				<div class="flex space-x-4">
+					<a href="#" class="text-gray-600 hover:text-gray-900">Home</a>
+				</div>
+			</nav>
+		</header>
+		<!-- Main page -->
+		<main class="container mx-auto px-4 py-8">
+			{% block content %}
+			{% endblock %}
+		</main>
+		<footer class="bg-gray-100 py-8">
+			<div class="container mx-auto px-4">
+				<div class="text-center text-gray-600">
+					<p>&copy; 2024 Birdcardless LLC. All rights reserved.</p>
+					<p class="mt-2">
+						<a href="#" class="hover:text-gray-900">Privacy Policy</a> |
+						<a href="#" class="hover:text-gray-900">Terms of Service</a>
+					</p>
+				</div>
+			</div>
+		</footer>
 	</body>
 </html>
