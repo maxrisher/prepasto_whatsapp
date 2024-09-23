@@ -31,3 +31,7 @@ aws_layer/
 __pycache__/
 # Finder folder attributes
 .DS_Store
+
+# static
+/staticfiles/
+/static/

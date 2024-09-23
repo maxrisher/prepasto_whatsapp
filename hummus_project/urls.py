@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include("main_app.urls")),
     path('bot/', include("whatsapp_bot.urls")),
     path('admin/', admin.site.urls),
+    path('__reload__/', include("django_browser_reload.urls")),
 ]
