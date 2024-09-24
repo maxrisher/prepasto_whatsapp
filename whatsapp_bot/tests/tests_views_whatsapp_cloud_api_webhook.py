@@ -93,9 +93,10 @@ class WhatsappWebhookTestCase(TestCase):
 
         # Check if messages were recorded in the database
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
-        self.assertEqual(messages.count(), 2)
+        self.assertEqual(messages.count(), 3)
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
-        self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
+        self.assertEqual(messages[1].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[2].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     def test_reaction_message_user(self):
         self.create_existing_user_setup()
@@ -113,9 +114,10 @@ class WhatsappWebhookTestCase(TestCase):
         
         # Check if messages were recorded in the database
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
-        self.assertEqual(messages.count(), 2)
+        self.assertEqual(messages.count(), 3)
         self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
-        self.assertEqual(messages[1].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
+        self.assertEqual(messages[1].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[2].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     def test_timezone_cancel(self):
         data = mock_whatsapp_webhook_data.location_cancel
@@ -139,8 +141,12 @@ class WhatsappWebhookTestCase(TestCase):
         whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id='17204768288')
         self.assertEqual(whatsapp_user.time_zone_name, 'America/Denver')
         
-        message = WhatsappMessage.objects.get(whatsapp_user=self.django_whatsapp_user)
-        self.assertEqual(message.message_type, "UNKNOWN")
+        messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
+        self.assertEqual(messages.count(), 4)
+        self.assertEqual(messages[0].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[1].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[2].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[3].message_type, 'PREPASTO_ONBOARDING_TEXT')
 
     def test_location_sharing(self):
         data = mock_whatsapp_webhook_data.location_share
@@ -192,9 +198,10 @@ class WhatsappWebhookTestCase(TestCase):
         self.assertEqual(response.json(), {'status': 'success', 'message': 'sent onboarding message to user'})
         
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
-        self.assertEqual(messages.count(), 3)
+        self.assertEqual(messages.count(), 4) # 4 messages because create_existing_user_setup sends 1 message.
         self.assertEqual(messages[1].message_type, 'PREPASTO_ONBOARDING_TEXT')
-        self.assertEqual(messages[2].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
+        self.assertEqual(messages[2].message_type, 'PREPASTO_ONBOARDING_TEXT')
+        self.assertEqual(messages[3].message_type, 'PREPASTO_LOCATION_REQUEST_BUTTON')
 
     @patch('whatsapp_bot.views.send_to_lambda')
     def test_text_message_from_user(self, mock_send_to_lambda):

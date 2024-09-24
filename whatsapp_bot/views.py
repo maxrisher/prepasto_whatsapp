@@ -88,7 +88,7 @@ def _handle_anonymous(payload):
         user_timezone_str = payload.whatsapp_interactive_button_id.split("CONFIRM_TZ_")[1]
         WhatsappUser.objects.create(whatsapp_wa_id=payload.whatsapp_wa_id,
                                     time_zone_name=user_timezone_str)
-        WhatsappMessageSender(payload.whatsapp_wa_id).send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate.")
+        WhatsappMessageSender(payload.whatsapp_wa_id).confirm_new_user()
         return JsonResponse({'status': 'success', 'message': 'Handled whatsappuser creation from timezone confirmation'}, status=200)
         
     #Case 3: Anonymous just CANCELed their suggested timezone
