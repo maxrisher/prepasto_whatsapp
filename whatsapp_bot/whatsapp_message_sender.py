@@ -40,9 +40,25 @@ class WhatsappMessageSender:
         self._send_message(data_for_whatsapp_api, db_message_type=db_message_type, db_record_content=db_record_content)
         
     def onboard_new_user(self):
+        """
+        These are the first messages we send to a new user.
+        """
         self.send_text_message(message_text="Welcome to Prepasto. We automate nutrition tracking. If you send me any text describing something you ate, I'll tell you the calories and macros!",
                                db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_request_for_feedback()
         self.request_location()
+
+    def confirm_new_user(self):
+        """
+        These are the messages we send to a user after they have confirmed their timezone.
+        """
+        self.send_text_message("Great, you're all set. You might also want to add Prepasto as a contact",
+                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_prepasto_contact_card()
+        self.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"",
+                        db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_text_message("To begin tracking your food, just text me a description of something you ate",
+                               db_message_type='PREPASTO_ONBOARDING_TEXT')
 
     def notify_message_sender_of_processing(self):
         self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", db_message_type='PREPASTO_CREATING_MEAL_TEXT')
@@ -168,6 +184,49 @@ class WhatsappMessageSender:
 
     def send_meal_error_message(self):
         self.send_text_message("I'm sorry, and error occurred. Please try again later.")
-    
 
+    def send_request_for_feedback(self):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": "17204768288",
+            "interactive": {
+                "type": "cta_url",
+                "body": {
+                    "text": "If you have any issues/questions/requests please just reach out at the link below!"
+                },
+                "action": {
+                    "name": "cta_url",
+                    "parameters": {
+                        "display_text": "Talk to a human",
+                        "url": "https://wa.me/17204768288?text=Hey%2C%20I%20have%20an%20issue%2Fquestion%2Frequest%20about%20Prepasto"
+                    }
+                }
+            }
+        }
+
+        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
     
+    def send_prepasto_contact_card(self):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "to": "17204768288",
+            "type": "contacts",
+            "contacts": [
+                {
+                    "name": {
+                        "formatted_name": "Prepasto",
+                        "first_name": "Prepasto"
+                    },
+                    "phones": [
+                        {
+                            "wa_id": "14153476103",
+                            "phone": "+14153476103"
+                        }
+                    ]
+                }
+            ]
+        }
+
+        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
