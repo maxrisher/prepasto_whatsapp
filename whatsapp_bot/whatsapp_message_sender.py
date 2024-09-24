@@ -52,11 +52,13 @@ class WhatsappMessageSender:
         """
         These are the messages we send to a user after they have confirmed their timezone.
         """
-        self.send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate!",
-                               db_message_type='PREPASTO_ONBOARDING_TEXT')
-        self.send_text_message("You might also want to add Prepasto as a contact in your phone. That way you can use Siri / Google Assistant to track your food on the fly: \"Hey Siri, send a WhatsApp to prepasto: 'one apple'.\")",
+        self.send_text_message("Great, you're all set. You might also want to add Prepasto as a contact",
                                db_message_type='PREPASTO_ONBOARDING_TEXT')
         self.send_prepasto_contact_card()
+        self.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"",
+                        db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_text_message("To begin tracking your food, just text me a description of something you ate",
+                               db_message_type='PREPASTO_ONBOARDING_TEXT')
 
     def notify_message_sender_of_processing(self):
         self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", db_message_type='PREPASTO_CREATING_MEAL_TEXT')
