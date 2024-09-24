@@ -42,6 +42,7 @@ class WhatsappMessageSender:
     def onboard_new_user(self):
         self.send_text_message(message_text="Welcome to Prepasto. We automate nutrition tracking. If you send me any text describing something you ate, I'll tell you the calories and macros!",
                                db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_request_for_feedback()
         self.request_location()
 
     def notify_message_sender_of_processing(self):
@@ -168,6 +169,26 @@ class WhatsappMessageSender:
 
     def send_meal_error_message(self):
         self.send_text_message("I'm sorry, and error occurred. Please try again later.")
-    
 
-    
+    def send_request_for_feedback(self):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": "17204768288",
+            "interactive": {
+                "type": "cta_url",
+                "body": {
+                    "text": "If you have any issues/questions/requests please just reach out at the link below!"
+                },
+                "action": {
+                    "name": "cta_url",
+                    "parameters": {
+                        "display_text": "Talk to a human",
+                        "url": "https://wa.me/17204768288?text=Hey%2C%20I%20have%20an%20issue%2Fquestion%2Frequest%20about%20Prepasto"
+                    }
+                }
+            }
+        }
+
+        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
