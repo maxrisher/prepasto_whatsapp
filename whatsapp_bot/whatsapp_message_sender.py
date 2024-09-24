@@ -40,10 +40,23 @@ class WhatsappMessageSender:
         self._send_message(data_for_whatsapp_api, db_message_type=db_message_type, db_record_content=db_record_content)
         
     def onboard_new_user(self):
+        """
+        These are the first messages we send to a new user.
+        """
         self.send_text_message(message_text="Welcome to Prepasto. We automate nutrition tracking. If you send me any text describing something you ate, I'll tell you the calories and macros!",
                                db_message_type='PREPASTO_ONBOARDING_TEXT')
         self.send_request_for_feedback()
         self.request_location()
+
+    def confirm_new_user(self):
+        """
+        These are the messages we send to a user after they have confirmed their timezone.
+        """
+        self.send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate!",
+                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_text_message("You might also want to add Prepasto as a contact in your phone. That way you can use Siri / Google Assistant to track your food on the fly: \"Hey Siri, send a WhatsApp to prepasto: 'one apple'.\")",
+                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self.send_prepasto_contact_card()
 
     def notify_message_sender_of_processing(self):
         self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", db_message_type='PREPASTO_CREATING_MEAL_TEXT')
@@ -189,6 +202,29 @@ class WhatsappMessageSender:
                     }
                 }
             }
+        }
+
+        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
+    
+    def send_prepasto_contact_card(self):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "to": "17204768288",
+            "type": "contacts",
+            "contacts": [
+                {
+                    "name": {
+                        "formatted_name": "Prepasto",
+                        "first_name": "Prepasto"
+                    },
+                    "phones": [
+                        {
+                            "wa_id": "14153476103",
+                            "phone": "+14153476103"
+                        }
+                    ]
+                }
+            ]
         }
 
         self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
