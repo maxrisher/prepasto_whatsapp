@@ -23,10 +23,12 @@ class WhatsappMessageSender:
 
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
-        WhatsappMessage.objects.create(whatsapp_user=WhatsappUser.objects.get(pk=settings.WHATSAPP_BOT_WHATSAPP_WA_ID), #this is the user object for our bot
-                                       whatsapp_message_id=sent_message_whatsapp_wamid, 
-                                       direction='OUTGOING', 
+        WhatsappMessage.objects.create(whatsapp_message_id=sent_message_whatsapp_wamid,
+                                       whatsapp_user=WhatsappUser.objects.get(pk=settings.WHATSAPP_BOT_WHATSAPP_WA_ID), #this is the user object for our bot
+                                       sent_to = self.destination_whatsapp_wa_id,
+                                       sent_from = settings.WHATSAPP_BOT_WHATSAPP_WA_ID,
                                        message_type=db_message_type,
+                                       
                                        content=db_record_content,
                                        in_reply_to=in_reply_to)
         
@@ -190,7 +192,7 @@ class WhatsappMessageSender:
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
             "type": "interactive",
-            "to": "17204768288",
+            "to": self.destination_whatsapp_wa_id,
             "interactive": {
                 "type": "cta_url",
                 "body": {
@@ -211,7 +213,7 @@ class WhatsappMessageSender:
     def send_prepasto_contact_card(self):
         data_for_whatsapp_api = {
             "messaging_product": "whatsapp",
-            "to": "17204768288",
+            "to": self.destination_whatsapp_wa_id,
             "type": "contacts",
             "contacts": [
                 {
