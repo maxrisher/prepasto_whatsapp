@@ -1,4 +1,5 @@
 import pytz
+from enum import Enum
 
 from django.utils import timezone
 from django.db import models
@@ -25,46 +26,62 @@ class WhatsappUser(models.Model):
     def __str__(self):
         return f"{self.whatsapp_wa_id}"
     
+class MessageType(Enum):
+    #Incoming NEW user messages
+    NEW_USER_TEXT = "NEW_USER_TEXT"
+    NEW_USER_LOCATION_SHARE = "NEW_USER_LOCATION_SHARE"
+    NEW_USER_TIMEZONE_CONFIRMATION = "NEW_USER_TIMEZONE_CONFIRMATION"
+    NEW_USER_TIMEZONE_CANCELLATION = "NEW_USER_TIMEZONE_CANCELLATION"
+    NEW_USER_MESSAGE_GENERIC = "NEW_USER_MESSAGE_GENERIC"
+    NEW_USER_STATUS_UPDATE_SENT = "NEW_USER_STATUS_UPDATE_SENT"
+    NEW_USER_STATUS_UPDATE_READ = "NEW_USER_STATUS_UPDATE_READ"
+    NEW_USER_STATUS_UPDATE_FAILED = "NEW_USER_STATUS_UPDATE_FAILED"
+
+    #Incoming USER messages
+    USER_DELETE_REQUEST = "USER_DELETE_REQUEST"
+    USER_TEXT = "USER_TEXT"
+    USER_IMAGE = "USER_IMAGE"
+    USER_VIDEO = "USER_VIDEO"
+    USER_MESSAGE_GENERIC = "USER_MESSAGE_GENERIC"
+    USER_STATUS_UPDATE_SENT = "USER_STATUS_UPDATE_SENT"
+    USER_STATUS_UPDATE_READ = "USER_STATUS_UPDATE_READ"
+    USER_STATUS_UPDATE_FAILED = "USER_STATUS_UPDATE_FAILED"
+
+    #Outgoing for new users
+    PREPASTO_ONBOARDING_TEXT = "PREPASTO_ONBOARDING_TEXT"
+    PREPASTO_LOCATION_REQUEST_BUTTON = "PREPASTO_LOCATION_REQUEST_BUTTON"
+    PREPASTO_CONFIRM_TIMEZONE_BUTTON = "PREPASTO_CONFIRM_TIMEZONE_BUTTON"
+    
+    #Outgoing meal creation
+    PREPASTO_CREATING_MEAL_TEXT = "PREPASTO_CREATING_MEAL_TEXT"
+    PREPASTO_MEAL_BUTTON = "PREPASTO_MEAL_BUTTON"
+    PREPASTO_DIARY_TEXT = "PREPASTO_DIARY_TEXT"
+
+    #Outgoing meal deletion
+    PREPASTO_MEAL_DELETED_TEXT = "PREPASTO_MEAL_DELETED_TEXT"
+
+    #Outgoing error messages
+    PREPASTO_ERROR_TEXT = "PREPASTO_ERROR_TEXT"
+
+    #Other
+    UNKNOWN = "UNKNOWN"
+    
 class WhatsappMessage(models.Model):
-    DIRECTION_CHOICES = [
-        ('INCOMING', 'INCOMING'),
-        ('OUTGOING', 'OUTGOING'),
-    ]
-
-    MESSAGE_TYPE_CHOICES = [
-        #onboarding messages
-        ('USER_ANONYMOUS_TEXT', 'USER_ANONYMOUS_TEXT'),
-        ('PREPASTO_ONBOARDING_TEXT', 'PREPASTO_ONBOARDING_TEXT'),
-        ('PREPASTO_LOCATION_REQUEST_BUTTON', 'PREPASTO_LOCATION_REQUEST_BUTTON'),
-        ('USER_COORDINATES', 'USER_COORDINATES'),
-        ('PREPASTO_CONFIRM_TIMEZONE_BUTTON', 'PREPASTO_CONFIRM_TIMEZONE_BUTTON'),
-        ('USER_CONFIRM_TIMEZONE_PRESS', 'USER_CONFIRM_TIMEZONE_PRESS'),
-        ('USER_CANCEL_TIMEZONE_PRESS', 'USER_CANCEL_TIMEZONE_PRESS'),
-
-        #meal creation messages
-        ('USER_CREATE_MEAL_TEXT', 'USER_CREATE_MEAL_TEXT'),
-        ('PREPASTO_CREATING_MEAL_TEXT', 'PREPASTO_CREATING_MEAL_TEXT'),
-        ('PREPASTO_MEAL_BUTTON', 'PREPASTO_MEAL_BUTTON'),
-        ('PREPASTO_DIARY_TEXT', 'PREPASTO_DIARY_TEXT'),
-
-        #meal deletion messages
-        ('USER_MEAL_DELETE_PRESS', 'USER_MEAL_DELETE_PRESS'),
-        ('PREPASTO_MEAL_DELETED_TEXT', 'PREPASTO_MEAL_DELETED_TEXT'),
-
-        #other
-        ('PREPASTO_ERROR_TEXT', 'PREPASTO_ERROR_TEXT'),
-
-        ('UNKNOWN', 'UNKNOWN'),
-    ]
+    MESSAGE_TYPE_CHOICES = [(type.name, type.value) for type in MessageType]
 
     whatsapp_message_id = models.CharField(max_length=255, primary_key=True)
-    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='messages')
-    timestamp = models.DateTimeField(auto_now_add=True)
-    direction = models.CharField(max_length=8, choices=DIRECTION_CHOICES)
-    message_type = models.CharField(max_length=32, choices=MESSAGE_TYPE_CHOICES, default='UNKNOWN')
+    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
+    record_created_at = models.DateTimeField(auto_now_add=True)
+    sent_to = models.CharField(max_length=20)
+    sent_from = models.CharField(max_length=20)
+    message_type = models.CharField(max_length=50, choices=MESSAGE_TYPE_CHOICES, default=MessageType.UNKNOWN.value)
     
     content = models.TextField(null=True, blank=True)
     in_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
 
+    sent_at = models.DateTimeField(null=True, blank=True)
+    failed_at = models.DateTimeField(null=True, blank=True)
+    failure_details = models.TextField(null=True, blank=True)
+
     def __str__(self):
-        return f"{self.direction} {self.message_type} message for {self.whatsapp_user} at {self.timestamp}"
+        return f"{self.message_type} message from {self.sent_from} to {self.sent_to} at {self.timestamp}"

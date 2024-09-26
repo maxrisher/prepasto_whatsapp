@@ -182,7 +182,7 @@ class WhatsappMessageSender:
     
         self.send_text_message(message_text=formatted_text, db_message_type='PREPASTO_DIARY_TEXT')
 
-    def send_meal_error_message(self):
+    def send_generic_error_message(self):
         self.send_text_message("I'm sorry, and error occurred. Please try again later.")
 
     def send_request_for_feedback(self):
@@ -230,3 +230,6 @@ class WhatsappMessageSender:
         }
 
         self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
+
+    def send_response_to_image_or_video(self):
+        self.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.")
