@@ -74,46 +74,6 @@ delete_existing_meal_button_press = {
     ],
 }
 
-
-message_status_update_sent = {
-    "object": "whatsapp_business_account",
-    "entry": [
-        {
-            "id": "350132861527473",
-            "changes": [
-                {
-                    "value": {
-                        "messaging_product": "whatsapp",
-                        "metadata": {
-                            "display_phone_number": "14153476103",
-                            "phone_number_id": "428381170351556",
-                        },
-                        "statuses": [
-                            {
-                                "id": "wamid.HBgLMTMwMzk1NjIxNjYVAgARGBI1QzU0NEM3QjlCOEFFOTRDMzkA",
-                                "status": "sent",
-                                "timestamp": "1726771705",
-                                "recipient_id": "13039562166",
-                                "conversation": {
-                                    "id": "c8f93f29dde668cbb4ec848e4da47958",
-                                    "expiration_timestamp": "1726855800",
-                                    "origin": {"type": "service"},
-                                },
-                                "pricing": {
-                                    "billable": True,
-                                    "pricing_model": "CBP",
-                                    "category": "service",
-                                },
-                            }
-                        ],
-                    },
-                    "field": "messages",
-                }
-            ],
-        }
-    ],
-}
-
 location_share = {
     "object": "whatsapp_business_account",
     "entry": [
@@ -282,3 +242,56 @@ whatsapp_webhook_user_reacts_to_message = {
     }
   ]
 }
+
+message_status_update_sent = {
+    "object": "whatsapp_business_account",
+    "entry": [
+        {
+            "id": "350132861527473",
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "display_phone_number": "14153476103",
+                            "phone_number_id": "428381170351556",
+                        },
+                        "statuses": [
+                            {
+                                "id": "wamid.HBgLMTMwMzk1NjIxNjYVAgARGBI1QzU0NEM3QjlCOEFFOTRDMzkA",
+                                "status": "sent",
+                                "timestamp": "1726771705",
+                                "recipient_id": "13039562166",
+                                "conversation": {
+                                    "id": "c8f93f29dde668cbb4ec848e4da47958",
+                                    "expiration_timestamp": "1726855800",
+                                    "origin": {"type": "service"},
+                                },
+                                "pricing": {
+                                    "billable": True,
+                                    "pricing_model": "CBP",
+                                    "category": "service",
+                                },
+                            }
+                        ],
+                    },
+                    "field": "messages",
+                }
+            ],
+        }
+    ],
+}
+
+message_status_update_read = {}
+
+message_status_update_failed = {}
+
+whatsapp_webhook_user_image_message = {}
+
+whatsapp_webhook_user_video_message = {}
+
+whatsapp_webhook_user_audio_message = {}
+
+whatsapp_webhook_user_contacts_message = {}
+
+whatsapp_webhook_user_document_message = {}

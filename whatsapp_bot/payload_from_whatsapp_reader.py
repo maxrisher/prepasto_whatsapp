@@ -142,10 +142,9 @@ class PayloadFromWhatsappReader:
         
         if self.message_type == MessageType.UNKNOWN:
             logger.info("I got an unknown message. I am not logging it to the database")
-            return
         
         #If it's a status update, update the status of the appropriate message
-        if self.message_type in status_update_message_types:
+        elif self.message_type in status_update_message_types:
             try:
                 message_to_update_status = WhatsappMessage.objects.get(whatsapp_message_id = self.whatsapp_status_update_whatsapp_message_id)
                 
@@ -160,11 +159,11 @@ class PayloadFromWhatsappReader:
                     error_message = str(self.whatsapp_status_update_error_code) + str(self.whatsapp_status_update_error_title) + str(self.whatsapp_status_update_error_message) + str(self.whatsapp_status_update_error_details)
 
                     message_to_update_status.failure_details = error_message
+                
+                message_to_update_status.save()
 
             except WhatsappMessage.DoesNotExist:
                 logger.info("No whatsapp message in our database with the id: " + str(self.whatsapp_status_update_whatsapp_message_id))
-
-            return
 
         #If it's a message from a user, add it to our database
         else:

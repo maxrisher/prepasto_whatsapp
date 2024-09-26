@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.db import transaction
+from django.utils.crypto import constant_time_compare
 
 from .payload_from_whatsapp_reader import PayloadFromWhatsappReader
 from .meal_data_processor import MealDataProcessor
@@ -59,7 +60,7 @@ def food_processing_lambda_webhook(request):
     #STEP 1: make sure the request is POST AND AUTHENTICATED
     if request.method == 'POST':
         api_key = request.headers.get('Authorization')
-        if api_key != 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY'):
+        if not constant_time_compare(api_key, 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')):
             return JsonResponse({'error': 'Invalid API key'}, status=403)
         
         try:
