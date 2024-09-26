@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage, MessageType
 from main_app.models import Meal, Dish, Diary
 from whatsapp_bot.utils import send_to_lambda
-from mock_whatsapp_webhook_data import *  # Import all mock payloads
+from whatsapp_bot.tests.mock_whatsapp_webhook_data import create_meal_for_user_text
 
 class WhatsappUserMessageTestCase(TestCase):
     def setUp(self):
