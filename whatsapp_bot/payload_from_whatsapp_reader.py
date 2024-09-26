@@ -15,7 +15,6 @@ from dataclasses import dataclass, field
 from typing import Dict, Optional
 import json
 import logging
-from enum import Enum, auto
 from django.conf import settings
 from django.http import HttpRequest
 from .models import WhatsappUser
@@ -164,16 +163,17 @@ class PayloadFromWhatsappReader:
 
             except WhatsappMessage.DoesNotExist:
                 logger.info("No whatsapp message in our database with the id: " + str(self.whatsapp_status_update_whatsapp_message_id))
+                raise
 
         #If it's a message from a user, add it to our database
         else:
             db_record_content = self.whatsapp_text_message_text
 
             WhatsappMessage.objects.create(whatsapp_message_id = self.whatsapp_message_id,
-                                        whatsapp_user = self.prepasto_whatsapp_user, #this is the user object for our bot
+                                        whatsapp_user = self.prepasto_whatsapp_user,
                                         sent_to = settings.WHATSAPP_BOT_WHATSAPP_WA_ID,
                                         sent_from = self.whatsapp_wa_id,
-                                        message_type=self.message_type,
+                                        message_type=self.message_type.value,
                                         content=db_record_content)
 
     def _test_if_delete_request(self):

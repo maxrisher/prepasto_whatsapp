@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, Callable
 
 from django.http import HttpResponse
 
@@ -20,23 +21,22 @@ class WhatsappMessageHandler:
             MessageType.NEW_USER_LOCATION_SHARE: self._handle_location_share,
             MessageType.NEW_USER_TIMEZONE_CONFIRMATION: self._handle_timezone_confirmation,
             MessageType.NEW_USER_TIMEZONE_CANCELLATION: self._handle_timezone_cancellation,
-            MessageType.NEW_USER_MESSAGE_GENERIC: self._handle_new_user_text_or_media_message,
             MessageType.NEW_USER_STATUS_UPDATE_SENT: self._handle_status_update,
             MessageType.NEW_USER_STATUS_UPDATE_READ: self._handle_status_update,
             MessageType.NEW_USER_STATUS_UPDATE_FAILED: self._handle_status_update,
+
+            MessageType.NEW_USER_MESSAGE_GENERIC: self._handle_new_user_text_or_media_message,
 
             #Incoming USER messages
             MessageType.USER_DELETE_REQUEST: self._handle_user_delete_meal_request,
             MessageType.USER_TEXT: self._handle_user_text_message,
             MessageType.USER_IMAGE: self._handle_user_image,
             MessageType.USER_VIDEO: self._handle_user_video,
-            MessageType.USER_MESSAGE_GENERIC: self._handle_user_generic,
             MessageType.USER_STATUS_UPDATE_SENT: self._handle_status_update,
             MessageType.USER_STATUS_UPDATE_READ: self._handle_status_update,
             MessageType.USER_STATUS_UPDATE_FAILED: self._handle_status_update,
 
-            #Other
-            MessageType.UNKNOWN: self._handle_unknown_message,
+            MessageType.USER_MESSAGE_GENERIC: self._handle_user_generic,
         }
     
     def handle_message(self) -> HttpResponse:
@@ -69,7 +69,8 @@ class WhatsappMessageHandler:
         return HttpResponse('Received', status=200)
 
     def _handle_timezone_cancellation(self):
-        WhatsappMessageSender(self.payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
+        WhatsappMessageSender(self.payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.", 
+                                                                             db_message_type=MessageType.PREPASTO_LOCATION_TRY_AGAIN.value)
         WhatsappMessageSender(self.payload.whatsapp_wa_id).request_location()
         logger.info("Handled timezone cancellation")
         return HttpResponse('Received', status=200)
@@ -94,7 +95,7 @@ class WhatsappMessageHandler:
             meal_to_delete = Meal.objects.get(id=self.payload.whatsapp_interactive_button_id)
         except Meal.DoesNotExist:
             WhatsappMessageSender(self.payload.whatsapp_wa_id).send_generic_error_message()
-            return 
+            return HttpResponse('Received', status=200)
 
         diary_to_change = meal_to_delete.diary
         meal_to_delete.delete()
@@ -118,7 +119,7 @@ class WhatsappMessageHandler:
         return HttpResponse('Received', status=200)
 
     # Other
-    def _handle_unknown_message(self):
+    def _handle_user_generic(self):
         logger.warning("Handled unknown message")
         return HttpResponse('Received', status=200)
     

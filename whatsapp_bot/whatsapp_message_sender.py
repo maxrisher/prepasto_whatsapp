@@ -4,7 +4,7 @@ import logging
 
 from django.conf import settings
 
-from .models import WhatsappMessage, WhatsappUser
+from .models import WhatsappMessage, WhatsappUser, MessageType
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -16,7 +16,7 @@ class WhatsappMessageSender:
                 "Content-Type": "application/json"
             }
 
-    def _send_message(self, data_for_whatsapp_api, db_message_type='UNKNOWN', db_record_content=None, in_reply_to=None):
+    def _send_message(self, data_for_whatsapp_api, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, in_reply_to=None):
         response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=self.whatsapp_post_request_headers, json=data_for_whatsapp_api)
         response_data = response.json()
         logger.info("I sent a text message via WhatsApp. This was the response from whatsap: %s", response_data)
@@ -28,11 +28,11 @@ class WhatsappMessageSender:
                                        sent_to = self.destination_whatsapp_wa_id,
                                        sent_from = settings.WHATSAPP_BOT_WHATSAPP_WA_ID,
                                        message_type=db_message_type,
-                                       
+
                                        content=db_record_content,
                                        in_reply_to=in_reply_to)
         
-    def send_text_message(self, message_text, db_message_type='UNKNOWN', db_record_content=None):
+    def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None):
         data_for_whatsapp_api = {
             "messaging_product": "whatsapp",
             "to": self.destination_whatsapp_wa_id,
@@ -46,7 +46,7 @@ class WhatsappMessageSender:
         These are the first messages we send to a new user.
         """
         self.send_text_message(message_text="Welcome to Prepasto. We automate nutrition tracking. If you send me any text describing something you ate, I'll tell you the calories and macros!",
-                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+                               db_message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value)
         self.send_request_for_feedback()
         self.request_location()
 
@@ -55,15 +55,16 @@ class WhatsappMessageSender:
         These are the messages we send to a user after they have confirmed their timezone.
         """
         self.send_text_message("Great, you're all set. You might also want to add Prepasto as a contact",
-                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+                               db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
         self.send_prepasto_contact_card()
         self.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"",
-                        db_message_type='PREPASTO_ONBOARDING_TEXT')
+                        db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
         self.send_text_message("To begin tracking your food, just text me a description of something you ate",
-                               db_message_type='PREPASTO_ONBOARDING_TEXT')
+                               db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
 
     def notify_message_sender_of_processing(self):
-        self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", db_message_type='PREPASTO_CREATING_MEAL_TEXT')
+        self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", 
+                               db_message_type=MessageType.PREPASTO_CREATING_MEAL_TEXT.value)
 
     def request_location(self):
         request_text = "To track your daily calories and macros, we need to know your timezone.\n\nPlease click below to send us your location or any coordinates in your local timezone.\n\n(We do not store your location data)"
@@ -83,7 +84,7 @@ class WhatsappMessageSender:
                 }
             }
         }
-        self._send_message(data_for_whatsapp_api, db_message_type="PREPASTO_LOCATION_REQUEST_BUTTON")
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value)
 
     def send_location_confirmation_buttons(self, user_timezone_string):
         data_for_whatsapp_api = {
@@ -117,7 +118,7 @@ class WhatsappMessageSender:
             }
         }
 
-        self._send_message(data_for_whatsapp_api, db_message_type="PREPASTO_CONFIRM_TIMEZONE_BUTTON")
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONFIRM_TIMEZONE_BUTTON.value)
 
     def send_meal_message(self, new_meal_object, new_dishes_objects):
         data_for_whatsapp_api = {
@@ -145,7 +146,7 @@ class WhatsappMessageSender:
             }            
         }
 
-        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_MEAL_BUTTON')
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_MEAL_BUTTON.value)
 
     def _meal_to_text_message(self, new_meal_object, new_dishes_objects):
         # Format the total nutrition section
@@ -182,7 +183,7 @@ class WhatsappMessageSender:
             f"{nutrition_totals_dict['carbs'] or 0}g carbs 🥖"
         )
     
-        self.send_text_message(message_text=formatted_text, db_message_type='PREPASTO_DIARY_TEXT')
+        self.send_text_message(message_text=formatted_text, db_message_type=MessageType.PREPASTO_DIARY_TEXT.value)
 
     def send_generic_error_message(self):
         self.send_text_message("I'm sorry, and error occurred. Please try again later.")
@@ -208,7 +209,7 @@ class WhatsappMessageSender:
             }
         }
 
-        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value)
     
     def send_prepasto_contact_card(self):
         data_for_whatsapp_api = {
@@ -231,7 +232,8 @@ class WhatsappMessageSender:
             ]
         }
 
-        self._send_message(data_for_whatsapp_api, db_message_type='PREPASTO_ONBOARDING_TEXT')
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONTACT_CARD.value)
 
     def send_response_to_image_or_video(self):
-        self.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.")
+        self.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.", 
+                               MessageType.PREPASTO_IS_TEXT_ONLY.value)
