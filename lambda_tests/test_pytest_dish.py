@@ -31,7 +31,7 @@ def test_dish(go_to_lambda_dir):
         name="cheese sandwich",
         usual_ingredients=["bread", "cheese", "butter"],
         state="ready-to-eat",
-        qualifiers=None,
+        qualifiers=[],
         confirmed_ing=None,
         amount="one sandwich",
         similar_dishes=[

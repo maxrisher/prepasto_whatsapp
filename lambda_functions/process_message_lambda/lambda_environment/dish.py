@@ -175,8 +175,11 @@ dish_schema = {
       "description": "Words describing how the food has been prepared, including the degree of preparation, cooking method, or preservation method. E.g., 'cooked, sauteed (meat and vegetable filling), boiled and mashed (potato topping), baked (entire pie)'."
     },
     "qualifiers": {
-      "type": ["string", "null"],
-      "description": "Any user-provided information on the overall nutritional content of a dish. Can be null if no information is provided. E.g., 'sugar-free', 'full-fat', 'high-protein', etc."
+      "type": ["array"],
+      "items": {
+        "type": "string"
+      },
+      "description": "Any user-provided information on the overall nutritional content of a dish. Can be empty if no information is provided. E.g., 'sugar-free', 'full-fat', 'high-protein', etc."
     },
     "confirmed_ingredients": {
       "type": ["array", "null"],

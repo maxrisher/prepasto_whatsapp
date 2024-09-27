@@ -54,7 +54,7 @@ class WhatsappUserMessageTestCase(TestCase):
             protein=40,
             usual_ingredients=['Chicken breast', 'Salt', 'Pepper'],
             state='grilled',
-            qualifiers='no skin',
+            qualifiers=['no skin'],
             confirmed_ingredients=['Chicken breast'],
             amount='150 grams',
             similar_dishes=['Roasted Chicken', 'Fried Chicken'],

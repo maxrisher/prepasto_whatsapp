@@ -57,7 +57,7 @@ class Dish(models.Model):
 
     usual_ingredients = ArrayField(models.CharField(max_length=255))
     state = models.CharField(max_length=255)
-    qualifiers = models.CharField(max_length=255, null=True, blank=True)
+    qualifiers = ArrayField(models.CharField(max_length=255), null=True, blank=True)
     confirmed_ingredients = ArrayField(models.CharField(max_length=255), null=True, blank=True)
     amount = models.CharField(max_length=255)
     similar_dishes = ArrayField(models.CharField(max_length=255))

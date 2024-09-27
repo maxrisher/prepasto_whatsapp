@@ -20,7 +20,7 @@ dish_schema = {
       "description": "Words describing how the food has been prepared, including the degree of preparation, cooking method, or preservation method. E.g., 'cooked, sauteed (meat and vegetable filling), boiled and mashed (potato topping), baked (entire pie)'."
     },
     "qualifiers": {
-      "type": ["array", "null"],
+      "type": ["array"],
       "items": {
         "type": "string"
       },
