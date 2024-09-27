@@ -153,7 +153,7 @@ class PayloadFromWhatsappReader:
                     message_to_update_status.sent_at = timezone.now()
 
                 if self.message_type in status_update_read:
-                    logger.info("Message read now: "+str(self.whatsapp_status_update_whatsapp_message_id))
+                    logger.info("Message just read by user: "+str(self.whatsapp_status_update_whatsapp_message_id))
 
                 if self.message_type in status_update_failed:
                     message_to_update_status.failed_at = timezone.now()
