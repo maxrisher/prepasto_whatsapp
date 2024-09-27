@@ -52,4 +52,4 @@ def get_lambda_alias(arn):
     if len(parts) > 7:
         return parts[7]
     else:
-        return 'production'
+        return 'production' #default to production alias if there is no alias
