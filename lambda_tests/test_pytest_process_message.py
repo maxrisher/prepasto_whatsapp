@@ -23,7 +23,7 @@ def mock_post_request_django(requests_mock):
 def test_lambda_full(go_to_lambda_dir, mock_post_request_django):
     event = {'sender_message': "three sausage patties, two fried eggs, one slice of toast",
              'sender_whatsapp_wa_id': 123456789}
-    context = MockContext(invoked_function_arn='arn:aws:lambda:region:account-id:function:my-function:pullRequestAlias')
+    context = MockContext(invoked_function_arn='arn:aws:lambda:region:account-id:function:my-function:stagingAlias')
     print("START")
     response = lambda_handler(event, context)
     assert response['statusCode'] == 200  # Ensure the response is happy
