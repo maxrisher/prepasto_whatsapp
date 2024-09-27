@@ -311,6 +311,45 @@ message_status_update_read = {
     ],
 }
 
+message_status_update_delivered = {
+    "object": "whatsapp_business_account",
+    "entry": [
+        {
+            "id": "350132861527473",
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "display_phone_number": "14153476103",
+                            "phone_number_id": "428381170351556",
+                        },
+                        "statuses": [
+                            {
+                                "id": "test_message_id",
+                                "status": "delivered",
+                                "timestamp": "1726771705",
+                                "recipient_id": "13039562166",
+                                "conversation": {
+                                    "id": "c8f93f29dde668cbb4ec848e4da47958",
+                                    "expiration_timestamp": "1726855800",
+                                    "origin": {"type": "service"},
+                                },
+                                "pricing": {
+                                    "billable": True,
+                                    "pricing_model": "CBP",
+                                    "category": "service",
+                                },
+                            }
+                        ],
+                    },
+                    "field": "messages",
+                }
+            ],
+        }
+    ],
+}
+
 message_status_update_failed = {
     "object": "whatsapp_business_account",
     "entry": [

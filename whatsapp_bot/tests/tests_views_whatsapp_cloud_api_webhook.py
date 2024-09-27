@@ -260,6 +260,28 @@ class WhatsappUserMessageTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_status_update_delivered_message_exists(self):
+        message = WhatsappMessage.objects.create(
+            whatsapp_message_id='test_message_id',
+            whatsapp_user=self.whatsapp_user,
+            sent_to='17204768288',
+            sent_from='14153476103',
+            message_type=MessageType.PREPASTO_MEAL_BUTTON.value
+        )
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_delivered),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_status_update_read_message_not_exists(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_delivered),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
 
 class NonWhatsappUserMessageTestCase(TestCase):
     def setUp(self):
@@ -499,6 +521,29 @@ class NonWhatsappUserMessageTestCase(TestCase):
         response = self.client.post(
             self.webhook_url,
             data=json.dumps(webhkdta.message_status_update_read),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_status_update_delivered_message_exists(self):
+        message = WhatsappMessage.objects.create(
+            whatsapp_message_id='test_message_id',
+            whatsapp_user=self.django_whatsapp_user,
+            sent_to='17204768288',
+            sent_from='14153476103',
+            message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value
+        )
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_delivered),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_status_update_delivered_message_not_exists(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_delivered),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)

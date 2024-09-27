@@ -24,6 +24,7 @@ class WhatsappMessageHandler:
             MessageType.NEW_USER_STATUS_UPDATE_SENT: self._handle_status_update,
             MessageType.NEW_USER_STATUS_UPDATE_READ: self._handle_status_update,
             MessageType.NEW_USER_STATUS_UPDATE_FAILED: self._handle_status_update,
+            MessageType.NEW_USER_STATUS_UPDATE_DELIVERED: self._handle_status_update,
 
             MessageType.NEW_USER_MESSAGE_GENERIC: self._handle_new_user_text_or_media_message,
 
@@ -35,6 +36,7 @@ class WhatsappMessageHandler:
             MessageType.USER_STATUS_UPDATE_SENT: self._handle_status_update,
             MessageType.USER_STATUS_UPDATE_READ: self._handle_status_update,
             MessageType.USER_STATUS_UPDATE_FAILED: self._handle_status_update,
+            MessageType.USER_STATUS_UPDATE_DELIVERED: self._handle_status_update,
 
             MessageType.USER_MESSAGE_GENERIC: self._handle_user_generic,
         }
