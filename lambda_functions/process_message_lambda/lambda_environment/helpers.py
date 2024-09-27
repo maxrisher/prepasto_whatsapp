@@ -33,6 +33,7 @@ def send_to_django(dict):
         raise RuntimeError(f"Error sending data to Django: {e}")
     
 def set_django_url(context):
+    print(context)
     alias_str = get_lambda_alias(context.invoked_function_arn)
     if alias_str == 'production':
         os.environ['RAILWAY_PUBLIC_DOMAIN'] = os.getenv('PRODUCTION_RAILWAY_PUBLIC_DOMAIN')
