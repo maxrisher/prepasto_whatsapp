@@ -41,6 +41,7 @@ class WhatsappMessageHandler:
     
     def handle_message(self) -> HttpResponse:
         handler = self.handlers.get(self.payload.message_type)
+        logger.info("Handled message (waid: " + str(self.payload.whatsapp_message_id) + ") of type: "+self.payload.message_type.value)
         return handler()
     
     # Status updates
@@ -51,13 +52,11 @@ class WhatsappMessageHandler:
     # NEW user messages
     def _handle_new_user_text_or_media_message(self):
         WhatsappMessageSender(self.payload.whatsapp_wa_id).onboard_new_user()
-        logger.info("Handled a text or media message from a new user")
         return HttpResponse('Received', status=200)
     
     def _handle_location_share(self):
         user_timezone_str = user_timezone_from_lat_long(self.payload.location_latitude, self.payload.location_longitude)
         WhatsappMessageSender(self.payload.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
-        logger.info("Handled a location share")
         return HttpResponse('Received', status=200)
     
     def _handle_timezone_confirmation(self):
@@ -65,14 +64,12 @@ class WhatsappMessageHandler:
         WhatsappUser.objects.create(whatsapp_wa_id=self.payload.whatsapp_wa_id,
                                     time_zone_name=user_timezone_str)
         WhatsappMessageSender(self.payload.whatsapp_wa_id).confirm_new_user()
-        logger.info("Handled timezone confirmation")
         return HttpResponse('Received', status=200)
 
     def _handle_timezone_cancellation(self):
         WhatsappMessageSender(self.payload.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.", 
                                                                              db_message_type=MessageType.PREPASTO_LOCATION_TRY_AGAIN.value)
         WhatsappMessageSender(self.payload.whatsapp_wa_id).request_location()
-        logger.info("Handled timezone cancellation")
         return HttpResponse('Received', status=200)
     
     # Existing USER message
@@ -120,6 +117,5 @@ class WhatsappMessageHandler:
 
     # Other
     def _handle_user_generic(self):
-        logger.warning("Handled unknown message")
         return HttpResponse('Received', status=200)
     

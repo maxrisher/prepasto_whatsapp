@@ -19,7 +19,6 @@ class WhatsappMessageSender:
     def _send_message(self, data_for_whatsapp_api, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, in_reply_to=None):
         response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=self.whatsapp_post_request_headers, json=data_for_whatsapp_api)
         response_data = response.json()
-        logger.info("I sent a text message via WhatsApp. This was the response from whatsap: %s", response_data)
 
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
@@ -31,6 +30,8 @@ class WhatsappMessageSender:
 
                                        content=db_record_content,
                                        in_reply_to=in_reply_to)
+        
+        logger.info("Sent message (waid: "+str(sent_message_whatsapp_wamid)+") of type: "+db_message_type+" to "+str(self.destination_whatsapp_wa_id))
         
     def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None):
         data_for_whatsapp_api = {

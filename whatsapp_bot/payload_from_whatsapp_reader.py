@@ -52,7 +52,8 @@ class PayloadFromWhatsappReader:
         self._identify_sender_and_message()
         self._determine_message_type()
         self._extract_relevant_message_data()
-        self._record_message_in_db()    
+        self._record_message_in_db()
+        logger.info("Read message (waid: " + str(self.whatsapp_message_id) + ") of type: "+self.message_type.value)
 
     def _identify_sender_and_message(self):
         """
