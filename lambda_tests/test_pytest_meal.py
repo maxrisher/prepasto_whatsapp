@@ -43,6 +43,24 @@ def test_meal_process_flow(go_to_lambda_dir):
     meal_dict = meal.to_dict()
     validate_against_schema(meal_dict)
 
+def test_qualifiers_field(go_to_lambda_dir):
+    # Arrange
+    meal = Meal("300g of 2% milk")
+
+    # Act
+    meal.process()
+
+    # Assert
+    assert meal.total_nutrition['calories'] > 0, "Total calories should be greater than 0"
+    assert 'dish_list_from_log' in meal.llm_responses, "'dish_list_from_log' should be in llm_responses"
+    assert len(meal.llm_responses) == 2, "LLM responses should contain the meal response and the dict of dish responses for 'Cheese sandwich'"
+    assert len(meal.dishes[0].llm_responses) == 3, "LLM responses should contain the dish response for 'Cheese sandwich'"
+    assert meal.errors == [], "There should be no errors"
+
+    # Validate against JSON schema
+    meal_dict = meal.to_dict()
+    validate_against_schema(meal_dict)
+
 def test_meal_creation_and_processing(go_to_lambda_dir):
     # Arrange
     meal = Meal("I had a cheese sandwich and an apple")
