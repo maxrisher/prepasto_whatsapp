@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+import traceback
 
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -74,7 +75,7 @@ def food_processing_lambda_webhook(request):
             return JsonResponse({'message': 'OK'}, status=200)
         except Exception as e:
             logger.error(f'Error at food_processing_lambda_webhook: {e}')
-            logger.error(e)
+            logger.error(traceback.format_exc(e))
             return JsonResponse({"error": "Error processing webhook"}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
