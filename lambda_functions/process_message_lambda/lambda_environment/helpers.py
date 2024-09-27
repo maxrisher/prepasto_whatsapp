@@ -31,3 +31,29 @@ def send_to_django(dict):
     
     except requests.RequestException as e:
         raise RuntimeError(f"Error sending data to Django: {e}")
+    
+def set_django_url(context):
+    """
+    Sets the django site url depending on which alias the function has
+    """
+    print(context)
+    alias_str = get_lambda_alias(context.invoked_function_arn)
+
+    if alias_str == 'production':
+        os.environ['RAILWAY_PUBLIC_DOMAIN'] = os.getenv('PRODUCTION_RAILWAY_PUBLIC_DOMAIN')
+
+    elif alias_str == 'stagingAlias':
+        os.environ['RAILWAY_PUBLIC_DOMAIN'] = os.getenv('STAGING_RAILWAY_PUBLIC_DOMAIN')
+
+    elif alias_str == 'pullRequestAlias':
+        os.environ['RAILWAY_PUBLIC_DOMAIN'] = os.getenv('PULL_REQUEST_RAILWAY_PUBLIC_DOMAIN')
+    
+    print("Alias is "+alias_str+", so I am sending lambda result to "+ os.getenv('RAILWAY_PUBLIC_DOMAIN'))
+
+def get_lambda_alias(arn):
+    parts = arn.split(':')
+
+    if len(parts) > 7:
+        return parts[7]
+    else:
+        return 'production' #default to production alias if there is no alias

@@ -12,6 +12,7 @@ from django.utils.crypto import constant_time_compare
 from .payload_from_whatsapp_reader import PayloadFromWhatsappReader
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_handler import WhatsappMessageHandler
+from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -72,11 +73,16 @@ def food_processing_lambda_webhook(request):
             
             processor = MealDataProcessor(payload_dict)
             processor.process()
+
             return JsonResponse({'message': 'OK'}, status=200)
+        
         except Exception as e:
             logger.error(f'Error at food_processing_lambda_webhook: {e}')
             logger.error(traceback.format_exc())
-            return JsonResponse({"error": "Error processing webhook"}, status=400)
+
+            WhatsappMessageSender(payload_dict['meal_requester_whatsapp_wa_id']).send_generic_error_message()
+
+            return JsonResponse({"error": "Error processing lambda meal webhook"}, status=200)
+        
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-    

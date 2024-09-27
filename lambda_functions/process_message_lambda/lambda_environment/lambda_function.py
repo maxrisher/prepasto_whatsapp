@@ -2,10 +2,11 @@ import json
 import time
 
 from meal import Meal
-from helpers import send_to_django
+from helpers import send_to_django, set_django_url
 
 # This is the main function for the lambda!
 def lambda_handler(event, context):
+    set_django_url(context)
     start_time = time.time()
 
     text = event['sender_message']
