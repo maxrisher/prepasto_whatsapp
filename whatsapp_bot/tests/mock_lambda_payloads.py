@@ -15,8 +15,8 @@ hot_dog_lambda_meal_payload = {
                     "onions",
                 ],
                 "state": "cooked",
-                "qualifiers": None,
-                "confirmed_ingredients": None,
+                "qualifiers": [],
+                "confirmed_ingredients": [],
                 "amount": "one hot dog",
                 "similar_dishes": [
                     "corn dog",

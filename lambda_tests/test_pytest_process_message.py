@@ -18,13 +18,17 @@ def go_to_lambda_dir():
 
 @pytest.fixture
 def mock_post_request_django(requests_mock):
-    requests_mock.post('https://127.0.0.1/bot/lambda_webhook/', json={'status': 'success'}, status_code = 200)
+    requests_mock.post('https://prepastowhatsapp-staging.up.railway.app/bot/lambda_webhook/', json={'status': 'success'}, status_code = 200)
     
 def test_lambda_full(go_to_lambda_dir, mock_post_request_django):
     event = {'sender_message': "three sausage patties, two fried eggs, one slice of toast",
              'sender_whatsapp_wa_id': 123456789}
-    context = ''
+    context = MockContext(invoked_function_arn='arn:aws:lambda:region:account-id:function:my-function:stagingAlias')
     print("START")
     response = lambda_handler(event, context)
     assert response['statusCode'] == 200  # Ensure the response is happy
     print("END")
+
+class MockContext:
+    def __init__(self, invoked_function_arn):
+        self.invoked_function_arn = invoked_function_arn

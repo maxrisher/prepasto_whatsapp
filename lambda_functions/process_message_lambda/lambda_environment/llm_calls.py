@@ -8,7 +8,7 @@ from helpers import get_answer_str
 def dish_list_from_log(meal_description_text):
     client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
 
-    with open('00_input_to_foods_v2.txt', 'r') as file:
+    with open('00_input_to_foods_v3.txt', 'r') as file:
         system_prompt = file.read()
 
     user_prompt = "<FoodDiary>\n" + meal_description_text + "\n</FoodDiary>"

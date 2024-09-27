@@ -322,7 +322,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
             "almond butter"
             ],
             "state": "toasted",
-            "qualifiers": null,
+            "qualifiers": [],
             "confirmed_ingredients": [
             "sourdough bread",
             "almond butter"
@@ -367,7 +367,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
                 "chili paste"
             ],
             "state": "stir-fried",
-            "qualifiers": null,
+            "qualifiers": [],
             "confirmed_ingredients": [
                 "eggplant",
                 "garlic",

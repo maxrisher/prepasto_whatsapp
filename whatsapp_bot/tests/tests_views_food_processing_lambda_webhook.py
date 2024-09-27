@@ -49,8 +49,10 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         anonymous_meal_dict['meal_requester_whatsapp_wa_id'] = '13034761234' #Anonymous sender!
         response = self.client.post(path=self.url, data=json.dumps(anonymous_meal_dict), content_type='application/json', headers=headers)
 
+        json_response = response.json()
+
         # Assert the response is bad
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json_response['error'], 'Error processing lambda meal webhook')
 
         # Assert that no Meal object was created in the database
         self.assertFalse(Meal.objects.exists())

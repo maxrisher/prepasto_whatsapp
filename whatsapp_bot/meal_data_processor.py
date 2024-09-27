@@ -32,9 +32,7 @@ class MealDataProcessor:
             self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
 
             if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
-                logger.error("Lambda returned an error!")
-                WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_generic_error_message()
-                return
+                raise ValueError("Meal processing lambda returned an unhandled error!")
             
             self._validate_payload()
             self.diary, created = Diary.objects.get_or_create(whatsapp_user=self.prepasto_whatsapp_user, local_date=self.prepasto_whatsapp_user.current_date)
@@ -46,19 +44,16 @@ class MealDataProcessor:
             
         except WhatsappUser.DoesNotExist:
             logger.error("WhatsappUser does not exist!")
-            WhatsappMessageSender(self.meal_requester_whatsapp_wa_id).send_generic_error_message()
             raise
         except Exception as e:
             logger.error("Error processing meal!")
             logger.error(e)
-            WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_generic_error_message()
             raise
 
     def _validate_payload(self):
-        schema_path_resolver = RefResolver(base_uri="https://thalos.fit/", referrer=new_meal_from_lambda_payload_schema, store={
-            "https://thalos.fit/meal.schema.json": meal_schema,
-            "https://thalos.fit/dish.schema.json": dish_schema
-        })
+        schema_path_resolver = RefResolver(base_uri="https://thalos.fit/", referrer=new_meal_from_lambda_payload_schema, 
+                                           store={"https://thalos.fit/meal.schema.json": meal_schema,
+                                                  "https://thalos.fit/dish.schema.json": dish_schema})
 
         try:
             validate(instance=self.payload, schema=new_meal_from_lambda_payload_schema, resolver=schema_path_resolver)
