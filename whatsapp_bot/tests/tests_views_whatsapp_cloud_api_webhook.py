@@ -23,8 +23,6 @@ class WhatsappUserMessageTestCase(TestCase):
         )
         self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
 
-        self.time_now = timezone.now()
-
         self.diary = Diary.objects.create(
             whatsapp_user=self.whatsapp_user,
             local_date=self.whatsapp_user.current_date
@@ -187,6 +185,9 @@ class WhatsappUserMessageTestCase(TestCase):
             sent_from='14153476103',
             message_type=MessageType.PREPASTO_MEAL_BUTTON.value
         )
+
+        self.assertIsNone(message.sent_at)
+
         response = self.client.post(
             self.webhook_url,
             data=json.dumps(webhkdta.message_status_update_sent),
@@ -205,7 +206,7 @@ class WhatsappUserMessageTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    @freeze_time("2023-05-01 12:00:00")
+    @freeze_time(timezone.now())
     def test_status_update_failed_message_exists(self):
         message = WhatsappMessage.objects.create(
             whatsapp_message_id='test_message_id',
@@ -214,9 +215,12 @@ class WhatsappUserMessageTestCase(TestCase):
             sent_from='14153476103',
             message_type=MessageType.PREPASTO_MEAL_BUTTON.value
         )
+
+        self.assertIsNone(message.failed_at)
+
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_failed('test_message_id')),
+            data=json.dumps(webhkdta.message_status_update_failed),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -228,10 +232,10 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_status_update_failed_message_not_exists(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_failed('non_existent_message_id')),
+            data=json.dumps(webhkdta.message_status_update_failed),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
     def test_status_update_read_message_exists(self):
         message = WhatsappMessage.objects.create(
@@ -243,7 +247,7 @@ class WhatsappUserMessageTestCase(TestCase):
         )
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_read('test_message_id')),
+            data=json.dumps(webhkdta.message_status_update_read),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -251,21 +255,22 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_status_update_read_message_not_exists(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_read('non_existent_message_id')),
+            data=json.dumps(webhkdta.message_status_update_read),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
 
 class NonWhatsappUserMessageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        self.webhook_url = reverse('whatsapp_cloud_api_webhook')
+        self.webhook_url = reverse('whatsapp-webhook')
+        self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
 
     def test_text_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_text_message),
+            data=json.dumps(webhkdta.create_meal_for_user_text),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -273,11 +278,12 @@ class NonWhatsappUserMessageTestCase(TestCase):
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
 
     def test_photo_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_photo_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_image_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -285,11 +291,12 @@ class NonWhatsappUserMessageTestCase(TestCase):
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
 
     def test_video_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_video_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_video_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -301,7 +308,7 @@ class NonWhatsappUserMessageTestCase(TestCase):
     def test_reaction_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_reaction_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_reacts_to_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -309,11 +316,12 @@ class NonWhatsappUserMessageTestCase(TestCase):
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
-        
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
+
     def test_contact_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_contact_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_contacts_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -321,11 +329,13 @@ class NonWhatsappUserMessageTestCase(TestCase):
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
+
 
     def test_document_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_document_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_document_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -333,53 +343,162 @@ class NonWhatsappUserMessageTestCase(TestCase):
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
-
-    def test_location_message_from_new_user(self):
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
+    
+    def test_generic_location_message_from_new_user(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_location_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_generic_location_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_LOCATION_SHARE.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_CONFIRM_TIMEZONE_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 2)
+
+    def test_generic_button_reply_from_new_user(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.whatsapp_webhook_user_generic_button_press),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_MESSAGE_GENERIC.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
 
     def test_reply_button_message_confirm(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_reply_button_confirm),
+            data=json.dumps(webhkdta.location_confirmation),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_TIMEZONE_CONFIRMATION.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value).count(), 3)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_CONTACT_CARD.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 5)
 
     def test_reply_button_message_cancel(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_reply_button_cancel),
+            data=json.dumps(webhkdta.location_cancel),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_TIMEZONE_CANCELLATION.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_TRY_AGAIN.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 3)
 
-    def test_status_update_sent_from_new_user(self):
+    def test_location_button_press(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_status_update_sent),
+            data=json.dumps(webhkdta.location_share),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_STATUS_UPDATE_SENT.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_LOCATION_SHARE.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_CONFIRM_TIMEZONE_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 2)
 
-    def test_status_update_failed_from_new_user(self):
+    def test_delete_button_press(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(new_user_status_update_failed),
+            data=json.dumps(webhkdta.delete_not_existing_meal_button_press),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_STATUS_UPDATE_FAILED.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.NEW_USER_MESSAGE_GENERIC.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_LOCATION_REQUEST_BUTTON.value).count(), 1)
+        self.assertEqual(WhatsappMessage.objects.count(), 4)
+
+    @freeze_time(timezone.now())
+    def test_status_update_sent_message_exists(self):
+        message = WhatsappMessage.objects.create(
+            whatsapp_message_id='test_message_id',
+            whatsapp_user=self.django_whatsapp_user,
+            sent_to='17204768288',
+            sent_from='14153476103',
+            message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value
+        )
+
+        self.assertIsNone(message.sent_at)
+
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_sent),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        message.refresh_from_db()
+        self.assertIsNotNone(message.sent_at)
+        self.assertEqual(message.sent_at, timezone.now())
+
+    def test_status_update_sent_message_not_exists(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_sent),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(WhatsappMessage.objects.count(), 0)
+
+    @freeze_time(timezone.now())
+    def test_status_update_failed_message_exists(self):
+        message = WhatsappMessage.objects.create(
+            whatsapp_message_id='test_message_id',
+            whatsapp_user=self.django_whatsapp_user,
+            sent_to='17204768288',
+            sent_from='14153476103',
+            message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value
+        )
+
+        self.assertIsNone(message.failed_at)
+
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_failed),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        message.refresh_from_db()
+        self.assertIsNotNone(message.failed_at)
+        self.assertEqual(message.failed_at, timezone.now())
+        self.assertIsNotNone(message.failure_details)
+
+    def test_status_update_failed_message_not_exists(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_failed),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(WhatsappMessage.objects.count(), 0)
+
+    def test_status_update_read_message_exists(self):
+        message = WhatsappMessage.objects.create(
+            whatsapp_message_id='test_message_id',
+            whatsapp_user=self.django_whatsapp_user,
+            sent_to='17204768288',
+            sent_from='14153476103',
+            message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value
+        )
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_read),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_status_update_read_message_not_exists(self):
+        response = self.client.post(
+            self.webhook_url,
+            data=json.dumps(webhkdta.message_status_update_read),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)

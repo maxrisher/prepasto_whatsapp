@@ -326,7 +326,7 @@ message_status_update_failed = {
                         },
                         "statuses": [
                             {
-                                "id": "ABCD1234",  # The WhatsApp Message ID for the message that failed
+                                "id": "test_message_id",  # The WhatsApp Message ID for the message that failed
                                 "status": "failed",
                                 "timestamp": "1695795567",  #The timestamp when the failure event occurred (in Unix epoch format)
                                 "recipient_id": "9876543210",  # The WhatsApp ID of the recipient
