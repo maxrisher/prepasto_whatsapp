@@ -14,6 +14,15 @@ Resources:
       Runtime: python3.12
       Timeout: 120      # Number of seconds before the lambda times out
       AutoPublishAlias: pullRequestAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
+      Environment:
+        Variables: # These are variables stored in our AWS parameter store
+          CUSTOM_SEARCH_ID: '{{resolve:ssm:/process_message_lambda/production/custom_search_id:1}}'
+          G_SEARCH_API_KEY: '{{resolve:ssm:/process_message_lambda/production/g_search_api_key:1}}'
+          LAMBDA_TO_DJANGO_API_KEY: '{{resolve:ssm:/process_message_lambda/production/lambda_to_django_api_key:1}}'
+          OPENAI_KEY: '{{resolve:ssm:/process_message_lambda/production/openai_key:1}}'
+          PRODUCTION_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/process_message_lambda/production/production_railway_public_domain:1}}'
+          PULL_REQUEST_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/process_message_lambda/production/pull_request_railway_public_domain}}' #always just point to the latest PR domain in our variable store
+          STAGING_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/process_message_lambda/production/staging_railway_public_domain:1}}'
 
   StagingProcessMessageAlias:
     Type: AWS::Lambda::Alias
