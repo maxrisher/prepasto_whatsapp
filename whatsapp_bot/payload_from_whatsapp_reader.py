@@ -62,16 +62,26 @@ class PayloadFromWhatsappReader:
         Try to find their WhatsappUser model in the db
             If no WhatsappUser model, they are a new user
         """
+        # First, try on a regular message
         try:
             self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
             self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-
             try:
                 self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
             except WhatsappUser.DoesNotExist:
                 logger.info("Webhook is not from a WhatsappUser")
                 self.prepasto_whatsapp_user = None 
-
+        except KeyError:
+            return
+        
+        # Second, try on a status update message
+        try:
+            self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["statuses"][0]["recipient_id"])
+            try:
+                self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+            except WhatsappUser.DoesNotExist:
+                logger.info("Webhook is not from a WhatsappUser")
+                self.prepasto_whatsapp_user = None 
         except KeyError:
             return
         
