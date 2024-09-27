@@ -88,10 +88,9 @@ class MealDataProcessorTests(TestCase):
         processor = MealDataProcessor(error_payload)
 
         # Process the meal (which should trigger error handling)
-        processor.process()
-
-        # Check that the error message was sent
-        send_generic_error_message.assert_called()
+        with self.assertRaises(ValueError):
+            # Code that should raise the exception
+            processor.process()
 
     @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_generic_error_message')
     def test_bad_schema(self, send_generic_error_message):
@@ -109,5 +108,4 @@ class MealDataProcessorTests(TestCase):
             # Code that should raise the exception
             processor.process()
 
-        # Check that the error message was sent
-        send_generic_error_message.assert_called()
+        

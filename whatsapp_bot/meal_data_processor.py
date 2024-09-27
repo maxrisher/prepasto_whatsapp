@@ -32,7 +32,7 @@ class MealDataProcessor:
             self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.meal_requester_whatsapp_wa_id)
 
             if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
-                raise KeyError("Meal processing lambda returned an unhandled error!")
+                raise ValueError("Meal processing lambda returned an unhandled error!")
             
             self._validate_payload()
             self.diary, created = Diary.objects.get_or_create(whatsapp_user=self.prepasto_whatsapp_user, local_date=self.prepasto_whatsapp_user.current_date)
