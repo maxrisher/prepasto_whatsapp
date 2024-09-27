@@ -68,6 +68,7 @@ class PayloadFromWhatsappReader:
             try:
                 self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
             except WhatsappUser.DoesNotExist:
+                logger.info("Webhook is not from a WhatsappUser")
                 self.prepasto_whatsapp_user = None 
 
         except KeyError:
@@ -140,7 +141,7 @@ class PayloadFromWhatsappReader:
         status_update_message_types = status_update_sent + status_update_read + status_update_failed
         
         if self.message_type == MessageType.UNKNOWN:
-            logger.info("I got an unknown message. I am not logging it to the database")
+            logger.warning("I got an unknown message. I am not logging it to the database")
         
         #If it's a status update, update the status of the appropriate message
         elif self.message_type in status_update_message_types:
@@ -162,8 +163,7 @@ class PayloadFromWhatsappReader:
                 message_to_update_status.save()
 
             except WhatsappMessage.DoesNotExist:
-                logger.info("No whatsapp message in our database with the id: " + str(self.whatsapp_status_update_whatsapp_message_id))
-                raise
+                logger.warning("Not logging any status to the db. No whatsapp message in our database with the id: " + str(self.whatsapp_status_update_whatsapp_message_id))
 
         #If it's a message from a user, add it to our database
         else:

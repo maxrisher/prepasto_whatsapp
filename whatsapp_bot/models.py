@@ -75,7 +75,7 @@ class WhatsappMessage(models.Model):
     MESSAGE_TYPE_CHOICES = [(type.name, type.value) for type in MessageType]
 
     whatsapp_message_id = models.CharField(max_length=255, primary_key=True)
-    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
+    whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='messages', null=True, blank=True) #the whatsapp user who sent the message.
     record_created_at = models.DateTimeField(auto_now_add=True)
     sent_to = models.CharField(max_length=20)
     sent_from = models.CharField(max_length=20)

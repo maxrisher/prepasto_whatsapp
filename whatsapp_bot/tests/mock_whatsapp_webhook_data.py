@@ -258,7 +258,7 @@ message_status_update_sent = {
                         },
                         "statuses": [
                             {
-                                "id": "wamid.HBgLMTMwMzk1NjIxNjYVAgARGBI1QzU0NEM3QjlCOEFFOTRDMzkA",
+                                "id": "test_message_id",
                                 "status": "sent",
                                 "timestamp": "1726771705",
                                 "recipient_id": "13039562166",
@@ -425,44 +425,6 @@ whatsapp_webhook_user_video_message = {
     ],
 }
 
-whatsapp_webhook_user_audio_message = {
-    "object": "whatsapp_business_account",
-    "entry": [
-        {
-            "id": "350132861527473",
-            "changes": [
-                {
-                    "value": {
-                        "messaging_product": "whatsapp",
-                        "metadata": {
-                            "display_phone_number": "14153476103",
-                            "phone_number_id": "428381170351556",
-                        },
-                        "contacts": [
-                            {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
-                        ],
-                        "messages": [
-                            {
-                                "from": "17204768288",
-                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTEyQkM0NDk5RENCOEQ1MjI2MQA=",
-                                "timestamp": "1727379644",
-                                "type": "audio",
-                                "audio": {
-                                    "mime_type": "audio/ogg; codecs=opus",
-                                    "sha256": "E6bLbAHLz2W1Wo+Tf/fMNZMl7HSCxBfzSvsq+APo0z0=",
-                                    "id": "1161541848246249",
-                                    "voice": True,
-                                },
-                            }
-                        ],
-                    },
-                    "field": "messages",
-                }
-            ],
-        }
-    ],
-}
-
 whatsapp_webhook_user_contacts_message = {
     "object": "whatsapp_business_account",
     "entry": [
@@ -547,7 +509,7 @@ whatsapp_webhook_user_document_message = {
     ],
 }
 
-whatsapp_webhook_user_sticker_message = {
+whatsapp_webhook_user_generic_location_message = {
     "object": "whatsapp_business_account",
     "entry": [
         {
@@ -566,14 +528,98 @@ whatsapp_webhook_user_sticker_message = {
                         "messages": [
                             {
                                 "from": "17204768288",
-                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTVBNDRBMUEzQkZCQkJBRjk5NQA=",
-                                "timestamp": "1727379612",
-                                "type": "sticker",
-                                "sticker": {
-                                    "mime_type": "image/webp",
-                                    "sha256": "mCZ/7a6sZ6TMa14YokRCSfultjY6aQEVE5Z11TpjsP8=",
-                                    "id": "1267993307534510",
-                                    "animated": False,
+                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQUI4MEZFRkQ3Rjc3MzI1QTIxMgA=",
+                                "timestamp": "1727396636",
+                                "location": {
+                                    "latitude": 39.757125854492,
+                                    "longitude": -104.89503479004,
+                                },
+                                "type": "location",
+                            }
+                        ],
+                    },
+                    "field": "messages",
+                }
+            ],
+        }
+    ],
+}
+
+whatsapp_webhook_user_generic_button_press = {
+    "object": "whatsapp_business_account",
+    "entry": [
+        {
+            "id": "350132861527473",
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "display_phone_number": "14153476103",
+                            "phone_number_id": "428381170351556",
+                        },
+                        "contacts": [
+                            {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
+                        ],
+                        "messages": [
+                            {
+                                "context": {
+                                    "from": "14153476103",
+                                    "id": "wamid.fake1234",
+                                },
+                                "from": "17204768288",
+                                "id": "wamid.fake4567=",
+                                "timestamp": "1726885734",
+                                "type": "interactive",
+                                "interactive": {
+                                    "type": "button_reply",
+                                    "button_reply": {
+                                        "id": "some_random_id",
+                                        "title": "Generic reply",
+                                    },
+                                },
+                            }
+                        ],
+                    },
+                    "field": "messages",
+                }
+            ],
+        }
+    ],
+}
+
+delete_not_existing_meal_button_press = {
+    "object": "whatsapp_business_account",
+    "entry": [
+        {
+            "id": "350132861527473",
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "display_phone_number": "14153476103",
+                            "phone_number_id": "428381170351556",
+                        },
+                        "contacts": [
+                            {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
+                        ],
+                        "messages": [
+                            {
+                                "context": {
+                                    "from": "14153476103",
+                                    "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI2QTdGMENENjE2MDg0NDVENjcA",
+                                },
+                                "from": "17204768288",
+                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQUY0NkIxRjI1MTgzRTU0NDkwOQA=",
+                                "timestamp": "1726885734",
+                                "type": "interactive",
+                                "interactive": {
+                                    "type": "button_reply",
+                                    "button_reply": {
+                                        "id": "00000000-0000-0000-0000-000000000000",
+                                        "title": "DELETE this meal.",
+                                    },
                                 },
                             }
                         ],

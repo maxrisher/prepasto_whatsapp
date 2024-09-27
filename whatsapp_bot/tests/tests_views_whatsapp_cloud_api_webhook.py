@@ -1,67 +1,95 @@
 import json
-from datetime import date, datetime, timedelta
+from freezegun import freeze_time
+from unittest.mock import patch
+import uuid
+
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
-from freezegun import freeze_time
+from django.conf import settings
+from django.utils import timezone
 
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage, MessageType
 from main_app.models import Meal, Dish, Diary
-from whatsapp_bot.utils import send_to_lambda
-from whatsapp_bot.tests.mock_whatsapp_webhook_data import create_meal_for_user_text
+import whatsapp_bot.tests.mock_whatsapp_webhook_data as webhkdta
 
 class WhatsappUserMessageTestCase(TestCase):
     def setUp(self):
         self.client = Client()
-        self.webhook_url = reverse('whatsapp_cloud_api_webhook')
+        self.webhook_url = reverse('whatsapp-webhook')
         self.whatsapp_user = WhatsappUser.objects.create(
             whatsapp_wa_id='17204768288',
             time_zone_name='America/Denver'
         )
-        self.meal = Meal.objects.create(
+        self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
+
+        self.time_now = timezone.now()
+
+        self.diary = Diary.objects.create(
             whatsapp_user=self.whatsapp_user,
-            diary=Diary.objects.create(whatsapp_user=self.whatsapp_user, local_date=date.today()),
-            local_date=date.today(),
-            calories=200,
-            carbs=30,
-            fat=10,
-            protein=3,
-            description='1 brownie'
+            local_date=self.whatsapp_user.current_date
         )
+
+        self.meal = Meal.objects.create(
+            id = uuid.UUID('f2e3b84f-c29d-4e03-bcfb-f4ca6918a64e'),
+            whatsapp_user=self.whatsapp_user,
+            diary=self.diary,
+            local_date=self.whatsapp_user.current_date,
+            calories=500,
+            carbs=60,
+            fat=20,
+            protein=30,
+            description="A meal description, e.g., Grilled chicken with rice and veggies"
+        )
+
         self.dish = Dish.objects.create(
             whatsapp_user=self.whatsapp_user,
             meal=self.meal,
-            name='Brownie',
+            name='Grilled Chicken',
             matched_thalos_id=12345,
-            usda_food_data_central_id=54321,
-            usda_food_data_central_food_name='Chocolate brownie',
-            grams=100,
+            usda_food_data_central_id=67890,
+            usda_food_data_central_food_name="Chicken, broilers or fryers, breast, meat only, cooked, grilled",
+            grams=150,
             calories=200,
-            carbs=30,
-            fat=10,
-            protein=3,
-            usual_ingredients=['flour', 'sugar', 'cocoa'],
-            state='baked',
-            amount='1 piece',
-            similar_dishes=['cookie', 'cake'],
-            fndds_categories=[1000, 2000]
+            carbs=0,
+            fat=5,
+            protein=40,
+            usual_ingredients=['Chicken breast', 'Salt', 'Pepper'],
+            state='grilled',
+            qualifiers='no skin',
+            confirmed_ingredients=['Chicken breast'],
+            amount='150 grams',
+            similar_dishes=['Roasted Chicken', 'Fried Chicken'],
+            fndds_categories=[100],
+            fndds_and_sr_legacy_google_search_results=[123456]
         )
 
-    @freeze_time("2023-05-01 12:00:00")
-    def test_text_message(self):
+        WhatsappMessage.objects.create(
+            whatsapp_message_id='test_meal_button',
+            sent_to=self.whatsapp_user.whatsapp_wa_id,
+            sent_from=settings.WHATSAPP_BOT_WHATSAPP_WA_ID,
+            message_type='PREPASTO_MEAL_BUTTON',
+        )
+
+    @patch('whatsapp_bot.whatsapp_message_handler.send_to_lambda')
+    def test_text_message(self, mock_send_to_lambda):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(create_meal_for_user_text),
+            data=json.dumps(webhkdta.create_meal_for_user_text),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.USER_TEXT.value).count(), 1)
-        self.assertTrue(send_to_lambda.called)
+        self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_CREATING_MEAL_TEXT.value).count(), 1)
+        mock_send_to_lambda.assert_called_once_with({
+            'sender_whatsapp_wa_id': '17204768288',
+            'sender_message': 'Peach'
+        })
 
     def test_photo_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_photo_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_image_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -71,7 +99,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_video_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_video_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_video_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -81,7 +109,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_reaction_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_reaction_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_reacts_to_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -91,7 +119,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_contact_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_contact_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_contacts_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -101,7 +129,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_document_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_document_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_document_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -111,7 +139,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_location_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_location_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_generic_location_message),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -121,7 +149,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_reply_button_message(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_reply_button_message),
+            data=json.dumps(webhkdta.whatsapp_webhook_user_generic_button_press),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -131,7 +159,7 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_delete_button_press_meal_exists(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_delete_button_press(str(self.meal.id))),
+            data=json.dumps(webhkdta.delete_existing_meal_button_press),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -141,28 +169,27 @@ class WhatsappUserMessageTestCase(TestCase):
         self.assertFalse(Meal.objects.filter(id=self.meal.id).exists())
 
     def test_delete_button_press_meal_not_exists(self):
-        non_existent_meal_id = '00000000-0000-0000-0000-000000000000'
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(user_delete_button_press(non_existent_meal_id)),
+            data=json.dumps(webhkdta.delete_not_existing_meal_button_press),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.USER_DELETE_REQUEST.value).count(), 1)
         self.assertEqual(WhatsappMessage.objects.filter(message_type=MessageType.PREPASTO_ERROR_TEXT.value).count(), 1)
 
-    @freeze_time("2023-05-01 12:00:00")
+    @freeze_time(timezone.now())
     def test_status_update_sent_message_exists(self):
         message = WhatsappMessage.objects.create(
             whatsapp_message_id='test_message_id',
-            whatsapp_user=self.whatsapp_user,
+            whatsapp_user=self.django_whatsapp_user,
             sent_to='17204768288',
             sent_from='14153476103',
             message_type=MessageType.PREPASTO_MEAL_BUTTON.value
         )
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_sent('test_message_id')),
+            data=json.dumps(webhkdta.message_status_update_sent),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
@@ -173,10 +200,10 @@ class WhatsappUserMessageTestCase(TestCase):
     def test_status_update_sent_message_not_exists(self):
         response = self.client.post(
             self.webhook_url,
-            data=json.dumps(status_update_sent('non_existent_message_id')),
+            data=json.dumps(webhkdta.message_status_update_sent),
             content_type='application/json'
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
     @freeze_time("2023-05-01 12:00:00")
     def test_status_update_failed_message_exists(self):
