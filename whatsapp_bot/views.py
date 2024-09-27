@@ -76,7 +76,7 @@ def food_processing_lambda_webhook(request):
         except Exception as e:
             logger.error(f'Error at food_processing_lambda_webhook: {e}')
             logger.error(traceback.format_exc())
-            return JsonResponse({"error": "Error processing webhook"}, status=400)
+            return JsonResponse({"error": "Error processing webhook"}, status=200) # We should only return non-200 responses if we did not understand the request. Otherwise, return 200
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+        return JsonResponse({'error': 'Invalid request method'}, status=200) # We should only return non-200 responses if we did not understand the request. Otherwise, return 200
     
