@@ -104,6 +104,8 @@ class PayloadFromWhatsappReader:
                 self.message_type = MessageType.NEW_USER_STATUS_UPDATE_READ
             elif self._test_if_whatsapp_status_update_failed():
                 self.message_type = MessageType.NEW_USER_STATUS_UPDATE_FAILED
+            elif self._test_if_whatsapp_status_update_delivered():
+                self.message_type = MessageType.NEW_USER_STATUS_UPDATE_DELIVERED
 
             #All other messages from NEW users
             else:
@@ -123,6 +125,8 @@ class PayloadFromWhatsappReader:
             #Status update messages
             elif self._test_if_whatsapp_status_update_sent():
                 self.message_type = MessageType.USER_STATUS_UPDATE_SENT
+            elif self._test_if_whatsapp_status_update_delivered():
+                self.message_type = MessageType.USER_STATUS_UPDATE_DELIVERED
             elif self._test_if_whatsapp_status_update_read():
                 self.message_type = MessageType.USER_STATUS_UPDATE_READ
             elif self._test_if_whatsapp_status_update_failed():
@@ -139,7 +143,7 @@ class PayloadFromWhatsappReader:
             self._get_whatsapp_interactive_button_data()
         elif self.message_type == MessageType.NEW_USER_LOCATION_SHARE:
             self._get_location_data()
-        elif self.message_type in [MessageType.USER_STATUS_UPDATE_SENT, MessageType.NEW_USER_STATUS_UPDATE_SENT, MessageType.NEW_USER_STATUS_UPDATE_READ, MessageType.USER_STATUS_UPDATE_READ]:
+        elif self.message_type in [MessageType.USER_STATUS_UPDATE_SENT, MessageType.NEW_USER_STATUS_UPDATE_SENT, MessageType.NEW_USER_STATUS_UPDATE_READ, MessageType.USER_STATUS_UPDATE_READ, MessageType.USER_STATUS_UPDATE_DELIVERED, MessageType.NEW_USER_STATUS_UPDATE_DELIVERED]:
             self._get_status_update_data()
         elif self.message_type in [MessageType.USER_STATUS_UPDATE_FAILED, MessageType.NEW_USER_STATUS_UPDATE_FAILED]:
             self._get_failed_status_update_data()
@@ -148,8 +152,9 @@ class PayloadFromWhatsappReader:
         status_update_sent = [MessageType.USER_STATUS_UPDATE_SENT, MessageType.NEW_USER_STATUS_UPDATE_SENT]
         status_update_read = [MessageType.USER_STATUS_UPDATE_READ, MessageType.NEW_USER_STATUS_UPDATE_READ]
         status_update_failed = [MessageType.USER_STATUS_UPDATE_FAILED, MessageType.NEW_USER_STATUS_UPDATE_FAILED]
+        status_update_delivered = [MessageType.USER_STATUS_UPDATE_DELIVERED, MessageType.NEW_USER_STATUS_UPDATE_DELIVERED]
         
-        status_update_message_types = status_update_sent + status_update_read + status_update_failed
+        status_update_message_types = status_update_sent + status_update_read + status_update_failed + status_update_delivered
         
         if self.message_type == MessageType.UNKNOWN:
             logger.warning("I got an unknown message. I am not logging it to the database")
@@ -172,6 +177,10 @@ class PayloadFromWhatsappReader:
 
                     message_to_update_status.failure_details = error_message
                 
+                if self.message_type in status_update_delivered:
+                    time_now = str(timezone.now())
+                    logger.info("Message just delivered to user: "+str(self.whatsapp_status_update_whatsapp_message_id)+". Time is (UTC): "+time_now)
+
                 message_to_update_status.save()
 
             except WhatsappMessage.DoesNotExist:
@@ -249,6 +258,12 @@ class PayloadFromWhatsappReader:
     def _test_if_whatsapp_status_update_failed(self):
         try:
             return self.request_dict["entry"][0]["changes"][0]["value"]["statuses"][0]["status"] == "failed"
+        except KeyError:
+            return False
+        
+    def _test_if_whatsapp_status_update_delivered(self):
+        try:
+            return self.request_dict["entry"][0]["changes"][0]["value"]["statuses"][0]["status"] == "delivered"
         except KeyError:
             return False
         
