@@ -69,10 +69,10 @@ class PayloadFromWhatsappReader:
             try:
                 self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
             except WhatsappUser.DoesNotExist:
-                logger.info("Webhook is not from a WhatsappUser")
+                logger.info("Message is not from a WhatsappUser")
                 self.prepasto_whatsapp_user = None 
         except KeyError:
-            return
+            pass
         
         # Second, try on a status update message
         try:
@@ -80,10 +80,10 @@ class PayloadFromWhatsappReader:
             try:
                 self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
             except WhatsappUser.DoesNotExist:
-                logger.info("Webhook is not from a WhatsappUser")
+                logger.info("Status update is not from a WhatsappUser")
                 self.prepasto_whatsapp_user = None 
         except KeyError:
-            return
+            pass
         
     def _determine_message_type(self):
         #BRANCH 1: message is from a NON USER
