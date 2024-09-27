@@ -15,7 +15,7 @@ mock_lambda_output_breakfast = {
                 ],
                 "state": "pan-fried",
                 "qualifiers": [],
-                "confirmed_ingredients": None,
+                "confirmed_ingredients": [],
                 "amount": "not specified",
                 "similar_dishes": [
                     "bacon",
@@ -164,7 +164,7 @@ mock_lambda_output_breakfast = {
                 ],
                 "state": "not specified",
                 "qualifiers": [],
-                "confirmed_ingredients": None,
+                "confirmed_ingredients": [],
                 "amount": "not specified",
                 "similar_dishes": [
                     "omelette",
@@ -370,7 +370,7 @@ mock_lambda_output_breakfast = {
                 "usual_ingredients": ["bread"],
                 "state": "toasted",
                 "qualifiers": [],
-                "confirmed_ingredients": None,
+                "confirmed_ingredients": [],
                 "amount": "not specified",
                 "similar_dishes": [
                     "bagel",

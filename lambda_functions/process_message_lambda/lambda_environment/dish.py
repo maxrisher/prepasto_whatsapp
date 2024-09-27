@@ -182,7 +182,7 @@ dish_schema = {
       "description": "Any user-provided information on the overall nutritional content of a dish. Can be empty if no information is provided. E.g., 'sugar-free', 'full-fat', 'high-protein', etc."
     },
     "confirmed_ingredients": {
-      "type": ["array", "null"],
+      "type": ["array"],
       "items": {
         "type": "string"
       },
