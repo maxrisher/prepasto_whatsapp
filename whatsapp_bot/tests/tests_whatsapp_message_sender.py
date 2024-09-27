@@ -17,12 +17,12 @@ class MealDataProcessorTests(TestCase):
 
     @patch('whatsapp_bot.whatsapp_message_sender.requests.post')
     def test_send_meal_whatsapp_message(self, mock_post):
-        self.assertFalse(self.django_whatsapp_user.messages.filter(direction='OUT').exists())
+        self.assertFalse(self.django_whatsapp_user.messages.filter(sent_from=settings.WHATSAPP_BOT_WHATSAPP_WA_ID).exists())
 
         # Setup mock response
         mock_response = MagicMock()
         mock_response.json.return_value = {'messages': [{'id': 'test_message_id'}]}
-        mock_post.return_value = mock_response
+        mock_post.return_value = mock_response 
 
         WhatsappMessageSender(self.whatsapp_user.whatsapp_wa_id).send_text_message("Hello world!")
 
@@ -30,4 +30,4 @@ class MealDataProcessorTests(TestCase):
         mock_post.assert_called()
 
         # Check that a WhatsappMessage object was created
-        self.assertTrue(self.django_whatsapp_user.messages.filter(direction='OUTGOING').exists())
+        self.assertTrue(self.django_whatsapp_user.messages.filter(sent_from=settings.WHATSAPP_BOT_WHATSAPP_WA_ID).exists())

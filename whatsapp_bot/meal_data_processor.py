@@ -33,7 +33,7 @@ class MealDataProcessor:
 
             if 'unhandled_errors' in self.payload and self.payload['unhandled_errors']:
                 logger.error("Lambda returned an error!")
-                WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_meal_error_message()
+                WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_generic_error_message()
                 return
             
             self._validate_payload()
@@ -46,12 +46,12 @@ class MealDataProcessor:
             
         except WhatsappUser.DoesNotExist:
             logger.error("WhatsappUser does not exist!")
-            WhatsappMessageSender(self.meal_requester_whatsapp_wa_id).send_meal_error_message()
+            WhatsappMessageSender(self.meal_requester_whatsapp_wa_id).send_generic_error_message()
             raise
         except Exception as e:
             logger.error("Error processing meal!")
             logger.error(e)
-            WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_meal_error_message()
+            WhatsappMessageSender(self.prepasto_whatsapp_user.whatsapp_wa_id).send_generic_error_message()
             raise
 
     def _validate_payload(self):

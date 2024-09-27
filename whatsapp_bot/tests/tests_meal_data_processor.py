@@ -76,8 +76,8 @@ class MealDataProcessorTests(TestCase):
 
         self.assertEqual(mock_send_message.call_count, 2)
     
-    @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_meal_error_message')
-    def test_unhandled_error_from_lambda(self, send_meal_error_message):
+    @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_generic_error_message')
+    def test_unhandled_error_from_lambda(self, send_generic_error_message):
         # Create a payload with errors
         error_payload = {
             'meal_requester_whatsapp_wa_id': '17204768288',
@@ -91,10 +91,10 @@ class MealDataProcessorTests(TestCase):
         processor.process()
 
         # Check that the error message was sent
-        send_meal_error_message.assert_called()
+        send_generic_error_message.assert_called()
 
-    @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_meal_error_message')
-    def test_bad_schema(self, send_meal_error_message):
+    @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_generic_error_message')
+    def test_bad_schema(self, send_generic_error_message):
         # Create a payload with errors
         error_payload = {
             'meal_requester_whatsapp_wa_id': '17204768288',
@@ -110,4 +110,4 @@ class MealDataProcessorTests(TestCase):
             processor.process()
 
         # Check that the error message was sent
-        send_meal_error_message.assert_called()
+        send_generic_error_message.assert_called()
