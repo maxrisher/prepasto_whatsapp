@@ -42,8 +42,8 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
     # If we get a request from an anonymous user, make sure we just send a WhatsApp message without saving a Meal object
-    @patch('whatsapp_bot.meal_data_processor.WhatsappMessageSender.send_meal_error_message')
-    def test_lambda_webhook_anonymous_user(self, mock_send_meal_error_message):
+    @patch('whatsapp_bot.meal_data_processor.WhatsappMessageSender.send_generic_error_message')
+    def test_lambda_webhook_anonymous_user(self, mock_send_generic_error_message):
         headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
         anonymous_meal_dict = self.lambda_output.copy()
         anonymous_meal_dict['meal_requester_whatsapp_wa_id'] = '13034761234' #Anonymous sender!
@@ -56,7 +56,7 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
         self.assertFalse(Meal.objects.exists())
 
         # Check if messages were recorded in the database
-        mock_send_meal_error_message.assert_called()
+        mock_send_generic_error_message.assert_called()
 
     # If we get a request from a real user, make sure we save a meal object to the database
     def test_lambda_webhook_real_user_saves_meal(self):
