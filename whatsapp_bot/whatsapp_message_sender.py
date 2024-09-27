@@ -187,6 +187,7 @@ class WhatsappMessageSender:
         self.send_text_message(message_text=formatted_text, db_message_type=MessageType.PREPASTO_DIARY_TEXT.value)
 
     def send_generic_error_message(self):
+        return
         self.send_text_message("I'm sorry, and error occurred. Please try again later.",
                                db_message_type=MessageType.PREPASTO_ERROR_TEXT.value)
 
