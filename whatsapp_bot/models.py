@@ -89,4 +89,4 @@ class WhatsappMessage(models.Model):
     failure_details = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.message_type} message from {self.sent_from} to {self.sent_to} at {self.timestamp}"
+        return f"{self.message_type} message from {self.sent_from} to {self.sent_to} at {self.record_created_at}"
