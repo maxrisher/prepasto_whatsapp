@@ -37,7 +37,7 @@ class Meal:
 
   async def _process_dishes(self):
     # for each dish, process it independently. No need to create_tasks() here on the dish.process() coroutines because we're gathering immediately.
-    generated_dishes = [dish.process() for dish in self.dishes]
+    generated_dishes = [asyncio.create_task(dish.process()) for dish in self.dishes]
     await asyncio.gather(*generated_dishes, return_exceptions=False) #any exceptions in the dishes will be raised immediately
 
   def _calculate_total_nutrition(self):
