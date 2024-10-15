@@ -41,16 +41,19 @@ class Dish:
 
   async def process(self):
     try:
-      print(f"Parallel debug. Dish {self.name}. Calling _get_candidate_database_matches(). {time.time()}")
+      print(f"Parallel debug. Dish {self.name}. Starting _get_candidate_database_matches(). {time.time()}")
       await self._get_candidate_database_matches()
+      print(f"Parallel debug. Dish {self.name}. Finished _get_candidate_database_matches(). {time.time()}")
 
-      print(f"Parallel debug. Dish {self.name}. Calling _pick_final_database_match(). {time.time()}")
+      print(f"Parallel debug. Dish {self.name}. Starting _pick_final_database_match(). {time.time()}")
       await self._pick_final_database_match()
+      print(f"Parallel debug. Dish {self.name}. Finished _pick_final_database_match(). {time.time()}")
 
       self._get_usda_food_data_central_id() #No web requests, no need to async
 
-      print(f"Parallel debug. Dish {self.name}. Calling _estimate_food_quantity(). {time.time()}")
+      print(f"Parallel debug. Dish {self.name}. Starting _estimate_food_quantity(). {time.time()}")
       await self._estimate_food_quantity()
+      print(f"Parallel debug. Dish {self.name}. Finished _estimate_food_quantity(). {time.time()}")
 
       self._calculate_nutrition() #No web requests, no need to async
       print(f"Dish nutrition for {self.name}:")
@@ -66,6 +69,7 @@ class Dish:
     await asyncio.gather(category_matching_task, google_search_task, return_exceptions=False)
 
   async def _fndds_codes_from_category_filtering(self):
+    print(f"Parallel debug. Dish {self.name}. Starting dish_dict_to_fndds_categories(). {time.time()}")
     llm_call_dict = await dish_dict_to_fndds_categories(self.to_simple_dict())
     print(f"Parallel debug. Dish {self.name}. Finished dish_dict_to_fndds_categories(). {time.time()}")
 
@@ -76,6 +80,7 @@ class Dish:
 
   async def _usda_codes_from_usda_google_search(self):
     self._generate_google_search_queries()
+    print(f"Parallel debug. Dish {self.name}. Starting google_search_usda_async(). {time.time()}")
     food_data_central_codes = await google_search_usda_async(self.google_search_queries_usda_site[0])
     print(f"Parallel debug. Dish {self.name}. Finished google_search_usda_async(). {time.time()}")
 
