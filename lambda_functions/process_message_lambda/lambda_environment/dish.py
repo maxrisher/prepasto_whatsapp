@@ -1,5 +1,6 @@
 from typing import List, Dict
 import asyncio
+import time
 
 from food_data import FoodDescriptionDataset, FoodPortionDataset, FNDDSDataset, FoodCodeLookup, NutritionDataset
 from llm_calls import dish_dict_to_fndds_categories
@@ -40,10 +41,17 @@ class Dish:
 
   async def process(self):
     try:
+      print(f"Parallel debug. Dish {self.name}. Calling _get_candidate_database_matches(). {time.time()}")
       await self._get_candidate_database_matches()
+
+      print(f"Parallel debug. Dish {self.name}. Calling _pick_final_database_match(). {time.time()}")
       await self._pick_final_database_match()
+
       self._get_usda_food_data_central_id() #No web requests, no need to async
+
+      print(f"Parallel debug. Dish {self.name}. Calling _estimate_food_quantity(). {time.time()}")
       await self._estimate_food_quantity()
+
       self._calculate_nutrition() #No web requests, no need to async
       print(f"Dish nutrition for {self.name}:")
       print(self.nutrition)
@@ -59,6 +67,8 @@ class Dish:
 
   async def _fndds_codes_from_category_filtering(self):
     llm_call_dict = await dish_dict_to_fndds_categories(self.to_simple_dict())
+    print(f"Parallel debug. Dish {self.name}. Finished dish_dict_to_fndds_categories(). {time.time()}")
+
     self.llm_responses['dish_to_categories'] = llm_call_dict['llm_response']
     self.fndds_categories = llm_call_dict['fndds_categories']
 
@@ -67,6 +77,7 @@ class Dish:
   async def _usda_codes_from_usda_google_search(self):
     self._generate_google_search_queries()
     food_data_central_codes = await google_search_usda_async(self.google_search_queries_usda_site[0])
+    print(f"Parallel debug. Dish {self.name}. Finished google_search_usda_async(). {time.time()}")
 
     self.candidate_thalos_ids['fndds_and_sr_legacy_google_search_results'] = FoodCodeLookup("food codes lookup", FOOD_CODES_LOOKUP).get_thalos_id_list(food_data_central_codes)
   

@@ -13,7 +13,7 @@ def dish_list_from_log(meal_description_text):
 
     user_prompt = "<FoodDiary>\n" + meal_description_text + "\n</FoodDiary>"
 
-    print("user_prompt:\n"+user_prompt)
+    # print("user_prompt:\n"+user_prompt)
 
     response = client.chat.completions.create(
         model = 'gpt-4o',
@@ -36,10 +36,10 @@ def dish_list_from_log(meal_description_text):
     response = response.choices[0].message.content
 
     answer_str = get_answer_str(response)
-    print(response)
+    # print(response)
 
     answer_dict = json.loads(answer_str)
-    print(answer_dict)
+    # print(answer_dict)
 
     if len(answer_dict) == 0:
         raise ValueError("Dish list is malformed")
@@ -55,7 +55,7 @@ async def dish_dict_to_fndds_categories(short_dish_dict):
     dish_dict_str = json.dumps(short_dish_dict, indent=4)
 
     user_prompt = "<FoodLog>\n" + dish_dict_str + "\n</FoodLog>"
-    print(f"Dish to categories prompt\nDish: {short_dish_dict['name']}\nPrompt:\n"+user_prompt)
+    # print(f"Dish to categories prompt\nDish: {short_dish_dict['name']}\nPrompt:\n"+user_prompt)
 
     # call the llm
     response_dict = await client.chat.completions.create(
@@ -76,7 +76,7 @@ async def dish_dict_to_fndds_categories(short_dish_dict):
         ],
         temperature = 0.1
     )
-    print(response_dict)
+    # print(response_dict)
     response = response_dict.choices[0].message.content
 
     fndds_categories_dict = _cleans_dish_dict_to_fndds_categories(response)
@@ -123,7 +123,7 @@ async def picks_best_food_code_from_description(database_csv, dish_dict):
         ],
         temperature = 0.1
     )
-    print(response_dict)
+    # print(response_dict)
 
     response = response_dict.choices[0].message.content
 
@@ -149,7 +149,7 @@ async def estimates_dish_weight(portion_db_csv, dish_dict):
 
     filled_user_prompt = user_prompt.format(portion_csv=portion_db_csv, name=dish_dict["name"], amount=dish_dict["amount"], state=dish_dict["state"])
 
-    print(filled_user_prompt)
+    # print(filled_user_prompt)
 
     # call the llm
     response_dict = await client.chat.completions.create(
@@ -170,7 +170,7 @@ async def estimates_dish_weight(portion_db_csv, dish_dict):
         ],
         temperature = 0.1
     )
-    print(response_dict)
+    # print(response_dict)
     response = response_dict.choices[0].message.content
 
     gram_estimate_dict = _cleans_dish_grams(response)
