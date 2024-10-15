@@ -12,6 +12,7 @@ Resources:
       CodeUri: lambda_functions/process_message_lambda/lambda_environment/
       Handler: lambda_function.lambda_handler
       Runtime: python3.12
+      MemorySize: 3008
       Timeout: 120      # Number of seconds before the lambda times out
       AutoPublishAlias: pullRequestAlias # This is the default alias that will be associated with the function when we do a 'sam deploy'
       Environment:
