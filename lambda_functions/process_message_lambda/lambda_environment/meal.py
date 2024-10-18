@@ -22,16 +22,7 @@ class Meal:
 
   def _create_dishes(self):
     dish_list, full_response = dish_list_from_log(self.description)
-    self.dishes = [
-      Dish(name=single_dish["name"],
-          usual_ingredients=single_dish["common_ingredients"],
-          state=single_dish["state"],
-          qualifiers=single_dish["qualifiers"],
-          confirmed_ing=single_dish["confirmed_ingredients"],
-          amount=single_dish["amount"],
-          similar_dishes=single_dish["similar_dishes"]
-      )
-      for single_dish in dish_list]
+    self.dishes = [Dish(llm_dish_dict=single_dish) for single_dish in dish_list]
     self.llm_responses['dish_list_from_log'] = full_response
     print(f"Created {len(self.dishes)} dishes")
 
