@@ -2,7 +2,7 @@ from typing import List, Dict
 import asyncio
 
 from dish import Dish, dish_schema
-from llm_calls import dish_list_from_log
+from llm_caller import LlmCaller
 
 class Meal:
   def __init__(self, description: str):
@@ -16,15 +16,12 @@ class Meal:
     self._create_dishes()
     asyncio.run(self._process_dishes())
     self._calculate_total_nutrition()
-    self._get_dish_llm_responses()
-    self._get_dish_errors()
-    print(self.to_dict())
 
   def _create_dishes(self):
-    dish_list, full_response = dish_list_from_log(self.description)
+    llm = LlmCaller()
+    asyncio.run(llm.create_dish_list_from_log(self.description))
+    dish_list = llm.cleaned_response
     self.dishes = [Dish(llm_dish_dict=single_dish) for single_dish in dish_list]
-    self.llm_responses['dish_list_from_log'] = full_response
-    print(f"Created {len(self.dishes)} dishes")
 
   async def _process_dishes(self):
     # for each dish, process it independently. No need to create_tasks() here on the dish.process() coroutines because we're gathering immediately.
@@ -48,14 +45,6 @@ class Meal:
                             'carbs': total_carbs,
                             'fat': total_fat,
                             'protein': total_protein}
-    
-  def _get_dish_llm_responses(self):
-    for dish in self.dishes:
-      self.llm_responses[f'dish_responses_{dish.name}'] = dish.llm_responses
-
-  def _get_dish_errors(self):
-    for dish in self.dishes:
-      self.errors.extend(dish.errors)
   
   def __repr__(self):
     return self.description

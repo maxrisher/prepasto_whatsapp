@@ -33,6 +33,7 @@ class LlmCaller:
         self.full_response_object: Dict[str, Any] = None
         self.response_string: str = None
 
+        #Generated after the call
         self.answer_string: str = None
         self.cleaned_response: Any = None
 
@@ -95,7 +96,13 @@ class LlmCaller:
                 "response_string": self.response_string
             }))
         
-    def estimate_food_grams(self, food_name, food_amount, food_state, portion_csv_str):
+    async def create_dish_list_from_log(self, meal_description_text):
+        self.system_prompt_file = '00_input_to_foods_v3.txt'
+        self.user_prompt = "<FoodDiary>\n" + meal_description_text + "\n</FoodDiary>"
+        await self.call()
+        self.cleaned_response = json.loads(self.answer_string)
+
+    async def estimate_food_grams(self, food_name, food_amount, food_state, portion_csv_str):
         self.system_prompt_file = '03_dish_quant_to_g_v1.txt'
         self.user_prompt_file = '03_food_and_portion_csv_v1.txt'
         self.user_format_vars = {
@@ -104,15 +111,15 @@ class LlmCaller:
                 'amount': food_amount,
                 'state': food_state
             }
-        
-        self.call()
+        await self.call()
+        self.cleaned_response = round(float(self.answer_string))
 
-    def dish_dict_to_fndds_categories(self, dish_dict):
+    async def dish_dict_to_fndds_categories(self, dish_dict):
         self.system_prompt_file = '01_dishes_to_categories_v2.txt'
-        dish_dict_str = json.dumps(short_dish_dict, indent=4)
+        dish_dict_str = json.dumps(dish_dict, indent=4)
         self.user_prompt="<FoodLog>\n" + dish_dict_str + "\n</FoodLog>"
-        
-        self.call()
+        await self.call()
+        self._cleans_dish_dict_to_fndds_categories
 
     def _cleans_dish_dict_to_fndds_categories(self):
         category_pattern = r'<WweiaCategory code="(\d+)">(.*?)</WweiaCategory>'

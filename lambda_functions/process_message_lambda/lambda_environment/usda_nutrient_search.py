@@ -3,6 +3,7 @@ from typing import List, Dict
 
 from llm_caller import LlmCaller
 from food_data_getter import FoodDataGetter
+from web_searcher import WebSearcher
 
 class UsdaNutrientSearcher:
     def __init__(self, llm_dish_dict: Dict):
@@ -25,13 +26,17 @@ class UsdaNutrientSearcher:
         self.usda_food_data_central_food_name: str = None
         self.fndds_categories: List[int] = [] # FNDDS: Food and Nutrient Database for Dietary Studies
         self.google_search_queries_usda_site: List[str] = []
+        self.calories_per_100g: int = None
+        self.carbs_per_100g: int = None
+        self.fat_per_100g: int = None
+        self.protein_per_100g: int = None
 
     async def search(self):
         category_filtering = self._fndds_codes_from_category_filtering()
         google_search_usda = self._usda_codes_from_usda_google_search()
         await asyncio.gather(category_filtering, google_search_usda, return_exceptions=False)
-
         await self._pick_final_database_match()
+        self._get_nutrient_density()
 
     async def _fndds_codes_from_category_filtering(self):
         llm = LlmCaller()
@@ -42,19 +47,32 @@ class UsdaNutrientSearcher:
 
     async def _usda_codes_from_usda_google_search(self):
         self.google_search_queries_usda_site = [self.name]
-        #search usda site using the google search.
-        #extract the usda codes from the results
-        #filter the usda codes to just the ones we want
-        #add these codes to our candidate ids
+        web_searcher = WebSearcher()
+        fdc_codes_from_websearch = await web_searcher.google_search_usda(self.google_search_queries_usda_site[0])
+        prepasto_id_codes = FoodDataGetter().fdc_codes_to_prepasto_codes(fdc_codes_from_websearch)
+        self.candidate_prepasto_usda_codes['fndds_and_sr_legacy_google_search_results'] = prepasto_id_codes
 
     async def _pick_final_database_match(self):
-        #get the category search results
-        #get the google search results
-        #csv = foodDataGetter.get_descriptions_csv(combined list)
-        #food_code = llm_caller.pick_final_food_code(simple dict, food_csv)
-        #usda_food_row = foodDataGetter.return_filtered_csv(combined list)
-        #usda_food_cod = usda_food_row[code]
-        #usda_food_name = usda_food_row[name]
+        finalist_prepasto_food_codes = set(self.candidate_prepasto_usda_codes['fndds_and_sr_legacy_google_search_results'] +
+                                           self.candidate_prepasto_usda_codes['fndds_category_search_results'])
+        finalist_foods_csv = FoodDataGetter().get_food_descriptions_csv(finalist_prepasto_food_codes)
+        llm = LlmCaller()
+        await llm.pick_best_food_code_from_description(finalist_foods_csv, self.to_simple_dict())
+        self.prepasto_usda_code = llm.cleaned_response
+
+        food_code_lookup_rows = FoodDataGetter().get_rows_food_codes_lookup('thalos_id', self.prepasto_usda_code)
+        food_code_lookup_dict = food_code_lookup_rows.iloc[0].to_dict()
+        self.usda_food_data_central_id = food_code_lookup_dict.get('fdc_id')
+        self.usda_food_data_central_food_name = food_code_lookup_dict.get('name')
+
+    def _get_nutrient_density(self):
+        food_nutrition_rows = FoodDataGetter().get_rows_food_nutrition_lookup('thalos_id', self.prepasto_usda_code)
+        food_nutrition_dict = food_nutrition_rows.iloc[0].to_dict()
+
+        self.calories_per_100g = food_nutrition_dict.get('calories', 0)
+        self.carbs_per_100g = food_nutrition_dict.get('carbs', 0)
+        self.fat_per_100g = food_nutrition_dict.get('fat', 0)
+        self.protein_per_100g = food_nutrition_dict.get('protein', 0)
 
     def to_simple_dict(self):
         return {
