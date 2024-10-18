@@ -1,20 +1,50 @@
 import re
 import os
 import requests
+import logging
+import time
+import json
 
-def get_answer_str(response_content):
-    print(response_content)
+logger = logging.getLogger("helpers")
 
+def get_answer_str(input_string):
+    # First, try to extract between <Answer> and </Answer> tags
     answer_pattern = r"<Answer>([\s\S]*?)<\/Answer>"
-    match = re.search(answer_pattern, response_content)
+    match = re.search(answer_pattern, input_string)
 
     if match:
         answer_str = match.group(1).strip()
-        print(answer_str)
         return answer_str
     else:
-        raise ValueError("No <Answer> tag found.")
+        # Fallback: try to find everything after <Answer> if </Answer> is missing
+        fallback_pattern = r"<Answer>([\s\S]*)"
+        fallback_match = re.search(fallback_pattern, input_string)
+
+        if fallback_match:
+            answer_str = fallback_match.group(1).strip()
+            logger.warning(json.dumps({
+                "event_type": "llm_response_format_error",
+                "timestamp": time.time(),
+                "error": "LLM response missing closing </Answer> tag",
+                "response_received": input_string
+            }))
+            return answer_str
+        else:
+            # Log error if no <Answer> tag is found at all
+            logger.error(json.dumps({
+                "event_type": "llm_response_format_error",
+                "timestamp": time.time(),
+                "error": "LLM response missing <Answer> tags",
+                "response_received": input_string
+            }))
+            raise ValueError("No <Answer> tag found.")
     
+def usda_code_from_usda_url(url):
+    pattern = r'https://fdc\.nal\.usda\.gov/fdc-app\.html#/food-details/(\d+)/nutrients'
+    match = re.search(pattern, url)
+    usda_fdc_code = match.group(1)
+    return usda_fdc_code
+
 # sends a post request to the backend webhook which collects lambda responses
 def send_to_django(dict):
     headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}

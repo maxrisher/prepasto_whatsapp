@@ -1,6 +1,9 @@
 import asyncio
 from typing import List, Dict
 
+from llm_caller import LlmCaller
+from food_data_getter import FoodDataGetter
+
 class UsdaNutrientSearcher:
     def __init__(self, llm_dish_dict: Dict):
         self.llm_dish_dict = llm_dish_dict
@@ -31,9 +34,11 @@ class UsdaNutrientSearcher:
         await self._pick_final_database_match()
 
     async def _fndds_codes_from_category_filtering(self):
-        #call the llm
-        #set the categories variable to the output from the llm
-        #csv getter: convert a list of fndds_categories to a list of food codes
+        llm = LlmCaller()
+        await llm.dish_dict_to_fndds_categories(self.to_simple_dict())
+        self.fndds_categories = llm.cleaned_response
+        prepasto_codes = FoodDataGetter().category_list_to_code_list(self.fndds_categories)
+        self.candidate_prepasto_usda_codes['fndds_category_search_results'] = prepasto_codes
 
     async def _usda_codes_from_usda_google_search(self):
         self.google_search_queries_usda_site = [self.name]

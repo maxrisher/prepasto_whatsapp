@@ -7,6 +7,8 @@ import time
 import json
 import re
 
+from helpers import get_answer_str
+
 logger = logging.getLogger("llm_calls")
 
 class LlmCaller:
@@ -61,7 +63,7 @@ class LlmCaller:
                 temperature=self.temperature
             )
         self.response_string = self.full_response_object.choices[0].message.content
-        self._get_answer_str()
+        self.answer_string = get_answer_str(self.response_string)
         self._log_response()
 
     def _read_file(self, file_path):
@@ -93,40 +95,6 @@ class LlmCaller:
                 "response_string": self.response_string
             }))
         
-    def _get_answer_str(self):
-        # First, try to extract between <Answer> and </Answer> tags
-        answer_pattern = r"<Answer>([\s\S]*?)<\/Answer>"
-        match = re.search(answer_pattern, self.response_string)
-
-        if match:
-            answer_str = match.group(1).strip()
-            self.answer_string = answer_str
-        else:
-            # Fallback: try to find everything after <Answer> if </Answer> is missing
-            fallback_pattern = r"<Answer>([\s\S]*)"
-            fallback_match = re.search(fallback_pattern, self.response_string)
-
-            if fallback_match:
-                answer_str = fallback_match.group(1).strip()
-                logger.warning(json.dumps({
-                    "event_type": "llm_response_format_error",
-                    "conversation_id": self.call_uuid,
-                    "timestamp": time.time(),
-                    "error": "LLM response missing closing </Answer> tag",
-                    "response_received": self.response_string
-                }))
-                self.answer_string = answer_str
-            else:
-                # Log error if no <Answer> tag is found at all
-                logger.error(json.dumps({
-                    "event_type": "llm_response_format_error",
-                    "conversation_id": self.call_uuid,
-                    "timestamp": time.time(),
-                    "error": "LLM response missing <Answer> tags",
-                    "response_received": self.response_string
-                }))
-                raise ValueError("No <Answer> tag found.")
-        
     def estimate_food_grams(self, food_name, food_amount, food_state, portion_csv_str):
         self.system_prompt_file = '03_dish_quant_to_g_v1.txt'
         self.user_prompt_file = '03_food_and_portion_csv_v1.txt'
@@ -136,4 +104,18 @@ class LlmCaller:
                 'amount': food_amount,
                 'state': food_state
             }
+        
         self.call()
+
+    def dish_dict_to_fndds_categories(self, dish_dict):
+        self.system_prompt_file = '01_dishes_to_categories_v2.txt'
+        dish_dict_str = json.dumps(short_dish_dict, indent=4)
+        self.user_prompt="<FoodLog>\n" + dish_dict_str + "\n</FoodLog>"
+        
+        self.call()
+
+    def _cleans_dish_dict_to_fndds_categories(self):
+        category_pattern = r'<WweiaCategory code="(\d+)">(.*?)</WweiaCategory>'
+        matches = re.findall(category_pattern, self.answer_string)
+        category_code_list = [int(code) for code,category in matches]
+        self.cleaned_response = category_code_list
