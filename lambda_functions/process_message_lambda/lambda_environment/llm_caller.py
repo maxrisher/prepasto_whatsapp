@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 import os
-from types import Dict, Any
+from typing import Dict, Any
 import logging
 import uuid
 import time
@@ -128,8 +128,8 @@ class LlmCaller:
         self.cleaned_response = category_code_list
 
     async def brand_name_food_estimate_nutrition_facts(self, food_name, food_brand, food_chain_restaurant):
-        self.system_prompt = "Generate your best guess USDA Nutrition Facts style label for the user's food. Put your answer inside <Answer></Answer>."
-        self.user_prompt = f"{self.food_name} {self.food_brand} {self.food_chain_restaurant}"
+        self.system_prompt_file = '04_brand_name_food_estimate_nutrition.txt'
+        self.user_prompt = "<FoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</FoodLog>"
         await self.call()
         self.cleaned_response = self.answer_string
 

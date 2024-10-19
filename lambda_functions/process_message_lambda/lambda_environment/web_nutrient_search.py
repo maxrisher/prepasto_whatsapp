@@ -1,4 +1,4 @@
-from types import List, Dict
+from typing import List, Dict
 import asyncio
 
 from llm_caller import LlmCaller
@@ -41,6 +41,9 @@ class WebNutrientSearcher:
         pass
 
     async def _get_nutrition_facts_from_llm(self):
-        llm = LlmCaller
-        llm.brand_name_food_estimate_nutrition_facts(self.food_name, self.food_brand, self.food_chain_restaurant)
+        llm = LlmCaller()
+        await llm.brand_name_food_estimate_nutrition_facts(self.food_name, self.food_brand, self.food_chain_restaurant)
         print(llm.cleaned_response)
+
+srchr = WebNutrientSearcher({'name': 'protein pudding', 'brand_name':'Arla', 'chain_restaurant': None})
+asyncio.run(srchr.search())

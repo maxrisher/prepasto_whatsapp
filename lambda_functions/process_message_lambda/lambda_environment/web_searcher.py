@@ -2,7 +2,7 @@ import os
 import re
 import aiohttp
 import logging
-from types import List
+from typing import List
 
 from helpers import usda_code_from_usda_url
 
