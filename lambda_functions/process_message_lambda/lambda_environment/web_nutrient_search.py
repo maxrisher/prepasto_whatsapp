@@ -43,7 +43,18 @@ class WebNutrientSearcher:
     async def _get_nutrition_facts_from_llm(self):
         llm = LlmCaller()
         await llm.brand_name_food_estimate_nutrition_facts(self.food_name, self.food_brand, self.food_chain_restaurant)
-        print(llm.cleaned_response)
+        
+        self.product_name = llm.cleaned_response.get('product_name')
+        self.serving_size_description = llm.cleaned_response.get('serving_size_description')
+        self.grams_per_serving = llm.cleaned_response.get('grams_per_serving')
+
+        nutrient_density = lambda value_per_serving: round((100 * value_per_serving / self.grams_per_serving), ndigits=2)
+
+        self.calories_per_100g = nutrient_density(llm.cleaned_response.get('calories_per_serving'))
+        self.carbs_per_100g = nutrient_density(llm.cleaned_response.get('carbs_per_serving'))
+        self.fat_per_100g = nutrient_density(llm.cleaned_response.get('fat_per_serving'))
+        self.protein_per_100g = nutrient_density(llm.cleaned_response.get('protein_per_serving'))
 
 srchr = WebNutrientSearcher({'name': 'protein pudding', 'brand_name':'Arla', 'chain_restaurant': None})
 asyncio.run(srchr.search())
+print('done')

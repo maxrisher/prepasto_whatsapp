@@ -131,5 +131,5 @@ class LlmCaller:
         self.system_prompt_file = '04_brand_name_food_estimate_nutrition.txt'
         self.user_prompt = "<FoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</FoodLog>"
         await self.call()
-        self.cleaned_response = self.answer_string
+        self.cleaned_response = json.loads(self.answer_string)
 
