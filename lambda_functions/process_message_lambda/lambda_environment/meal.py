@@ -98,3 +98,11 @@ meal_schema = {
   "additionalProperties": False,
 }
 
+import os
+import sys
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
+
+meal = Meal("All from chipotle: - White rice: double serving - Black beans: one serving - Corn: one serving - Sour cream: one serving - Cheese: one serving - Mild salsa: one serving")
+meal.process()
+print("done!")

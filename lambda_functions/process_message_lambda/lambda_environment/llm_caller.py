@@ -44,8 +44,8 @@ class LlmCaller:
             self.system_prompt = self._read_file(self.system_prompt_file)
         if self.user_prompt_file:
             self.user_prompt = self._read_file(self.user_prompt_file)
-        if self.user_format_vars and user_prompt:
-            user_prompt = user_prompt.format(**self.user_format_vars)
+        if self.user_format_vars and self.user_prompt:
+            self.user_prompt = self.user_prompt.format(**self.user_format_vars)
 
         self._log_call()
         self.full_response_object = await self.client.chat.completions.create(
@@ -115,7 +115,7 @@ class LlmCaller:
             }))
         
     async def create_dish_list_from_log(self, meal_description_text):
-        self.system_prompt_file = '00_input_to_foods_v3.txt'
+        self.system_prompt_file = '00_input_to_foods_v4.txt'
         self.user_prompt = "<FoodDiary>\n" + meal_description_text + "\n</FoodDiary>"
         await self.call()
         self.cleaned_response = json.loads(self.answer_string)
@@ -130,7 +130,7 @@ class LlmCaller:
                 'state': food_state
             }
         await self.call()
-        self.cleaned_response = round(float(self.answer_string))
+        self.cleaned_response = round(float(self.answer_string), ndigits=2)
 
     async def dish_dict_to_fndds_categories(self, dish_dict):
         self.system_prompt_file = '01_dishes_to_categories_v2.txt'

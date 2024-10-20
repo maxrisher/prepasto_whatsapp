@@ -37,3 +37,13 @@ class FoodDataGetter:
         self.df = pd.read_csv(FNDDS_AND_SR_NUTRITION_CSV_PATH)
         food_nutrition_lookup_row = self.df.loc[self.df[column_name] == filter_by_value]
         return food_nutrition_lookup_row
+    
+    def get_rows_food_portion_lookup(self, column_name, filter_by_value):
+        df = pd.read_csv(FNDDS_AND_SR_LEGACY_PORTIONS_CSV_PATH)
+        portion_lookup_row = df.loc[df[column_name] == filter_by_value]
+        return portion_lookup_row
+
+    def return_portions_csv(self, prepasto_usda_code):
+        portion_row = self.get_rows_food_codes_lookup('thalos_id', prepasto_usda_code)
+        portion_row = portion_row.drop(columns=['thalos_id'])
+        return portion_row.to_csv(index=False)

@@ -93,12 +93,12 @@ class WebNutrientSearcher:
         df = pd.DataFrame(csv_data)
         self.web_portion_reference_csv = df.to_csv(index = False)
 
-import os
-import sys
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
+# import os
+# import sys
+# script_dir = os.path.dirname(os.path.abspath(__file__))
+# os.chdir(script_dir)
 
-srchr = WebNutrientSearcher({'name': 'extreme milk chocolate', 'brand_name':'ON', 'chain_restaurant': ''})
-asyncio.run(srchr.search())
-print(srchr.web_portion_reference_csv)
-print('done')
+# srchr = WebNutrientSearcher({'name': 'extreme milk chocolate', 'brand_name':'ON', 'chain_restaurant': ''})
+# asyncio.run(srchr.search())
+# print(srchr.web_portion_reference_csv)
+# print('done')
