@@ -13,7 +13,7 @@ class Dish:
         self.name = llm_dish_dict.get('name')
         self.state = llm_dish_dict.get('state')
         self.amount = llm_dish_dict.get('amount')
-        self.brand_name = llm_dish_dict.get('brand_name')
+        self.brand_name = llm_dish_dict.get('manufactured_by')
         self.chain_restaurant = llm_dish_dict.get('chain_restaurant')
 
         # Meta attributes
@@ -52,7 +52,8 @@ class Dish:
             searcher = WebNutrientSearcher()
             await searcher.search()
             self.nutrition_citation_website = searcher.final_nutrition_citation_website
-                    
+            self.web_portion_reference_csv = searcher.web_portion_reference_csv
+        
         self.nutrients_per_100g.update({
             'calories_per_100g': searcher.calories_per_100g,
             'carbs_per_100g': searcher.carbs_per_100g,

@@ -81,10 +81,28 @@ class LlmCaller:
             "system_prompt": self.system_prompt,
             "user_prompt": self.user_prompt
         }))
+        print(json.dumps({
+            "event_type": "llm_call_start",
+            "conversation_id": self.call_uuid,
+            "timestamp": self.start_time,
+            "system_prompt": self.system_prompt,
+            "user_prompt": self.user_prompt
+        }))
     
     def _log_response(self):
         self.call_uuid = str(uuid.uuid4())
         logger.info(json.dumps({
+                "event_type": "llm_call_complete",
+                "conversation_id": self.call_uuid,
+                "timestamp": time.time(),
+                "duration": time.time() - self.start_time,
+                "prompt_tokens": self.full_response_object.usage.prompt_tokens,
+                "completion_tokens": self.full_response_object.usage.completion_tokens,
+                "total_tokens": self.full_response_object.usage.total_tokens,
+                "answer_text": self.answer_string,
+                "response_string": self.response_string
+            }))
+        print(json.dumps({
                 "event_type": "llm_call_complete",
                 "conversation_id": self.call_uuid,
                 "timestamp": time.time(),
@@ -129,7 +147,7 @@ class LlmCaller:
 
     async def brand_name_food_estimate_nutrition_facts(self, food_name, food_brand, food_chain_restaurant):
         self.system_prompt_file = '04_brand_name_food_estimate_nutrition.txt'
-        self.user_prompt = "<FoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</FoodLog>"
+        self.user_prompt = "<UserFoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</UserFoodLog>"
         await self.call()
         self.cleaned_response = json.loads(self.answer_string)
 
