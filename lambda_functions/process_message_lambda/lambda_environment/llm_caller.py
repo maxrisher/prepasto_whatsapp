@@ -120,6 +120,32 @@ class LlmCaller:
         await self.call()
         self.cleaned_response = json.loads(self.answer_string)
 
+    async def dish_dict_to_fndds_categories(self, dish_dict):
+        self.system_prompt_file = '01_dishes_to_categories_v2.txt'
+        dish_dict_str = json.dumps(dish_dict, indent=4)
+        self.user_prompt="<FoodLog>\n" + dish_dict_str + "\n</FoodLog>"
+        await self.call()
+        self._cleans_dish_dict_to_fndds_categories()
+
+    def _cleans_dish_dict_to_fndds_categories(self):
+        category_pattern = r'<WweiaCategory code="(\d+)">(.*?)</WweiaCategory>'
+        matches = re.findall(category_pattern, self.answer_string)
+        category_code_list = [int(code) for code,category in matches]
+        self.cleaned_response = category_code_list
+
+    async def pick_best_food_code_from_description(self, finalist_foods_csv, dish_dict):
+        self.system_prompt_file = '02_candidate_foods_to_final_food.txt'
+        dish_dict_str = json.dumps(dish_dict, indent=4)
+        self.user_prompt="<USDAFoodCodes>\n"+finalist_foods_csv+"</USDAFoodCodes>\n"+"<FoodLog>\n"+dish_dict_str+"\n</FoodLog>\n"
+        await self.call()
+        self.cleaned_response = int(self.answer_string)
+
+    async def brand_name_food_estimate_nutrition_facts(self, food_name, food_brand, food_chain_restaurant):
+        self.system_prompt_file = '04_brand_name_food_estimate_nutrition.txt'
+        self.user_prompt = "<UserFoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</UserFoodLog>"
+        await self.call()
+        self.cleaned_response = json.loads(self.answer_string)
+
     async def estimate_food_grams(self, food_name, food_amount, food_state, portion_csv_str):
         self.system_prompt_file = '03_dish_quant_to_g_v1.txt'
         self.user_prompt_file = '03_food_and_portion_csv_v1.txt'
@@ -131,23 +157,3 @@ class LlmCaller:
             }
         await self.call()
         self.cleaned_response = round(float(self.answer_string), ndigits=2)
-
-    async def dish_dict_to_fndds_categories(self, dish_dict):
-        self.system_prompt_file = '01_dishes_to_categories_v2.txt'
-        dish_dict_str = json.dumps(dish_dict, indent=4)
-        self.user_prompt="<FoodLog>\n" + dish_dict_str + "\n</FoodLog>"
-        await self.call()
-        self._cleans_dish_dict_to_fndds_categories
-
-    def _cleans_dish_dict_to_fndds_categories(self):
-        category_pattern = r'<WweiaCategory code="(\d+)">(.*?)</WweiaCategory>'
-        matches = re.findall(category_pattern, self.answer_string)
-        category_code_list = [int(code) for code,category in matches]
-        self.cleaned_response = category_code_list
-
-    async def brand_name_food_estimate_nutrition_facts(self, food_name, food_brand, food_chain_restaurant):
-        self.system_prompt_file = '04_brand_name_food_estimate_nutrition.txt'
-        self.user_prompt = "<UserFoodLog>\n" + f"{food_name} {food_brand} {food_chain_restaurant}" + "\n</UserFoodLog>"
-        await self.call()
-        self.cleaned_response = json.loads(self.answer_string)
-

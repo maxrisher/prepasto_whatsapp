@@ -24,7 +24,7 @@ class FoodDataGetter:
     
     def get_food_descriptions_csv(self, finalist_prepasto_food_codes):
         self.df = pd.read_csv(FNDDS_AND_SR_LEGACY_DESCRIPTIONS_CSV_PATH)
-        filtered_df = self.df[self.df['thalos_id'].is_in(finalist_prepasto_food_codes)]
+        filtered_df = self.df[self.df['thalos_id'].isin(finalist_prepasto_food_codes)]
         renamed_col_df = filtered_df.rename(columns={'thalos_id': 'usda_code'})
         return renamed_col_df.to_csv(index=False)
 

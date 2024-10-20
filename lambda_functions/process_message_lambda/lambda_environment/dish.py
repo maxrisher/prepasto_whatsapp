@@ -63,7 +63,7 @@ class Dish:
     
     async def _estimate_mass(self):
         if self.is_generic_dish:
-            portion_reference_csv = FoodDataGetter.return_portions_csv(self.prepasto_usda_code)
+            portion_reference_csv = FoodDataGetter().return_portions_csv(self.prepasto_usda_code)
         else:
             portion_reference_csv = self.web_portion_reference_csv
 

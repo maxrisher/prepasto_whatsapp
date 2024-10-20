@@ -42,8 +42,11 @@ def get_answer_str(input_string):
 def usda_code_from_usda_url(url):
     pattern = r'https://fdc\.nal\.usda\.gov/fdc-app\.html#/food-details/(\d+)/nutrients'
     match = re.search(pattern, url)
-    usda_fdc_code = match.group(1)
-    return usda_fdc_code
+    if match:
+        usda_fdc_code = match.group(1)
+        return usda_fdc_code
+    else:
+        return None
 
 # sends a post request to the backend webhook which collects lambda responses
 def send_to_django(dict):
