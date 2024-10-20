@@ -107,13 +107,43 @@ Your answer
 - Wrap your JSON array in <Answer> tags.
 </Instructions>
 <DraftJson>
-- white rice: double portion
-- black beans: typical Chipotle serving
-- corn: typical Chipotle serving
-- sour cream: typical Chipotle serving
-- cheese: typical Chipotle serving
-- mild salsa: typical Chipotle serving
-- chicken: typical Chipotle serving
+[
+  {
+    "independent_food": "chicken",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "white rice",
+    "amount": "double serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "black beans",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "corn",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "sour cream",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "cheese",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "mild salsa",
+    "amount": "one serving",
+    "descriptor_foods": []
+  }
+]
 </DraftJson>
 <Example>
 <Thinking>
@@ -134,7 +164,6 @@ Your answer
   - Sour cream, cheese, and salsa are served fresh/raw, unless otherwise noted.
 - No specific nutritional qualifiers are mentioned.
 </Thinking>
-
 <Answer>
 [
   {

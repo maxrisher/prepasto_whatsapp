@@ -120,6 +120,18 @@ class LlmCaller:
         await self.call()
         self.cleaned_response = json.loads(self.answer_string)
 
+    async def create_draft_dish_list(self, meal_description_text):
+        self.system_prompt_file = '00_user_input_to_draft_json_v1.txt'
+        self.user_prompt = "<ClientMealDiary>\n" + meal_description_text + "\n</ClientMealDiary>"
+        await self.call()
+        self.cleaned_response = json.loads(self.answer_string)
+
+    async def create_final_dist_list(self, meal_description_text, draft_dish_json):
+        self.system_prompt_file = '00_draft_json_to_meal_json_v1.txt'
+        self.user_prompt = "<ClientMealDiary>\n" + meal_description_text + "\n</ClientMealDiary>" + "\n<DraftJson>\n" + json.dumps(draft_dish_json) + "\n</DraftJson>"
+        await self.call()
+        self.cleaned_response = json.loads(self.answer_string)
+
     async def dish_dict_to_fndds_categories(self, dish_dict):
         self.system_prompt_file = '01_dishes_to_categories_v2.txt'
         dish_dict_str = json.dumps(dish_dict, indent=4)

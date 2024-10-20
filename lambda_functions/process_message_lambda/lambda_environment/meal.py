@@ -13,14 +13,17 @@ class Meal:
     self.llm_responses: Dict[str, str] = {}
 
   def process(self):
-    self._create_dishes()
+    asyncio.run(self._create_dishes())
     asyncio.run(self._process_dishes())
     self._calculate_total_nutrition()
 
-  def _create_dishes(self):
-    llm = LlmCaller()
-    asyncio.run(llm.create_dish_list_from_log(self.description))
-    dish_list = llm.cleaned_response
+  async def _create_dishes(self):
+    draft_food_call = LlmCaller()
+    await draft_food_call.create_draft_dish_list(self.description)
+    draft_dish_list = draft_food_call.cleaned_response
+    final_food_call = LlmCaller()
+    await final_food_call.create_final_dist_list(self.description, draft_dish_list)
+    dish_list = final_food_call.cleaned_response
     self.dishes = [Dish(llm_dish_dict=single_dish) for single_dish in dish_list]
 
   async def _process_dishes(self):
@@ -103,6 +106,6 @@ import sys
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
-meal = Meal("All from chipotle: - White rice: double serving - Black beans: one serving - Corn: one serving - Sour cream: one serving - Cheese: one serving - Mild salsa: one serving")
+meal = Meal("One banana, one rossopomodoro margerita pizza")
 meal.process()
 print("done!")
