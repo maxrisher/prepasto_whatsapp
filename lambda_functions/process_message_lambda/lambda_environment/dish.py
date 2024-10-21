@@ -5,17 +5,7 @@ from usda_nutrient_search import UsdaNutrientSearcher
 from web_nutrient_search import WebNutrientSearcher
 from llm_caller import LlmCaller
 from food_data_getter import FoodDataGetter
-  {
-    "name": "mild salsa",
-    "common_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime"],
-    "state": "fresh",
-    "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["pico de gallo", "fresh salsa"],
-    "manufactured_by": null,
-    "chain_restaurant": "Chipotle"
-  }
+
 class Dish:
     def __init__(self, llm_dish_dict: Dict):
         # Attributes to set on initialization
@@ -23,7 +13,10 @@ class Dish:
         self.name = llm_dish_dict.get('name')
         self.usual_ingredients = llm_dish_dict.get('usual_ingredients')
         self.state = llm_dish_dict.get('state')
+        self.qualifiers = llm_dish_dict.get('qualifiers')
+        self.confirmed_ingredients = llm_dish_dict.get('confirmed_ingredients')
         self.amount = llm_dish_dict.get('amount')
+        self.similar_foods = llm_dish_dict.get('similar_foods')
         self.brand_name = llm_dish_dict.get('manufactured_by')
         self.chain_restaurant = llm_dish_dict.get('chain_restaurant')
 
