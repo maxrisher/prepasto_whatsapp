@@ -62,7 +62,7 @@ class UsdaNutrientSearcher:
 
         food_code_lookup_rows = FoodDataGetter().get_rows_food_codes_lookup('thalos_id', self.prepasto_usda_code)
         food_code_lookup_dict = food_code_lookup_rows.iloc[0].to_dict()
-        self.usda_food_data_central_id = food_code_lookup_dict.get('fdc_id')
+        self.usda_food_data_central_id = int(food_code_lookup_dict.get('fdc_id', 0))
         self.usda_food_data_central_food_name = food_code_lookup_dict.get('name')
 
     def _get_nutrient_density(self):
