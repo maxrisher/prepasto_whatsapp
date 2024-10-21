@@ -7,7 +7,7 @@ from helpers import set_django_url, describe_b64_food_image, send_to_django
 def lambda_handler(event, context):
     start_time = time.time()
     errors = None
-    # set_django_url(context)
+    set_django_url(context)
 
     client_caption = event.get('user_caption')
     client_whatsapp_media_id = event.get('user_image_id')
@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 
     print(prepasto_django_payload)
 
-    # send_to_django(prepasto_django_payload)
+    send_to_django(prepasto_django_payload)
 
     return {
         'statusCode': 200,
