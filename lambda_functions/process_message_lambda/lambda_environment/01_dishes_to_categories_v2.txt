@@ -317,7 +317,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
         <FoodLog>
         {
             "name": "toast with almond butter",
-            "common_ingredients": [
+            "usual_ingredients": [
             "bread",
             "almond butter"
             ],
@@ -356,7 +356,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
         <FoodLog>
         {
             "name": "Fish Fragrant Eggplant",
-            "common_ingredients": [
+            "usual_ingredients": [
                 "eggplant",
                 "garlic",
                 "ginger",

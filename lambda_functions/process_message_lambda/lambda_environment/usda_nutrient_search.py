@@ -9,7 +9,7 @@ class UsdaNutrientSearcher:
     def __init__(self, llm_dish_dict: Dict):
         self.llm_dish_dict = llm_dish_dict
         self.name = llm_dish_dict.get('name')
-        self.usual_ingredients= llm_dish_dict.get('common_ingredients')
+        self.usual_ingredients= llm_dish_dict.get('usual_ingredients')
         self.state = llm_dish_dict.get('state')
         self.qualifiers = llm_dish_dict.get('qualifiers')
         self.confirmed_ing = llm_dish_dict.get('confirmed_ingredients')

@@ -11,7 +11,7 @@ Answer JSON schema:
       "type": "object",
       "required": [
           "name",
-          "common_ingredients",
+          "usual_ingredients",
           "state",
           "qualifiers",
           "confirmed_ingredients",
@@ -25,7 +25,7 @@ Answer JSON schema:
               "type": "string",
               "description": "Create a short and general description of the food. If we're lucky, there will be a USDA code with the same name. Eg. 'shepherd's pie'.",
           },
-          "common_ingredients": {
+          "usual_ingredients": {
               "type": "array",
               "items": {"type": "string"},
               "minItems": 0,
@@ -168,7 +168,7 @@ Your answer
 [
   {
     "name": "chicken",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "likely grilled",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -179,7 +179,7 @@ Your answer
   },
   {
     "name": "white rice",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "cooked",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -190,7 +190,7 @@ Your answer
   },
   {
     "name": "black beans",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "cooked",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -201,7 +201,7 @@ Your answer
   },
   {
     "name": "corn",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "likely steamed or boiled",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -212,7 +212,7 @@ Your answer
   },
   {
     "name": "sour cream",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "fresh",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -223,7 +223,7 @@ Your answer
   },
   {
     "name": "cheese",
-    "common_ingredients": [],
+    "usual_ingredients": [],
     "state": "fresh",
     "qualifiers": null,
     "confirmed_ingredients": [],
@@ -234,7 +234,7 @@ Your answer
   },
   {
     "name": "mild salsa",
-    "common_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime"],
+    "usual_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime"],
     "state": "fresh",
     "qualifiers": null,
     "confirmed_ingredients": [],
