@@ -6,7 +6,7 @@ import requests
 def describe_b64_food_image(image_base64_content, client_caption):
     client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
     model = "gpt-4o"
-    system_prompt = read_file('lambda_environment/00_prompt_image_to_meal_description.txt')
+    system_prompt = read_file('00_prompt_image_to_meal_description.txt')
     user_prompt = _write_user_prompt(image_base64_content, client_caption)
     assistant_completion = {"role": "assistant", "content": "<Thinking>\n"}
     temperature = 0.1
