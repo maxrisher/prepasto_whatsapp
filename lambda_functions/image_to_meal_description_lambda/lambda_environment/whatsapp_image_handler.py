@@ -1,6 +1,7 @@
 import os
 import requests
 import base64
+import json
 
 class WhatsappImageHandler:
     def __init__(self, whatsapp_media_id):
@@ -20,7 +21,8 @@ class WhatsappImageHandler:
 
         whatsapp_media_url_response = requests.get(url, headers=headers)
         whatsapp_media_url_response.raise_for_status()
-        whatsapp_media_url = whatsapp_media_url_response.json.get('url')
+        whatsapp_media_url_response_json = json.loads(whatsapp_media_url_response.content)
+        whatsapp_media_url = whatsapp_media_url_response_json.get('url')
 
         whatsapp_image_response = requests.get(whatsapp_media_url, headers=headers)
         whatsapp_image_response.raise_for_status()

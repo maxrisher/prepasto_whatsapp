@@ -4,9 +4,9 @@ import os
 import requests
 
 def describe_b64_food_image(image_base64_content, client_caption):
-    client = OpenAI()
+    client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
     model = "gpt-4o"
-    system_prompt = read_file('00_prompt_image_to_meal_description.txt')
+    system_prompt = read_file('lambda_environment/00_prompt_image_to_meal_description.txt')
     user_prompt = _write_user_prompt(image_base64_content, client_caption)
     assistant_completion = {"role": "assistant", "content": "<Thinking>\n"}
     temperature = 0.1
@@ -28,7 +28,7 @@ def describe_b64_food_image(image_base64_content, client_caption):
             )
     print(llm_response)
 
-    meal_log = get_answer_str(llm_response.choices[0].message)
+    meal_log = get_answer_str(llm_response.choices[0].message.content)
     return meal_log
     
 def read_file(file_path):
@@ -36,9 +36,7 @@ def read_file(file_path):
         return file.read()
     
 def _write_user_prompt(image_base64_content, client_caption):
-    return {
-        "role": "user",
-        "content": [
+    return [
             {
                 "type": "text",
                 "text": "<ClientCaption>\n"+client_caption+"\n</ClientCaption>\n",
@@ -49,8 +47,7 @@ def _write_user_prompt(image_base64_content, client_caption):
                     "url":  f"data:image/jpeg;base64,{image_base64_content}"
                 },
             },
-        ],
-    }
+        ]
 
 def get_answer_str(input_string):
     # First, try to extract between <Answer> and </Answer> tags
