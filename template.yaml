@@ -48,6 +48,14 @@ Resources:
       MemorySize: 3008
       Timeout: 120      
       AutoPublishAlias: pullRequestAlias 
+      Environment:
+        Variables: # These are variables stored in our AWS parameter store
+          WHATSAPP_TOKEN: '{{resolve:ssm:/image_to_meal_description_lambda/production/whatsapp_token:1}}'
+          DESCRIBE_FOOD_IMAGE_TO_DJANGO_API_KEY: '{{resolve:ssm:/image_to_meal_description_lambda/production/describe_food_image_to_django_api_key:1}}'
+          OPENAI_KEY: '{{resolve:ssm:/image_to_meal_description_lambda/production/openai_key:1}}'
+          PRODUCTION_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/image_to_meal_description_lambda/production/production_railway_public_domain:1}}'
+          PULL_REQUEST_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/image_to_meal_description_lambda/production/pull_request_railway_public_domain}}' #always just point to the latest PR domain in our variable store
+          STAGING_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/image_to_meal_description_lambda/production/staging_railway_public_domain:1}}'
 
   StagingImageToMealDescriptionAlias:
     Type: AWS::Lambda::Alias
