@@ -328,7 +328,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
             "almond butter"
             ],
             "amount": "one open-faced sandwich (one thick slice of sourdough bread, standard portion of almond butter)",
-            "similar_dishes": [
+            "similar_foods": [
             "peanut butter toast",
             "peanut butter and jelly sandwich",
             "toast with nutella",
@@ -375,7 +375,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
                 "soy sauce"
             ],
             "amount": "not specified",
-            "similar_dishes": [
+            "similar_foods": [
                 "ratatouille",
                 "spicy barbecue roasted vegetables",
                 "cajun-spiced vegetables",

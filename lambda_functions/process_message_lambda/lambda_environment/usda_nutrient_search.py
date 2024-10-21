@@ -14,7 +14,7 @@ class UsdaNutrientSearcher:
         self.qualifiers = llm_dish_dict.get('qualifiers')
         self.confirmed_ingredients = llm_dish_dict.get('confirmed_ingredients')
         self.amount = llm_dish_dict.get('amount')
-        self.similar_dishes = llm_dish_dict.get('similar_dishes')
+        self.similar_foods = llm_dish_dict.get('similar_foods')
         self.brand_name = llm_dish_dict.get('brand_name')
         self.chain_restaurant = llm_dish_dict.get('chain_restaurant')
 
@@ -82,4 +82,4 @@ class UsdaNutrientSearcher:
             'qualifiers': self.qualifiers,
             'confirmed_ingredients': self.confirmed_ingredients,
             'amount': self.amount,
-            'similar_dishes': self.similar_dishes}
+            'similar_foods': self.similar_foods}

@@ -98,7 +98,7 @@ class Dish:
         'qualifiers': self.qualifiers,
         'confirmed_ingredients': self.confirmed_ingredients,
         'amount': self.amount,
-        'similar_dishes': self.similar_dishes,
+        'similar_foods': self.similar_foods,
         'brand_name': self.brand_name,
         'chain_restaurant': self.chain_restaurant,
         'fndds_categories': self.fndds_categories,
