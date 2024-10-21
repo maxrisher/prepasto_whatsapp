@@ -96,7 +96,7 @@ class Dish:
         'usual_ingredients': self.usual_ingredients,
         'state': self.state,
         'qualifiers': self.qualifiers,
-        'confirmed_ingredients': self.confirmed_ing,
+        'confirmed_ingredients': self.confirmed_ingredients,
         'amount': self.amount,
         'similar_dishes': self.similar_dishes,
         'brand_name': self.brand_name,

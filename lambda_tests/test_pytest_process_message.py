@@ -21,8 +21,8 @@ def mock_post_request_django(requests_mock):
     requests_mock.post('https://prepastowhatsapp-staging.up.railway.app/bot/lambda_webhook/', json={'status': 'success'}, status_code = 200)
     
 def test_lambda_full(go_to_lambda_dir, mock_post_request_django):
-    event = {'sender_message': "96g steamed peas, 100g steamed carrots, 200g of blueberries, 300 g of peanut butter, 1 cup of flour, 1 apple, 1 banana, 2 pears, one apricot, 3 cherries, 4 oranges, 8 catelopes",
-             'sender_whatsapp_wa_id': 123456789}
+    event = {'sender_message': "one cupbop piggy bop, a cup of steamed broccoli, one serving of coconut curry",
+             'sender_whatsapp_wa_id': 17204768288}
     context = MockContext(invoked_function_arn='arn:aws:lambda:region:account-id:function:my-function:stagingAlias')
     print("START")
     response = lambda_handler(event, context)
