@@ -12,9 +12,9 @@ class Meal:
     self.errors: List[str] = []
     self.llm_responses: Dict[str, str] = {}
 
-  def process(self):
-    asyncio.run(self._create_dishes())
-    asyncio.run(self._process_dishes())
+  async def process(self):
+    await self._create_dishes()
+    await self._process_dishes()
     self._calculate_total_nutrition()
 
   async def _create_dishes(self):
@@ -107,5 +107,5 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
 meal = Meal("One banana, one rossopomodoro margerita pizza")
-meal.process()
+asyncio.run(meal.process())
 print("done!")
