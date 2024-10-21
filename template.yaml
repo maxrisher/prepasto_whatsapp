@@ -61,14 +61,14 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref ImageToMealDescriptionFunction 
-      FunctionVersion: 1 
+      FunctionVersion: 1
       Name: stagingAlias
 
   ProductionImageToMealDescriptionAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref ImageToMealDescriptionFunction 
-      FunctionVersion: 1 
+      FunctionVersion: 1
       Name: production
 
 Outputs:
