@@ -162,9 +162,14 @@ class WhatsappMessageSender:
         
         # Format the individual dish sections
         for index, dish in enumerate(new_dishes_objects, start=1):
+            if dish.usda_food_data_central_food_name:
+                citation = f"> {dish.usda_food_data_central_food_name} (USDA)\n"
+            else:
+                citation = f"> {dish.description} ({dish.nutrition_citation_website})\n"
+
             text_message += (
                 f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
-                f"> {dish.usda_food_data_central_food_name} (USDA)\n"
+                f"{citation}"
                 f"- {dish.calories} kcal\n"
                 f"- {dish.protein} g protein\n"
                 f"- {dish.fat} g fat\n"
