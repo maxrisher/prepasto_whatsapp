@@ -91,7 +91,7 @@ dish_schema = {
       "description": "Source website for nutrition information. Either 'USDA' or the specific website URL."
     },
     "grams": {
-      "type": "number",
+      "type": "integer",
       "description": "The weight of the food in grams."
     },
     "nutrition": {
@@ -99,19 +99,19 @@ dish_schema = {
       "required": ["calories", "carbs", "fat", "protein"],
       "properties": {
         "calories": {
-          "type": "number",
+          "type": "integer",
           "description": "Total calories in the food portion"
         },
         "carbs": {
-          "type": "number",
+          "type": "integer",
           "description": "Total carbohydrates in grams"
         },
         "fat": {
-          "type": "number",
+          "type": "integer",
           "description": "Total fat in grams"
         },
         "protein": {
-          "type": "number",
+          "type": "integer",
           "description": "Total protein in grams"
         }
       },
