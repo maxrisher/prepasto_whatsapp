@@ -168,4 +168,4 @@ class LlmCaller:
                 'state': food_state
             }
         await self.call()
-        self.cleaned_response = round(float(self.answer_string), ndigits=2)
+        self.cleaned_response = round(float(self.answer_string))
