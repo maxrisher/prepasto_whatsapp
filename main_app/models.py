@@ -45,7 +45,7 @@ class Dish(models.Model):
     whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='user_dishes')
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name='meal_dishes')
     name = models.CharField(max_length=255)
-    matched_thalos_id = models.PositiveIntegerField()
+    prepasto_usda_code = models.PositiveIntegerField()
     usda_food_data_central_id = models.PositiveIntegerField(null=True, blank=True)
     usda_food_data_central_food_name = models.CharField(max_length=255)
     
@@ -60,6 +60,6 @@ class Dish(models.Model):
     qualifiers = ArrayField(models.CharField(max_length=255), null=True, blank=True)
     confirmed_ingredients = ArrayField(models.CharField(max_length=255), null=True, blank=True)
     amount = models.CharField(max_length=255)
-    similar_dishes = ArrayField(models.CharField(max_length=255))
+    similar_foods = ArrayField(models.CharField(max_length=255))
     fndds_categories = ArrayField(models.IntegerField())
-    fndds_and_sr_legacy_google_search_results = ArrayField(models.IntegerField())
+    nutrition_citation_website = models.CharField(max_length=255)
