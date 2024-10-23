@@ -25,6 +25,7 @@ class MessageContent:
     whatsapp_interactive_button_text: Optional[str] = None
     location_latitude: Optional[float] = None
     location_longitude: Optional[float] = None
+    image_id: Optional[str] = None
 
     calories_goal: Optional[float] = None
     protein_pct_goal: Optional[float] = None
@@ -34,13 +35,8 @@ class MessageContent:
     protein_g_goal: Optional[int] = None
     carb_g_goal: Optional[int] = None
     fat_g_goal: Optional[int] = None
-#TODO image message id
-#TODO goal data
-#cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal).clean()
-#read nutrition from flow
-#read nutriton confirm
-#read nutrition cancel
 
+    ### Statuses ###
     whatsapp_status_update_whatsapp_message_id: Optional[str] = None
     whatsapp_status_update_whatsapp_wa_id: Optional[str] = None
 
@@ -110,6 +106,8 @@ class WhatsappMessageReader:
             self.message_content.message_type = MessageType.CANCEL_NUTRITION_GOALS
         elif self._test_if_prepasto_understanding():
             self.message_content.message_type = MessageType.PREPASTO_UNDERSTANDING
+        elif self._test_if_nutrition_data_request():
+            self.message_content.message_type = MessageType.NUTRITION_DATA_REQUEST
 
         #Generic whatsapp message types
         elif self._test_if_whatsapp_text_message():
@@ -141,19 +139,22 @@ class WhatsappMessageReader:
 
         if self.message_content.message_type == MessageType.TEXT:
             self._get_whatsapp_text_message_data()
-        elif self.message_content.message_type in button_press_message_types:
+        elif self.message_content.message_type in generic_button_press:
             self._get_whatsapp_interactive_button_data()
         elif self.message_content.message_type == MessageType.CONFIRM_NUTRITION_GOALS:
             self._get_whatsapp_interactive_button_data()
             self._get_nutrition_goal_id_data()
         elif self.message_content.message_type == MessageType.LOCATION_SHARE:
             self._get_location_data()
+        elif self.message_content.message_type == MessageType.NUTRITION_GOAL_DATA:
+            self._get_nutrition_goal_flow_data()
+        elif self.message_content.message_type == MessageType.IMAGE:
+            self._get_image_data()
+
         elif self.message_content.message_type in not_failing_status_updates:
             self._get_status_update_data()
         elif self.message_content.message_type == MessageType.STATUS_UPDATE_FAILED:
             self._get_failed_status_update_data()
-        elif self.message_content.message_type == MessageType.NUTRITION_GOAL_DATA:
-            self._get_nutrition_goal_flow_data()
 
     def _record_message_in_db(self):        
         if self.message_content.message_type == MessageType.UNKNOWN:
@@ -303,6 +304,12 @@ class WhatsappMessageReader:
             return button_id == settings.PREPASTO_UNDERSTANDING_ID
         except KeyError:
             return False
+    
+    def _test_if_nutrition_data_request(self):
+        try:
+            return self.message_messages[0]['text']['body'] == "/stats"
+        except KeyError:
+            return False
         
     def _get_whatsapp_text_message_data(self):
         self.message_content.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
@@ -350,3 +357,6 @@ class WhatsappMessageReader:
             self.message_content.protein_g_goal = int(match.group('protein_goal'))
             self.message_content.fat_g_goal = int(match.group('fat_goal'))
             self.message_content.carb_g_goal = int(match.group('carb_goal'))
+    
+    def _get_image_data(self):
+        self.message_content.image_id = self.message_messages[0]['image']['id']
