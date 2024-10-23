@@ -22,10 +22,9 @@ from .models import WhatsappUser
 logger = logging.getLogger('whatsapp_bot')
 
 @dataclass
-class PayloadFromWhatsappReader:
-    raw_request: HttpRequest
-    request_dict: Dict = field(init=False)
+class MessageOnWhatsapp:
     whatsapp_wa_id: Optional[str] = None
+    whatsapp_profile_name: Optional[str] = None
     whatsapp_message_id: Optional[str] = None
     prepasto_whatsapp_user: Optional[WhatsappUser] = None
     message_type: MessageType = MessageType.UNKNOWN
@@ -45,10 +44,17 @@ class PayloadFromWhatsappReader:
     whatsapp_status_update_error_message: Optional[str] = None
     whatsapp_status_update_error_details: Optional[str] = None
 
-    def __post_init__(self):
-        self.request_dict = json.loads(self.raw_request.body)
+class WhatsappMessageReader:
+    def __init__(self, raw_request):
+        self.message_on_whatsapp = MessageOnWhatsapp
+        self.request_dict = json.loads(raw_request.body)
+        self.message_value = self.request_dict["entry"][0]["changes"][0]["value"]
+        self.message_contacts = self.message_value.get("contacts")
+        self.message_messages = self.message_value.get("messages")
+        self.message_statuses = self.message_value.get("statuses")
+        self.message_is_status_update = True if self.message_statuses is not None else False
 
-    def process_message(self):
+    def read_message(self):
         self._identify_sender_and_message()
         self._determine_message_type()
         self._extract_relevant_message_data()
@@ -56,35 +62,30 @@ class PayloadFromWhatsappReader:
         logger.info("Read message (waid: " + str(self.whatsapp_message_id) + ") of type: "+self.message_type.value)
 
     def _identify_sender_and_message(self):
-        """
-        Grab the sender's wa_id and the message id. 
-            This will error if the webhook is a status update.
-        Try to find their WhatsappUser model in the db
-            If no WhatsappUser model, they are a new user
-        """
-        # First, try on a regular message
-        try:
-            self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
-            self.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
-            try:
-                self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
-            except WhatsappUser.DoesNotExist:
-                logger.info("Message is not from a WhatsappUser")
-                self.prepasto_whatsapp_user = None 
-        except KeyError:
-            pass
+        if self.message_is_status_update:
+            self._id_sender_and_message_status_update()
+        else:
+            self._id_sender_and_message_regular()
         
-        # Second, try on a status update message
+    def _id_sender_and_message_regular(self):
+        self.message_on_whatsapp.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["wa_id"])
+        self.message_on_whatsapp.whatsapp_profile_name = str(self.request_dict["entry"][0]["changes"][0]["value"]["contacts"][0]["profile"]["name"])
+        self.message_on_whatsapp.whatsapp_message_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["messages"][0]["id"])
         try:
-            self.whatsapp_wa_id = str(self.request_dict["entry"][0]["changes"][0]["value"]["statuses"][0]["recipient_id"])
-            try:
-                self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
-            except WhatsappUser.DoesNotExist:
-                logger.info("Status update is not from a WhatsappUser")
-                self.prepasto_whatsapp_user = None 
-        except KeyError:
-            pass
+            self.message_on_whatsapp.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+        except WhatsappUser.DoesNotExist:
+            logger.info("Message is not from a WhatsappUser")
+            self.prepasto_whatsapp_user = None 
         
+    def _id_sender_and_message_status_update(self):
+        self.whatsapp_wa_id = str(self.message_statuses[0]["recipient_id"])
+        try:
+            self.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.whatsapp_wa_id)
+        except WhatsappUser.DoesNotExist:
+            logger.info("Status update is not from a WhatsappUser")
+            new_user = WhatsappUser.objects.create()
+            self.prepasto_whatsapp_user = None 
+
     def _determine_message_type(self):
         #BRANCH 1: message is from a NON USER
         if self.prepasto_whatsapp_user is None:

@@ -5,9 +5,15 @@ from django.utils import timezone
 from django.db import models
 from django.conf import settings
 
+class OnboardingStep(models.TextChoices):
+    INITIAL = 'INITIAL', 'Initial WhatsApp Contact'
+    GOALS_SET = 'GOALS_SET', 'Nutrition Goals Set'
+    COMPLETED = 'COMPLETED', 'Onboarding Completed'
+
 class WhatsappUser(models.Model):
     whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
-    time_zone_name = models.CharField(max_length=50)
+    whatsapp_profile_name = models.CharField(max_length=255)
+    time_zone_name = models.CharField(max_length=50, null=True, blank=True)
     custom_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -15,6 +21,8 @@ class WhatsappUser(models.Model):
         blank=True,
         related_name='whatsapp_user'
     )
+    onboarding_step = models.CharField(max_length=50, choices=OnboardingStep.choices, default=OnboardingStep.INITIAL)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     @property
     def current_date(self):

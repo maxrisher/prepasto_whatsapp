@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.crypto import constant_time_compare
 
-from .payload_from_whatsapp_reader import PayloadFromWhatsappReader
+from .whatsapp_message_reader import WhatsappMessageReader
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_handler import WhatsappMessageHandler
 from .whatsapp_message_sender import WhatsappMessageSender
@@ -44,11 +44,14 @@ def _handle_whatsapp_webhook_get(request):
 
 def _handle_whatsapp_webhook_post(request):
     try:
-        payload = PayloadFromWhatsappReader(request)
-        logger.info(payload.request_dict)
-        payload.process_message()
+        reader = WhatsappMessageReader(request)
+        logger.info(reader.request_dict)
+        reader.read_message()
+        message = reader.message_on_whatsapp
 
-        return WhatsappMessageHandler(payload).handle_message()
+        msg_handler = WhatsappMessageHandler(message)
+        msg_handler.handle_message()
+        return msg_handler.response
 
     except Exception as e:
         logger.error(f'Error processing webhook: {e}')
