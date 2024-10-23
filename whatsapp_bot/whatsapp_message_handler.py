@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from main_app.models import Meal
 
-from .utils import send_to_aws_lambda, user_timezone_from_lat_long
+from .utils import send_to_aws_lambda, user_timezone_from_lat_long, NutritionDataCleaner
 from .models import MessageType, WhatsappUser, OnboardingStep
 from .whatsapp_message_sender import WhatsappMessageSender
 
@@ -42,57 +42,67 @@ class OnboardingMessageHandler:
             OnboardingStep.GOALS_SET: self._handle_awaiting_timezone,
             OnboardingStep.TIMEZONE_SET: self._handle_awaiting_prepasto_understanding,
         }
+        self.sender = None
     
     def handle(self, message_content):
+        self.sender = WhatsappMessageSender(message_content.whatsapp_wa_id)
         handler = self.handlers.get(message_content.prepasto_whatsapp_user.onboarding_step)
         handler(message_content)
 
     def _handle_awaiting_nutrition_goals(self, message_content):
         # If the user just confirmed their nutrition goals
         if message_content.message_type == MessageType.CONFIRM_NUTRITION_GOALS:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message(message_text="Thank you for setting your nutrition goals")
+            self.sender.send_text_message(message_text="Thank you for setting your nutrition goals")
             
             #Advance the user to the next onboarding step
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.GOALS_SET
             message_content.prepasto_whatsapp_user.save()
             
-            WhatsappMessageSender(message_content.whatsapp_wa_id).request_location()
-
+            self.sender.request_location()
+        
+        elif message_content.message_type == MessageType.CANCEL_NUTRITION_GOALS:
+            self.sender.send_text_message("Sorry about that! Let's try again.")
+            self.sender.send_set_goals_flow()
 
         # If the user just sent over their nutrition data
         elif message_content.message_type == MessageType.NUTRITION_GOAL_DATA:
-            ##TODO get goal data
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_goal_data_confirmation()
+            cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal).clean()
+            self.sender.send_goal_data_confirmation(cln_nutrition.calories, cln_nutrition.protein, cln_nutrition.carbs, cln_nutrition.fat)
 
         # If the user sent anything else
         else:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_set_goals_flow()
-    
+            self.sender.send_text_message("Welcome to Prepasto. We automate nutrition tracking. When you send me a text describing your food, I'll tell you the calories and macros!")        
+            self.sender.send_text_message("If you don't yet know your exact nutrition goals, we suggest using a calculator like this one: https://www.calculator.net/macro-calculator.html")
+            self.sender.send_set_goals_flow()
+
     def _handle_awaiting_timezone(self, message_content):
         #The user confirmed their timezone
         if message_content.message_type == MessageType.TIMEZONE_CONFIRMATION:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Thank you for setting your timezone")
+            self.sender.send_text_message("Thank you for setting your timezone")
             
             #Advance the user to the next onboarding step
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.TIMEZONE_SET
             message_content.prepasto_whatsapp_user.save()
 
-            WhatsappMessageSender(message_content.whatsapp_wa_id).ask_for_final_prepasto_understanding()
+            self.sender.send_text_message("So we're on the same page, Prepasto is not a ‘chat bot’ (at least right now). The way it works is that you just send me descriptions or photos of food you ate, and I’ll calculate and keep track of your nutrition.\n\nI’m intelligent when it comes to food 👨‍🔬🍎, but I can’t hold a conversation 🤯")
+            self.sender.send_prepasto_contact_card()
+            self.sender.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"")
+            self.sender.ask_for_final_prepasto_understanding()
 
         #The user didn't like their timezone
         elif message_content.message_type == MessageType.TIMEZONE_CANCELLATION:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
-            WhatsappMessageSender(message_content.whatsapp_wa_id).request_location()
+            self.sender.send_text_message("Sorry about that! Let's try again.")
+            self.sender.request_location()
 
         #The user shared their location
         elif message_content.message_type == MessageType.LOCATION_SHARE:
             user_timezone_str = user_timezone_from_lat_long(message_content.location_latitude, message_content.location_longitude)
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
+            self.sender.send_location_confirmation_buttons(user_timezone_str)
 
         #The user sent something else
         else:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message(I_DONT_UNDERSTAND)
-            WhatsappMessageSender(message_content.whatsapp_wa_id).request_location()
+            self.sender.send_text_message(I_DONT_UNDERSTAND)
+            self.sender.request_location()
 
     def _handle_awaiting_prepasto_understanding(self, message_content):
         if message_content.message_type == MessageType.PREPASTO_UNDERSTANDING:
@@ -100,11 +110,12 @@ class OnboardingMessageHandler:
             message_content.prepasto_whatsapp_user.onboarded_at = timezone.now()
             message_content.prepasto_whatsapp_user.save()
 
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Great, you're all set.")
+            self.sender.send_text_message("Great, you're all set. To begin tracking your food, just text me a description of something you ate")
+            self.sender.send_request_for_feedback()
         
         else:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message(I_DONT_UNDERSTAND)
-            WhatsappMessageSender(message_content.whatsapp_wa_id).ask_for_final_prepasto_understanding()
+            self.sender.send_text_message(I_DONT_UNDERSTAND)
+            self.sender.ask_for_final_prepasto_understanding()
 
 class SteadyStateMessageHandler:
     def handle(self, message_content):
@@ -130,8 +141,11 @@ class PremiumHandler:
             #Other
             MessageType.UNKNOWN: self._handle_unsupported_message_type,
         }
+        self.sender = None
     
     def handle(self, message_content):
+        self.sender = WhatsappMessageSender(message_content.whatsapp_wa_id)
+
         handler = self.handlers.get(message_content.message_type, self._handle_unsupported_message_type)
         handler(message_content)
     
@@ -141,7 +155,7 @@ class PremiumHandler:
 
         send_to_aws_lambda(os.getenv('PROCESS_MESSAGE_LAMBDA_FUNCTION_NAME'), lambda_event)
 
-        WhatsappMessageSender(message_content.whatsapp_wa_id).notify_message_sender_of_processing()
+        self.sender.notify_message_sender_of_processing()
 
     def _handle_delete_meal_message(self, message_content):
         """
@@ -154,7 +168,7 @@ class PremiumHandler:
             meal_to_delete = Meal.objects.get(id=message_content.whatsapp_interactive_button_id,
                                               whatsapp_user = message_content.prepasto_whatsapp_user)
         except Meal.DoesNotExist:
-            WhatsappMessageSender(message_content.whatsapp_wa_id).send_generic_error_message()
+            self.sender.send_generic_error_message()
             return
 
         diary_to_change = meal_to_delete.diary
@@ -164,13 +178,13 @@ class PremiumHandler:
         logger.info(meal_to_delete.description)
 
         #Step 2: send confirmation of meal deletion
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("🗑️")
+        self.sender.send_text_message("🗑️")
 
         #Step 3: send updated daily total
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_diary_message(diary_to_change)
+        self.sender.send_diary_message(diary_to_change)
 
     def _handle_image_message(self, message_content):
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_response_to_image_or_video()
+        self.sender.send_response_to_image_or_video()
 
     def _handle_unsupported_message_type(self, message_content):
         logger.info('I got a message of an unsupported message type')

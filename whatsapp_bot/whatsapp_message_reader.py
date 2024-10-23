@@ -26,6 +26,10 @@ class MessageContent:
     location_longitude: Optional[float] = None
 #TODO image message id
 #TODO goal data
+#cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal).clean()
+#read nutrition from flow
+#read nutriton confirm
+#read nutrition cancel
 
     whatsapp_status_update_whatsapp_message_id: Optional[str] = None
     whatsapp_status_update_whatsapp_wa_id: Optional[str] = None
