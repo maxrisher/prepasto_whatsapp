@@ -1,8 +1,6 @@
 import logging
-from typing import Dict, Callable
 import os
 
-from django.http import HttpResponse
 from django.utils import timezone
 
 from main_app.models import Meal
@@ -85,6 +83,11 @@ class OnboardingMessageHandler:
         elif message_content.message_type == MessageType.TIMEZONE_CANCELLATION:
             WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry about that! Let's try again.")
             WhatsappMessageSender(message_content.whatsapp_wa_id).request_location()
+
+        #The user shared their location
+        elif message_content.message_type == MessageType.LOCATION_SHARE:
+            user_timezone_str = user_timezone_from_lat_long(message_content.location_latitude, message_content.location_longitude)
+            WhatsappMessageSender(message_content.whatsapp_wa_id).send_location_confirmation_buttons(user_timezone_str)
 
         #The user sent something else
         else:
