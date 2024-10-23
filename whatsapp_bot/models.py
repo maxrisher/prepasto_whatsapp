@@ -1,5 +1,6 @@
 import pytz
 from enum import Enum
+from datetime import timedelta
 
 from django.utils import timezone
 from django.db import models
@@ -21,8 +22,23 @@ class WhatsappUser(models.Model):
         blank=True,
         related_name='whatsapp_user'
     )
-    onboarding_step = models.CharField(max_length=50, choices=OnboardingStep.choices, default=OnboardingStep.INITIAL)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    onboarding_step = models.CharField(max_length=50, choices=OnboardingStep.choices, default=OnboardingStep.INITIAL)
+    onboarded_at = models.DateTimeField(null=True, blank=True)
+
+    is_subscribed = models.BooleanField(default=False)
+
+    @property
+    def is_premium(self):
+        if self.is_subscribed == True:
+            return True
+        
+        if self.onboarded_at:        
+            if timezone.now() - self.onboarded_at <= timedelta(days=100000):
+                return True
+        
+        return False
 
     @property
     def current_date(self):

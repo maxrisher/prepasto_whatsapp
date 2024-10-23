@@ -12,6 +12,11 @@ from .whatsapp_message_sender import WhatsappMessageSender
 logger = logging.getLogger('whatsapp_bot')
 
 class WhatsappMessageHandler:
+    def __init__(self, message_on_whatsapp):
+        self.message = message_on_whatsapp
+
+
+class WhatsappMessageHandlerOld:
     def __init__(self, payload):
         self.payload = payload
         self.sender = WhatsappMessageSender(payload.whatsapp_wa_id)

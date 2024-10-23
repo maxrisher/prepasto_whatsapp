@@ -47,7 +47,7 @@ def _handle_whatsapp_webhook_post(request):
         reader = WhatsappMessageReader(request)
         logger.info(reader.request_dict)
         reader.read_message()
-        message = reader.message_on_whatsapp
+        message = reader.message_content
 
         msg_handler = WhatsappMessageHandler(message)
         msg_handler.handle_message()
