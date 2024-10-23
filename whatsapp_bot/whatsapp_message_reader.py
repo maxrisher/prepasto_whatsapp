@@ -11,16 +11,6 @@ from .models import WhatsappUser, MessageType, WhatsappMessage
 
 logger = logging.getLogger('whatsapp_bot')
 
-from dataclasses import dataclass, field
-from typing import Dict, Optional
-import json
-import logging
-from django.conf import settings
-from django.http import HttpRequest
-from .models import WhatsappUser
-
-logger = logging.getLogger('whatsapp_bot')
-
 @dataclass
 class MessageOnWhatsapp:
     whatsapp_wa_id: Optional[str] = None
@@ -46,7 +36,7 @@ class MessageOnWhatsapp:
 
 class WhatsappMessageReader:
     def __init__(self, raw_request):
-        self.message_on_whatsapp = MessageOnWhatsapp
+        self.message_on_whatsapp = MessageOnWhatsapp()
         self.request_dict = json.loads(raw_request.body)
         self.message_value = self.request_dict["entry"][0]["changes"][0]["value"]
         self.message_contacts = self.message_value.get("contacts")
@@ -59,7 +49,7 @@ class WhatsappMessageReader:
         self._determine_message_type()
         self._extract_relevant_message_data()
         self._record_message_in_db()
-        logger.info("Read message (waid: " + str(self.whatsapp_message_id) + ") of type: "+self.message_on_whatsapp.message_type.value)
+        logger.info("Read message (waid: " + str(self.message_on_whatsapp.whatsapp_message_id) + ") of type: "+self.message_on_whatsapp.message_type.value)
 
     def _identify_sender_and_message(self):
         if self.message_is_status_update:
@@ -72,10 +62,13 @@ class WhatsappMessageReader:
         self.message_on_whatsapp.whatsapp_profile_name = str(self.message_contacts[0]["profile"]["name"])
         self.message_on_whatsapp.whatsapp_message_id = str(self.message_messages[0]["id"])
 
-        self.message_on_whatsapp.prepasto_whatsapp_user, created = WhatsappUser.objects.get_or_create(
-            whatsapp_wa_id=self.message_on_whatsapp.whatsapp_wa_id,
-            whatsapp_profile_name = self.message_on_whatsapp.whatsapp_profile_name)
-        if created:
+        try:
+            self.message_on_whatsapp.prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=self.message_on_whatsapp.whatsapp_wa_id)
+        except WhatsappUser.DoesNotExist:
+            self.message_on_whatsapp.prepasto_whatsapp_user = WhatsappUser.objects.create(
+                whatsapp_wa_id=self.message_on_whatsapp.whatsapp_wa_id,
+                whatsapp_profile_name = self.message_on_whatsapp.whatsapp_profile_name
+                )
             logger.info("Got a message from a new WhatsappUser. Created them!")
         
     def _id_sender_and_message_status_update(self):
@@ -167,7 +160,14 @@ class WhatsappMessageReader:
 
         if self.message_on_whatsapp.message_type == MessageType.STATUS_UPDATE_FAILED:
             message_to_update_status.failed_at = timezone.now()
-            error_message = str(self.whatsapp_status_update_error_code) + str(self.whatsapp_status_update_error_title) + str(self.whatsapp_status_update_error_message) + str(self.whatsapp_status_update_error_details)
+
+            error_message = (
+                f"{self.message_on_whatsapp.whatsapp_status_update_error_code} "
+                f"{self.message_on_whatsapp.whatsapp_status_update_error_title} "
+                f"{self.message_on_whatsapp.whatsapp_status_update_error_message} "
+                f"{self.message_on_whatsapp.whatsapp_status_update_error_details}"
+            )
+
             message_to_update_status.failure_details = error_message
         
         if self.message_on_whatsapp.message_type == MessageType.STATUS_UPDATE_DELIVERED:
@@ -265,7 +265,7 @@ class WhatsappMessageReader:
 
     def _get_failed_status_update_data(self):
         self._get_status_update_data()
-        self.whatsapp_status_update_error_count = len(self.message_statuses[0]["errors"])
+        self.message_on_whatsapp.whatsapp_status_update_error_count = len(self.message_statuses[0]["errors"])
 
         error_dict = self.message_statuses[0]["errors"][0]
         self.message_on_whatsapp.whatsapp_status_update_error_code = error_dict["code"]
