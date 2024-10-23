@@ -9,6 +9,7 @@ from django.conf import settings
 class OnboardingStep(models.TextChoices):
     INITIAL = 'INITIAL', 'Initial WhatsApp Contact'
     GOALS_SET = 'GOALS_SET', 'Nutrition Goals Set'
+    TIMEZONE_SET = 'TIMEZONE_SET', 'Timezone Set'
     COMPLETED = 'COMPLETED', 'Onboarding Completed'
 
 class WhatsappUser(models.Model):
@@ -55,6 +56,8 @@ class MessageType(Enum):
     DELETE_REQUEST = "DELETE_REQUEST"
     TIMEZONE_CONFIRMATION = "TIMEZONE_CONFIRMATION"
     TIMEZONE_CANCELLATION = "TIMEZONE_CANCELLATION"
+    PREPASTO_UNDERSTANDING = "PREPASTO_UNDERSTANDING"
+
     TEXT = "TEXT"
     LOCATION_SHARE = "LOCATION_SHARE"
     IMAGE = "IMAGE"

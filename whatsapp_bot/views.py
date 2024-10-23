@@ -45,13 +45,13 @@ def _handle_whatsapp_webhook_get(request):
 def _handle_whatsapp_webhook_post(request):
     try:
         reader = WhatsappMessageReader(request)
+
         logger.info(reader.request_dict)
+
         reader.read_message()
         message = reader.message_content
-
-        msg_handler = WhatsappMessageHandler(message)
-        msg_handler.handle_message()
-        return msg_handler.response
+        WhatsappMessageHandler().handle(message)
+        return HttpResponse('OK', status=200)
 
     except Exception as e:
         logger.error(f'Error processing webhook: {e}')

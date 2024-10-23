@@ -33,7 +33,10 @@ class WhatsappMessageSender:
         
         logger.info("Sent message (waid: "+str(sent_message_whatsapp_wamid)+") of type: "+db_message_type+" to "+str(self.destination_whatsapp_wa_id))
         
-    def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None):
+    def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, save_text=True):
+        if save_text:
+            db_record_content = message_text
+
         data_for_whatsapp_api = {
             "messaging_product": "whatsapp",
             "to": self.destination_whatsapp_wa_id,
@@ -42,6 +45,18 @@ class WhatsappMessageSender:
         }
         self._send_message(data_for_whatsapp_api, db_message_type=db_message_type, db_record_content=db_record_content)
         
+    def send_set_goals_flow(self):
+        pass
+        #TODO
+    
+    def send_goal_data_confirmation(self):
+        pass
+        #TODO
+    
+    def ask_for_final_prepasto_understanding(self):
+        pass
+        #TODO
+    
     def onboard_new_user(self):
         """
         These are the first messages we send to a new user.

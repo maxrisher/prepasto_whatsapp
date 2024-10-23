@@ -24,6 +24,7 @@ class MessageContent:
     whatsapp_interactive_button_text: Optional[str] = None
     location_latitude: Optional[float] = None
     location_longitude: Optional[float] = None
+#TODO image message id
 
     whatsapp_status_update_whatsapp_message_id: Optional[str] = None
     whatsapp_status_update_whatsapp_wa_id: Optional[str] = None
