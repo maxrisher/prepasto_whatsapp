@@ -151,7 +151,8 @@ class PremiumHandler:
 
         #Step 1: try to delete the meal
         try:
-            meal_to_delete = Meal.objects.get(id=message_content.whatsapp_interactive_button_id)
+            meal_to_delete = Meal.objects.get(id=message_content.whatsapp_interactive_button_id,
+                                              whatsapp_user = message_content.prepasto_whatsapp_user)
         except Meal.DoesNotExist:
             WhatsappMessageSender(message_content.whatsapp_wa_id).send_generic_error_message()
             return
@@ -163,7 +164,7 @@ class PremiumHandler:
         logger.info(meal_to_delete.description)
 
         #Step 2: send confirmation of meal deletion
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Got it. I deleted the meal")
+        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("🗑️")
 
         #Step 3: send updated daily total
         WhatsappMessageSender(message_content.whatsapp_wa_id).send_diary_message(diary_to_change)

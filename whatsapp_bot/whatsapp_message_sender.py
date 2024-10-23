@@ -79,7 +79,7 @@ class WhatsappMessageSender:
                                db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
 
     def notify_message_sender_of_processing(self):
-        self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", 
+        self.send_text_message(message_text="💬🍽️", 
                                db_message_type=MessageType.PREPASTO_CREATING_MEAL_TEXT.value)
 
     def request_location(self):
