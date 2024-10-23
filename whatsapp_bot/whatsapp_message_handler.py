@@ -142,6 +142,7 @@ class PremiumHandler:
 
             #Prepasto specific message types
             MessageType.DELETE_REQUEST: self._handle_delete_meal_message,
+            MessageType.NUTRITION_DATA_REQUEST: self._handle_nutrition_data_request,
 
             #Other
             MessageType.UNKNOWN: self._handle_unsupported_message_type,
@@ -189,10 +190,21 @@ class PremiumHandler:
         self.sender.send_diary_message(diary_to_change)
 
     def _handle_image_message(self, message_content):
-        self.sender.send_response_to_image_or_video()
+        self.sender.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.")
+        
+        lambda_event = {'user_caption': message_content.image_caption,
+                        'user_image_id': message_content.image_id,
+                        'whatsapp_wa_id': message_content.whatsapp_wa_id,
+                        'whatsapp_wamid': message_content.whatsapp_message_id}
+        
+        send_to_aws_lambda(os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_FUNCTION_NAME'), lambda_event)
 
     def _handle_unsupported_message_type(self, message_content):
         logger.info('I got a message of an unsupported message type')
+    
+    def _handle_nutrition_data_request(self, message_content):
+        self.sender.send_text_message("Sorry, this feature is still in the works")
+        send_to_aws_lambda(os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_FUNCTION_NAME'), {"user_whatsapp_id": message_content.whatsapp_wa_id})
 
 class NotPremiumHandler():
     def handle(self, message_content):

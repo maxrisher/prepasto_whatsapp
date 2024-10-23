@@ -312,7 +312,3 @@ class WhatsappMessageSender:
         }
 
         self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONTACT_CARD.value)
-
-    def send_response_to_image_or_video(self):
-        self.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.", 
-                               MessageType.PREPASTO_IS_TEXT_ONLY.value)

@@ -26,6 +26,7 @@ class MessageContent:
     location_latitude: Optional[float] = None
     location_longitude: Optional[float] = None
     image_id: Optional[str] = None
+    image_caption: Optional[str] = None
 
     calories_goal: Optional[float] = None
     protein_pct_goal: Optional[float] = None
@@ -359,4 +360,6 @@ class WhatsappMessageReader:
             self.message_content.carb_g_goal = int(match.group('carb_goal'))
     
     def _get_image_data(self):
-        self.message_content.image_id = self.message_messages[0]['image']['id']
+        image_dict = self.message_messages[0]['image']
+        self.message_content.image_id = image_dict['id']
+        self.message_content.image_caption = image_dict['caption']
