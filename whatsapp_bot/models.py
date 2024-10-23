@@ -35,6 +35,21 @@ class WhatsappUser(models.Model):
         return f"{self.whatsapp_wa_id}"
     
 class MessageType(Enum):
+    #Incoming message types
+    DELETE_REQUEST = "DELETE_REQUEST"
+    TIMEZONE_CONFIRMATION = "TIMEZONE_CONFIRMATION"
+    TIMEZONE_CANCELLATION = "TIMEZONE_CANCELLATION"
+    TEXT = "TEXT"
+    LOCATION_SHARE = "LOCATION_SHARE"
+    IMAGE = "IMAGE"
+    VIDEO = "VIDEO"
+
+    #Incoming status update types
+    STATUS_UPDATE_SENT = "STATUS_UPDATE_SENT"
+    STATUS_UPDATE_READ = "STATUS_UPDATE_READ"
+    STATUS_UPDATE_FAILED = "STATUS_UPDATE_FAILED"
+    STATUS_UPDATE_DELIVERED = "STATUS_UPDATE_DELIVERED"
+
     #Incoming NEW user messages
     NEW_USER_TEXT = "NEW_USER_TEXT"
     NEW_USER_LOCATION_SHARE = "NEW_USER_LOCATION_SHARE"
