@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Optional
 import json
 import logging
+import re
 
 from django.utils import timezone
 from django.conf import settings
@@ -24,6 +25,15 @@ class MessageContent:
     whatsapp_interactive_button_text: Optional[str] = None
     location_latitude: Optional[float] = None
     location_longitude: Optional[float] = None
+
+    calories_goal: Optional[float] = None
+    protein_pct_goal: Optional[float] = None
+    carbs_pct_goal: Optional[float] = None
+    fat_pct_goal: Optional[float] = None
+
+    protein_g_goal: Optional[int] = None
+    carb_g_goal: Optional[int] = None
+    fat_g_goal: Optional[int] = None
 #TODO image message id
 #TODO goal data
 #cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal).clean()
@@ -92,6 +102,14 @@ class WhatsappMessageReader:
             self.message_content.message_type = MessageType.TIMEZONE_CONFIRMATION
         elif self._test_if_timezone_cancellation():
             self.message_content.message_type = MessageType.TIMEZONE_CANCELLATION
+        elif self._test_if_nutrition_goal_data():
+            self.message_content.message_type = MessageType.NUTRITION_GOAL_DATA
+        elif self._test_if_nutrition_goal_confirmation():
+            self.message_content.message_type = MessageType.CONFIRM_NUTRITION_GOALS
+        elif self._test_if_nutrition_goal_cancellation():
+            self.message_content.message_type = MessageType.CANCEL_NUTRITION_GOALS
+        elif self._test_if_prepasto_understanding():
+            self.message_content.message_type = MessageType.PREPASTO_UNDERSTANDING
 
         #Generic whatsapp message types
         elif self._test_if_whatsapp_text_message():
@@ -118,19 +136,24 @@ class WhatsappMessageReader:
             self.message_content.message_type = MessageType.UNKNOWN      
 
     def _extract_relevant_message_data(self):
-        button_press_message_types = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CONFIRMATION, MessageType.TIMEZONE_CANCELLATION]
+        generic_button_press = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CONFIRMATION, MessageType.TIMEZONE_CANCELLATION, MessageType.CANCEL_NUTRITION_GOALS, MessageType.PREPASTO_UNDERSTANDING]
         not_failing_status_updates = [MessageType.STATUS_UPDATE_SENT, MessageType.STATUS_UPDATE_READ, MessageType.STATUS_UPDATE_DELIVERED]
 
         if self.message_content.message_type == MessageType.TEXT:
             self._get_whatsapp_text_message_data()
         elif self.message_content.message_type in button_press_message_types:
             self._get_whatsapp_interactive_button_data()
+        elif self.message_content.message_type == MessageType.CONFIRM_NUTRITION_GOALS:
+            self._get_whatsapp_interactive_button_data()
+            self._get_nutrition_goal_id_data()
         elif self.message_content.message_type == MessageType.LOCATION_SHARE:
             self._get_location_data()
         elif self.message_content.message_type in not_failing_status_updates:
             self._get_status_update_data()
         elif self.message_content.message_type == MessageType.STATUS_UPDATE_FAILED:
             self._get_failed_status_update_data()
+        elif self.message_content.message_type == MessageType.NUTRITION_GOAL_DATA:
+            self._get_nutrition_goal_flow_data()
 
     def _record_message_in_db(self):        
         if self.message_content.message_type == MessageType.UNKNOWN:
@@ -252,6 +275,35 @@ class WhatsappMessageReader:
         except KeyError:
             return False
         
+    def _test_if_nutrition_goal_data(self):
+        try:
+            flow_json_str = self.message_messages[0]['interactive']['nfm_reply']['response_json']
+            flow_json = json.loads(flow_json_str)
+            return flow_json['flow_token'] == settings.NUTRITION_GOAL_DATA_FLOW_TOKEN
+        except KeyError:
+            return False
+        
+    def _test_if_nutrition_goal_confirmation(self):
+        try:
+            button_id = self.message_messages[0]['interactive']['button_reply']['id']
+            return button_id.startswith("CONFIRM_NUTRITION_GOAL_")
+        except KeyError:
+            return False
+        
+    def _test_if_nutrition_goal_cancellation(self):
+        try:
+            button_id = self.message_messages[0]['interactive']['button_reply']['id']
+            return button_id == settings.CANCEL_NUTRITION_GOAL_BUTTON_ID
+        except KeyError:
+            return False
+        
+    def _test_if_prepasto_understanding(self):
+        try:
+            button_id = self.message_messages[0]['interactive']['button_reply']['id']
+            return button_id == settings.PREPASTO_UNDERSTANDING_ID
+        except KeyError:
+            return False
+        
     def _get_whatsapp_text_message_data(self):
         self.message_content.whatsapp_text_message_text = str(self.request_dict["entry"][0]['changes'][0]['value']['messages'][0]['text']['body'])
 
@@ -278,3 +330,23 @@ class WhatsappMessageReader:
         self.message_content.whatsapp_status_update_error_title = error_dict["title"]
         self.message_content.whatsapp_status_update_error_message = error_dict["message"]
         self.message_content.whatsapp_status_update_error_details = error_dict["error_data"]["details"]
+    
+    def _get_nutrition_goal_flow_data(self):
+        flow_json_str = self.message_messages[0]['interactive']['nfm_reply']['response_json']
+        flow_json = json.loads(flow_json_str)
+        self.message_content.calories_goal = flow_json['calories']
+        self.message_content.protein_pct_goal = flow_json['protein_pct']
+        self.message_content.fat_pct_goal = flow_json['fat_pct']
+        self.message_content.carbs_pct_goal = flow_json['carbs_pct']
+
+    def _get_nutrition_goal_id_data(self):
+        button_id = self.message_content.whatsapp_interactive_button_id
+
+        pattern = r"CL(?P<calorie_goal>\d+)_P(?P<protein_goal>\d+)_F(?P<fat_goal>\d+)_CB(?P<carb_goal>\d+)"
+        match = re.search(pattern, button_id)
+
+        if match:
+            self.message_content.calories_goal = int(match.group('calorie_goal'))
+            self.message_content.protein_g_goal = int(match.group('protein_goal'))
+            self.message_content.fat_g_goal = int(match.group('fat_goal'))
+            self.message_content.carb_g_goal = int(match.group('carb_goal'))

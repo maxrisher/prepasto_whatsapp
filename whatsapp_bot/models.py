@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator
 
 class OnboardingStep(models.TextChoices):
     INITIAL = 'INITIAL', 'Initial WhatsApp Contact'
@@ -27,6 +28,11 @@ class WhatsappUser(models.Model):
 
     onboarding_step = models.CharField(max_length=50, choices=OnboardingStep.choices, default=OnboardingStep.INITIAL)
     onboarded_at = models.DateTimeField(null=True, blank=True)
+
+    calorie_goal = models.IntegerField(validators=[MinValueValidator(0)], default=2500)
+    protein_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=188)
+    fat_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=56)
+    carb_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=313)
 
     is_subscribed = models.BooleanField(default=False)
 

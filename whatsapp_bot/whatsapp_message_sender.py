@@ -61,8 +61,8 @@ class WhatsappMessageSender:
                 "name": "flow",
                     "parameters": {
                         "flow_message_version": "3",
-                        "flow_token": "set_nutrition_goals_token",
-                        "flow_id": "2008885356295434",
+                        "flow_token": settings.NUTRITION_GOAL_DATA_FLOW_TOKEN,
+                        "flow_id": "960004426143961",
                         "flow_cta": "Set goals",
                         "flow_action": "navigate",
                         "flow_action_payload": {
@@ -97,7 +97,7 @@ class WhatsappMessageSender:
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "CANCEL_NUTRITION_GOAL",
+                                "id": settings.CANCEL_NUTRITION_GOAL_BUTTON_ID,
                                 "title": "No, let's try again"
                             }
                         }
@@ -125,7 +125,7 @@ class WhatsappMessageSender:
                         {
                             "type": "reply",
                             "reply": {
-                                "id": "PREPASTO_UNDERSTANDING",
+                                "id": settings.PREPASTO_UNDERSTANDING_ID,
                                 "title": "Yep, got it!"
                             }
                         },

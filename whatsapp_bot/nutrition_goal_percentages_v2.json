@@ -1,0 +1,83 @@
+{
+    "version": "5.0",
+    "screens": [
+      {
+        "id": "CAL_AND_MACROS",
+        "title": "Nutrition goals",
+        "data": {},
+        "terminal": true,
+        "layout": {
+          "type": "SingleColumnLayout",
+          "children": [
+            {
+              "type": "Form",
+              "name": "flow_path",
+              "children": [
+                {
+                  "type": "TextSubheading",
+                  "text": "Calorie goal"
+                },
+                {
+                  "type": "TextBody",
+                  "text": "Your daily calorie goal"
+                },
+                {
+                  "type": "TextInput",
+                  "label": "Calories",
+                  "name": "TextInput_47f204",
+                  "required": true,
+                  "input-type": "number",
+                  "helper-text": "A number e.g., 2500"
+                },
+                {
+                  "type": "TextSubheading",
+                  "text": "Macronutrient goals"
+                },
+                {
+                  "type": "TextBody",
+                  "text": "Your macronutrient goals as a percentage of total calories.\n\nA common split is 20% protein, 30% fat, 50% carbohydrates"
+                },
+                {
+                  "type": "TextInput",
+                  "label": "Protein (%)",
+                  "name": "TextInput_56a8c5",
+                  "required": true,
+                  "input-type": "number",
+                  "helper-text": "A number between 0-100"
+                },
+                {
+                  "type": "TextInput",
+                  "label": "Fat (%)",
+                  "name": "TextInput_6ac9d3",
+                  "required": true,
+                  "input-type": "number",
+                  "helper-text": "A number between 0-100"
+                },
+                {
+                  "type": "TextInput",
+                  "label": "Carbohydrates (%)",
+                  "name": "TextInput_ede5d9",
+                  "required": true,
+                  "input-type": "number",
+                  "helper-text": "A number between 0-100"
+                },
+                {
+                  "type": "Footer",
+                  "label": "Set",
+                  "on-click-action": {
+                    "name": "complete",
+                    "payload": {
+                      "calories": "${form.TextInput_47f204}",
+                      "protein_pct": "${form.TextInput_56a8c5}",
+                      "fat_pct": "${form.TextInput_6ac9d3}",
+                      "carbs_pct": "${form.TextInput_ede5d9}"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }

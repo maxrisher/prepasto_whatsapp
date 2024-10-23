@@ -52,12 +52,17 @@ class OnboardingMessageHandler:
     def _handle_awaiting_nutrition_goals(self, message_content):
         # If the user just confirmed their nutrition goals
         if message_content.message_type == MessageType.CONFIRM_NUTRITION_GOALS:
-            self.sender.send_text_message(message_text="Thank you for setting your nutrition goals")
-            
+
+            message_content.prepasto_whatsapp_user.calorie_goal = message_content.calories_goal
+            message_content.prepasto_whatsapp_user.protein_g_goal = message_content.protein_g_goal
+            message_content.prepasto_whatsapp_user.carb_g_goal = message_content.carb_g_goal
+            message_content.prepasto_whatsapp_user.fat_g_goal = message_content.fat_g_goal
+
             #Advance the user to the next onboarding step
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.GOALS_SET
             message_content.prepasto_whatsapp_user.save()
-            
+            self.sender.send_text_message(message_text="Thank you for setting your nutrition goals")
+
             self.sender.request_location()
         
         elif message_content.message_type == MessageType.CANCEL_NUTRITION_GOALS:
