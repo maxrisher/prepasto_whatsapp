@@ -19,7 +19,7 @@ class WhatsappMessageSender:
     def _send_message(self, data_for_whatsapp_api, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, in_reply_to=None):
         response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=self.whatsapp_post_request_headers, json=data_for_whatsapp_api)
         response_data = response.json()
-
+        
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
         WhatsappMessage.objects.create(whatsapp_message_id=sent_message_whatsapp_wamid,
@@ -264,7 +264,7 @@ class WhatsappMessageSender:
             if dish.usda_food_data_central_food_name:
                 citation = f"> {dish.usda_food_data_central_food_name} (USDA)\n"
             else:
-                citation = f"> {dish.description} ({dish.nutrition_citation_website})\n"
+                citation = f"> {dish.name} ({dish.nutrition_citation_website})\n"
 
             text_message += (
                 f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"

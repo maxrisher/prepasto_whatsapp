@@ -1,8 +1,9 @@
+import os
+
 from django.test import TestCase
-from whatsapp_bot.utils import user_timezone_from_lat_long, send_to_lambda
+from whatsapp_bot.utils import user_timezone_from_lat_long, send_to_aws_lambda
 
-class UtilsTestCase(TestCase):
-
+class CoordsToTzTest(TestCase):
     def test_timezone_from_real_coordinates(self):
         # Coordinates for the specified landmarks
         landmarks = {
@@ -63,13 +64,30 @@ class UtilsTestCase(TestCase):
                 f"{name}: Expected {data['expected_timezone']}, got {timezone}"
             )
 
-#TODO
-    def test_send_to_lambda(self):
+class SendToLambdaTest(TestCase):
+    def test_send_to_meal_processing_lambda(self):
         payload = {
             'sender_whatsapp_wa_id': 17204768288,
             'sender_message': 'one juicy peach'
         }
         try:
-            send_to_lambda(payload)
+            send_to_aws_lambda(os.getenv('PROCESS_MESSAGE_LAMBDA_FUNCTION_NAME'), os.getenv('PROCESS_MESSAGE_LAMBDA_ALIAS'), payload)
         except Exception as e:
-            self.fail(f"send_to_lambda raised an exception: {e}")
+            self.fail(f"send_to_aws_lambda raised an exception: {e}")
+
+    def test_send_to_image_processing_lambda(self):
+        payload = {'user_caption': "lentil curry",
+                    'user_image_id': "560808869649560",
+                    'whatsapp_wa_id': "17204768288",
+                    'whatsapp_wamid': "fake_message_id"}
+        try:
+            send_to_aws_lambda(os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_FUNCTION_NAME'), os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_ALIAS'), payload)
+        except Exception as e:
+            self.fail(f"send_to_aws_lambda raised an exception: {e}")
+
+    def test_send_to_nutrition_data_lambda(self):
+        payload = {"user_whatsapp_id": "17204768288"}
+        try:
+            send_to_aws_lambda(os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_FUNCTION_NAME'), os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_ALIAS'), payload)
+        except Exception as e:
+            self.fail(f"send_to_aws_lambda raised an exception: {e}")
