@@ -28,6 +28,8 @@ class MessageContent:
     image_id: Optional[str] = None
     image_caption: Optional[str] = None
 
+    timezone_name: Optional[str] = None
+
     calories_goal: Optional[float] = None
     protein_pct_goal: Optional[float] = None
     carbs_pct_goal: Optional[float] = None
@@ -135,13 +137,16 @@ class WhatsappMessageReader:
             self.message_content.message_type = MessageType.UNKNOWN      
 
     def _extract_relevant_message_data(self):
-        generic_button_press = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CONFIRMATION, MessageType.TIMEZONE_CANCELLATION, MessageType.CANCEL_NUTRITION_GOALS, MessageType.PREPASTO_UNDERSTANDING]
+        generic_button_press = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CANCELLATION, MessageType.CANCEL_NUTRITION_GOALS, MessageType.PREPASTO_UNDERSTANDING]
         not_failing_status_updates = [MessageType.STATUS_UPDATE_SENT, MessageType.STATUS_UPDATE_READ, MessageType.STATUS_UPDATE_DELIVERED]
 
         if self.message_content.message_type == MessageType.TEXT:
             self._get_whatsapp_text_message_data()
         elif self.message_content.message_type in generic_button_press:
             self._get_whatsapp_interactive_button_data()
+        elif self.message_content.message_type == MessageType.TIMEZONE_CONFIRMATION:
+            self._get_whatsapp_interactive_button_data()
+            self._get_id_timezone_name()
         elif self.message_content.message_type == MessageType.CONFIRM_NUTRITION_GOALS:
             self._get_whatsapp_interactive_button_data()
             self._get_nutrition_goal_id_data()
@@ -358,7 +363,13 @@ class WhatsappMessageReader:
             self.message_content.protein_g_goal = int(match.group('protein_goal'))
             self.message_content.fat_g_goal = int(match.group('fat_goal'))
             self.message_content.carb_g_goal = int(match.group('carb_goal'))
-    
+
+    def _get_id_timezone_name(self):
+        button_id = self.message_content.whatsapp_interactive_button_id
+
+        # Extract timezone using string slicing
+        self.message_content.timezone_name = button_id.replace("CONFIRM_TZ_", "")
+            
     def _get_image_data(self):
         image_dict = self.message_messages[0]['image']
         self.message_content.image_id = image_dict['id']

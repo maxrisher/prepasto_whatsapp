@@ -84,6 +84,8 @@ class OnboardingMessageHandler:
     def _handle_awaiting_timezone(self, message_content):
         #The user confirmed their timezone
         if message_content.message_type == MessageType.TIMEZONE_CONFIRMATION:
+            message_content.prepasto_whatsapp_user.time_zone_name = message_content.timezone_name
+            message_content.prepasto_whatsapp_user.save()
             self.sender.send_text_message("Thank you for setting your timezone")
             
             #Advance the user to the next onboarding step
