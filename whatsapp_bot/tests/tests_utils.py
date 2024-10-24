@@ -63,6 +63,7 @@ class UtilsTestCase(TestCase):
                 f"{name}: Expected {data['expected_timezone']}, got {timezone}"
             )
 
+#TODO
     def test_send_to_lambda(self):
         payload = {
             'sender_whatsapp_wa_id': 17204768288,

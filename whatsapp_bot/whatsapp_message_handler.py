@@ -71,7 +71,8 @@ class OnboardingMessageHandler:
 
         # If the user just sent over their nutrition data
         elif message_content.message_type == MessageType.NUTRITION_GOAL_DATA:
-            cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal).clean()
+            cln_nutrition = NutritionDataCleaner(message_content.calories_goal, message_content.protein_pct_goal, message_content.carbs_pct_goal, message_content.fat_pct_goal)
+            cln_nutrition.clean()
             self.sender.send_goal_data_confirmation(cln_nutrition.calories, cln_nutrition.protein, cln_nutrition.carbs, cln_nutrition.fat)
 
         # If the user sent anything else
