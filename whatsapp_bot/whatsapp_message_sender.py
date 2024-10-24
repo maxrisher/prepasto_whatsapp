@@ -44,6 +44,33 @@ class WhatsappMessageSender:
             "text": {"body": message_text},
         }
         self._send_message(data_for_whatsapp_api, db_message_type=db_message_type, db_record_content=db_record_content)
+
+    def send_image(self, media_id, caption=None):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "image",
+            "to": self.destination_whatsapp_wa_id,
+            "image": {
+                "id" : media_id,
+                "caption": caption
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.IMAGE.value)
+
+    def send_document(self, media_id, caption=None, file_name=None):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "document",
+            "to": self.destination_whatsapp_wa_id,
+            "document": {
+                "id" : media_id,
+                "caption": caption,
+                "file_name": file_name
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.IMAGE.value)
         
     def send_set_goals_flow(self):
         request_text = "Let's set your nutrition goals"

@@ -208,4 +208,4 @@ class PremiumHandler:
 
 class NotPremiumHandler():
     def handle(self, message_content):
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry, but your subscription has expired. Please contact support at +17204768288 to subscribe again")
+        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry, but your subscription has expired. Please contact support at +17204768288 to subscribe again or if you think there is an issue")

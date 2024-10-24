@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.crypto import constant_time_compare
 
-from .whatsapp_message_reader import WhatsappMessageReader
+from .whatsapp_message_reader import WhatsappMessageReader, MessageContent
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_handler import WhatsappMessageHandler
 from .whatsapp_message_sender import WhatsappMessageSender
@@ -87,5 +87,75 @@ def food_processing_lambda_webhook(request):
 
             return JsonResponse({"error": "Error processing lambda meal webhook"}, status=200)
         
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def food_image_description_lambda_webhook(request):
+    if request.method == 'POST':
+        api_key = request.headers.get('Authorization')
+        if not constant_time_compare(api_key, 'Bearer ' + os.getenv('DESCRIBE_FOOD_IMAGE_TO_DJANGO_API_KEY')):
+            return JsonResponse({'error': 'Invalid API key'}, status=403)
+        
+        try:
+            payload_dict = json.loads(request.body)
+
+            logger.info("Payload decoded at lambda webhook: ")
+            logger.info(payload_dict)
+
+            #TODO: add validation
+
+            food_image_sender = payload_dict['food_image_sender_whatsapp_wa_id']
+            food_image_description = payload_dict['food_image_meal_description']
+
+            message = MessageContent(whatsapp_wa_id = food_image_sender,
+                                     whatsapp_text_message_text = food_image_description)
+            WhatsappMessageHandler().handle(message)
+
+            WhatsappMessageSender(food_image_sender).send_text_message(f"*Interpretation*\n\n{food_image_description}")
+
+            return JsonResponse({'message': 'OK'}, status=200)
+        
+        except Exception as e:
+            logger.error(f'Error at food_image_description_lambda_webhook: {e}')
+            logger.error(traceback.format_exc())
+
+            WhatsappMessageSender(payload_dict['food_image_sender_whatsapp_wa_id']).send_generic_error_message()
+
+            return JsonResponse({"error": "Error processing lambda meal webhook"}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def send_nutrition_data_webhook(request):
+    if request.method == 'POST':
+        api_key = request.headers.get('Authorization')
+        if not constant_time_compare(api_key, 'Bearer ' + os.getenv('GATHER_NUTRITION_DATA_TO_DJANGO_API_KEY')):
+            return JsonResponse({'error': 'Invalid API key'}, status=403)
+        
+        try:
+            payload_dict = json.loads(request.body)
+
+            logger.info("Payload decoded at lambda webhook: ")
+            logger.info(payload_dict)
+
+            #TODO: add validation
+
+            user_whatsapp_wa_id = payload_dict['nutrition_data_requester_whatsapp_wa_id']
+            bar_chart_image_media_id = payload_dict['nutrition_bar_chart_14_days']
+            annual_data_xlsx_media_id = payload_dict['user_nutrition_spreadsheet_ytd']
+
+            WhatsappMessageSender(user_whatsapp_wa_id).send_image(bar_chart_image_media_id)
+            WhatsappMessageSender(user_whatsapp_wa_id).send_document(annual_data_xlsx_media_id)
+
+            return JsonResponse({'message': 'OK'}, status=200)
+        
+        except Exception as e:
+            logger.error(f'Error at food_image_description_lambda_webhook: {e}')
+            logger.error(traceback.format_exc())
+
+            WhatsappMessageSender(payload_dict['nutrition_data_requester_whatsapp_wa_id']).send_generic_error_message()
+
+            return JsonResponse({"error": "Error processing lambda meal webhook"}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)

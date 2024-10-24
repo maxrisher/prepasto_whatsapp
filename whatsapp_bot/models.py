@@ -75,7 +75,7 @@ class MessageType(Enum):
     PREPASTO_UNDERSTANDING = "PREPASTO_UNDERSTANDING"
     NUTRITION_GOAL_DATA = "NUTRITION_GOAL_DATA"
 
-    #Generic incoming
+    ### Generic ###
     TEXT = "TEXT"
     LOCATION_SHARE = "LOCATION_SHARE"
     IMAGE = "IMAGE"
