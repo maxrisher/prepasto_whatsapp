@@ -159,7 +159,7 @@ class PremiumHandler:
         lambda_event = {'sender_whatsapp_wa_id': message_content.whatsapp_wa_id,
                         'sender_message': message_content.whatsapp_text_message_text}
 
-        send_to_aws_lambda(os.getenv('PROCESS_MESSAGE_LAMBDA_FUNCTION_NAME'), lambda_event)
+        send_to_aws_lambda(os.getenv('PROCESS_MESSAGE_LAMBDA_FUNCTION_NAME'), os.getenv('PROCESS_MESSAGE_LAMBDA_ALIAS'), lambda_event)
 
         self.sender.notify_message_sender_of_processing()
 
@@ -197,14 +197,14 @@ class PremiumHandler:
                         'whatsapp_wa_id': message_content.whatsapp_wa_id,
                         'whatsapp_wamid': message_content.whatsapp_message_id}
         
-        send_to_aws_lambda(os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_FUNCTION_NAME'), lambda_event)
+        send_to_aws_lambda(os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_FUNCTION_NAME'), os.getenv('IMAGE_TO_MEAL_DESCRIPTION_LAMBDA_ALIAS'), lambda_event)
 
     def _handle_unsupported_message_type(self, message_content):
         logger.info('I got a message of an unsupported message type')
     
     def _handle_nutrition_data_request(self, message_content):
         self.sender.send_text_message("Sorry, this feature is still in the works")
-        send_to_aws_lambda(os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_FUNCTION_NAME'), {"user_whatsapp_id": message_content.whatsapp_wa_id})
+        send_to_aws_lambda(os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_FUNCTION_NAME'), os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_ALIAS'), {"user_whatsapp_id": message_content.whatsapp_wa_id})
 
 class NotPremiumHandler():
     def handle(self, message_content):

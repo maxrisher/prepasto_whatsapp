@@ -6,7 +6,7 @@ from timezonefinder import TimezoneFinder
 
 logger = logging.getLogger('whatsapp_bot')
 
-def send_to_aws_lambda(lambda_function_name, request_body_dict):
+def send_to_aws_lambda(lambda_function_name, lambda_function_alias, request_body_dict):
     json_payload = json.dumps(request_body_dict)
 
     lambda_client = boto3.client('lambda', 
@@ -17,7 +17,7 @@ def send_to_aws_lambda(lambda_function_name, request_body_dict):
         FunctionName=lambda_function_name,
         InvocationType='Event',
         Payload=json_payload,
-        Qualifier=os.getenv('LAMBDA_ALIAS')
+        Qualifier=lambda_function_alias
     )
 
 def user_timezone_from_lat_long(latitude, longitude):
