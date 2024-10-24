@@ -299,6 +299,162 @@ def make_wa_reaction_message():
         }
     return message
 
+def make_whatsapp_status_update_sent(original_whatsapp_wamid="wamid_1", original_message_sent_to="17204768288"):
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "350132861527473",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "14153476103",
+                                "phone_number_id": "428381170351556",
+                            },
+                            "statuses": [
+                                {
+                                    "id": original_whatsapp_wamid,
+                                    "status": "sent",
+                                    "timestamp": "1726771705",
+                                    "recipient_id": original_message_sent_to,
+                                    "conversation": {
+                                        "id": "c8f93f29dde668cbb4ec848e4da47958",
+                                        "expiration_timestamp": "1726855800",
+                                        "origin": {"type": "service"},
+                                    },
+                                    "pricing": {
+                                        "billable": True,
+                                        "pricing_model": "CBP",
+                                        "category": "service",
+                                    },
+                                }
+                            ],
+                        },
+                        "field": "messages",
+                    }
+                ],
+            }
+        ],
+    }
+    return message
+
+def make_whatsapp_status_update_read(original_whatsapp_wamid="wamid_1", original_message_sent_to="17204768288"):
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "350132861527473",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "14153476103",
+                                "phone_number_id": "428381170351556",
+                            },
+                            "statuses": [
+                                {
+                                    "id": original_whatsapp_wamid,
+                                    "status": "read",
+                                    "timestamp": "1726771705",
+                                    "recipient_id": original_message_sent_to,
+                                }
+                            ],
+                        },
+                        "field": "messages",
+                    }
+                ],
+            }
+        ],
+    }
+    return message
+
+def make_whatsapp_status_update_delivered(original_whatsapp_wamid="wamid_1", original_message_sent_to="17204768288"):
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "350132861527473",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "14153476103",
+                                "phone_number_id": "428381170351556",
+                            },
+                            "statuses": [
+                                {
+                                    "id": original_whatsapp_wamid,
+                                    "status": "delivered",
+                                    "timestamp": "1726771705",
+                                    "recipient_id": original_message_sent_to,
+                                    "conversation": {
+                                        "id": "c8f93f29dde668cbb4ec848e4da47958",
+                                        "expiration_timestamp": "1726855800",
+                                        "origin": {"type": "service"},
+                                    },
+                                    "pricing": {
+                                        "billable": True,
+                                        "pricing_model": "CBP",
+                                        "category": "service",
+                                    },
+                                }
+                            ],
+                        },
+                        "field": "messages",
+                    }
+                ],
+            }
+        ],
+    }
+    return message
+
+def make_whatsapp_status_update_failed(original_whatsapp_wamid="wamid_1", original_message_sent_to="17204768288"):
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "350132861527473",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "14153476103",
+                                "phone_number_id": "428381170351556",
+                            },
+                            "statuses": [
+                                {
+                                    "id": original_whatsapp_wamid,  # The WhatsApp Message ID for the message that failed
+                                    "status": "failed",
+                                    "timestamp": "1695795567",  #The timestamp when the failure event occurred (in Unix epoch format)
+                                    "recipient_id": original_message_sent_to,  # The WhatsApp ID of the recipient
+                                    "errors": [
+                                        {
+                                            "code": 131051,  # Example error code
+                                            "title": "Invalid recipient",  # Error title describing the problem
+                                            "message": "The recipient number is invalid or not registered on WhatsApp.",  # Detailed error message
+                                            "error_data": {
+                                                "details": "The phone number +9876543210 is not a valid WhatsApp user."  # Specific error details
+                                                },
+                                            "href": "https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/"  # Documentation link for error codes
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "field": "messages",
+                    }
+                ],
+            }
+        ],
+    }
+    return message
+
+
 ### Custom whatsapp messages ###
 def make_wa_delete_press(wamid="wamid_1", sender_wa_id="17204768288"):
     return make_wa_button_press(title="DELETE this meal.", wamid=wamid, sender_wa_id=sender_wa_id)
@@ -313,13 +469,13 @@ def make_location_cancel(wamid="wamid_1", sender_wa_id="17204768288"):
     return make_wa_button_press(title="No, let's try again", id="CANCEL_TZ", wamid=wamid, sender_wa_id=sender_wa_id)
 
 def make_confirm_nutrition_goals():
-    return make_wa_button_press(title="Yes", id="CONFIRM_NUTRITION_GOAL_CL_1000_P20_F20_CB20")
+    return make_wa_button_press(title="Yes", id="CONFIRM_NUTRITION_GOAL_CL1000_P20_F20_CB20")
 
 def make_cancel_nutrition_goals():
     return make_wa_button_press(title="No, let's try again", id=settings.CANCEL_NUTRITION_GOAL_BUTTON_ID)
 
 def make_nutrition_goal_data():
-    flow_json = '{"flow_token":"AQAAAAACS5FpgQ_cAAAAAD0QI3s","screen_0_TextInput_1":"150","screen_0_TextInput_0":"2000","screen_0_TextInput_3":"56","screen_0_TextInput_2":"378"}'
+    flow_json = '{"flow_token":"set_nutrition_goals_token","calories":"3000","fat_pct":"30","protein_pct":"20","carbs_pct":"50"}'
     return make_wa_flow_payload(response_json=flow_json)
 
 def make_prepasto_understanding_confirm():
@@ -327,47 +483,6 @@ def make_prepasto_understanding_confirm():
 
 
 
-
-whatsapp_webhook_user_reacts_to_message = {
-  "object": "whatsapp_business_account",
-  "entry": [
-    {
-      "id": "350132861527473",
-      "changes": [
-        {
-          "value": {
-            "messaging_product": "whatsapp",
-            "metadata": {
-              "display_phone_number": "14153476103",
-              "phone_number_id": "428381170351556"
-            },
-            "contacts": [
-              {
-                "profile": {
-                  "name": "Max Risher"
-                },
-                "wa_id": "17204768288"
-              }
-            ],
-            "messages": [
-              {
-                "from": "17204768288",
-                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTZGRkU4QTMyNEQ4MzkzQTBBOQA=",
-                "timestamp": "1726885687",
-                "reaction": {
-                  "message_id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTZGdkU4QTMyNEQ4MzkzQTBBOQA=",
-                  "emoji": "❤️"
-                },
-                "type": "reaction"
-              }
-            ]
-          },
-          "field": "messages"
-        }
-      ]
-    }
-  ]
-}
 
 message_status_update_sent = {
     "object": "whatsapp_business_account",
@@ -508,80 +623,6 @@ message_status_update_failed = {
                                 ]
                             }
                         ]
-                    },
-                    "field": "messages",
-                }
-            ],
-        }
-    ],
-}
-
-whatsapp_webhook_user_image_message = {
-    "object": "whatsapp_business_account",
-    "entry": [
-        {
-            "id": "350132861527473",
-            "changes": [
-                {
-                    "value": {
-                        "messaging_product": "whatsapp",
-                        "metadata": {
-                            "display_phone_number": "14153476103",
-                            "phone_number_id": "428381170351556",
-                        },
-                        "contacts": [
-                            {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
-                        ],
-                        "messages": [
-                            {
-                                "from": "17204768288",
-                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQUI2ODZENDU5NzcwRDg2MkNFQQA=",
-                                "timestamp": "1727379622",
-                                "type": "image",
-                                "image": {
-                                    "mime_type": "image/jpeg",
-                                    "sha256": "gLlw9EGjRnHHqKEPOmj6ZsBjU4Fz+WwkPhcMg4mF1aY=",
-                                    "id": "879796470391041",
-                                },
-                            }
-                        ],
-                    },
-                    "field": "messages",
-                }
-            ],
-        }
-    ],
-}
-
-whatsapp_webhook_user_video_message = {
-    "object": "whatsapp_business_account",
-    "entry": [
-        {
-            "id": "350132861527473",
-            "changes": [
-                {
-                    "value": {
-                        "messaging_product": "whatsapp",
-                        "metadata": {
-                            "display_phone_number": "14153476103",
-                            "phone_number_id": "428381170351556",
-                        },
-                        "contacts": [
-                            {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
-                        ],
-                        "messages": [
-                            {
-                                "from": "17204768288",
-                                "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTFDNTQ1NzIxRjI3QUQ4QzUwQwA=",
-                                "timestamp": "1727379631",
-                                "type": "video",
-                                "video": {
-                                    "mime_type": "video/mp4",
-                                    "sha256": "bdNw+KKc4NPB5eI8RbPPSf5SaxAvyOjZf+qASBiecUg=",
-                                    "id": "1897349680742249",
-                                },
-                            }
-                        ],
                     },
                     "field": "messages",
                 }

@@ -211,46 +211,46 @@ class WhatsappMessageReader:
         try:
             button_title = self.message_messages[0]['interactive']['button_reply']['title']
             return button_title == settings.MEAL_DELETE_BUTTON_TEXT
-        except KeyError:
+        except (KeyError, TypeError):
             return False
 
     def _test_if_whatsapp_text_message(self):
         try:
             return self.message_messages[0]['type'] == 'text'
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_image_message(self):
         try:
             return self.message_messages[0]['type'] == 'image'
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_video_message(self):
         try:
             return self.message_messages[0]['type'] == 'video'
-        except KeyError:
+        except (KeyError, TypeError):
             return False
     
     def _test_if_location_share_message(self):
         try:
             location_dict = self.message_messages[0]['location']
             return location_dict['latitude'] is not None and location_dict['longitude'] is not None
-        except KeyError:
+        except (KeyError, TypeError):
             return False
 
     def _test_if_timezone_confirmation(self):
         try:
             button_id = self.message_messages[0]['interactive']['button_reply']['id']
             return button_id.startswith("CONFIRM_TZ_")
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_timezone_cancellation(self):
         try:
             button_id = self.message_messages[0]['interactive']['button_reply']['id']
             return button_id == settings.CANCEL_TIMEZONE_BUTTON_ID
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_status_update_sent(self):
@@ -282,34 +282,34 @@ class WhatsappMessageReader:
             flow_json_str = self.message_messages[0]['interactive']['nfm_reply']['response_json']
             flow_json = json.loads(flow_json_str)
             return flow_json['flow_token'] == settings.NUTRITION_GOAL_DATA_FLOW_TOKEN
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_nutrition_goal_confirmation(self):
         try:
             button_id = self.message_messages[0]['interactive']['button_reply']['id']
             return button_id.startswith("CONFIRM_NUTRITION_GOAL_")
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_nutrition_goal_cancellation(self):
         try:
             button_id = self.message_messages[0]['interactive']['button_reply']['id']
             return button_id == settings.CANCEL_NUTRITION_GOAL_BUTTON_ID
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_prepasto_understanding(self):
         try:
             button_id = self.message_messages[0]['interactive']['button_reply']['id']
             return button_id == settings.PREPASTO_UNDERSTANDING_ID
-        except KeyError:
+        except (KeyError, TypeError):
             return False
     
     def _test_if_nutrition_data_request(self):
         try:
             return self.message_messages[0]['text']['body'] == "/stats"
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _get_whatsapp_text_message_data(self):
