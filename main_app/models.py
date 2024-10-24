@@ -10,12 +10,12 @@ from whatsapp_bot.models import WhatsappUser
 class Diary(models.Model):
     whatsapp_user = models.ForeignKey(WhatsappUser, on_delete=models.CASCADE, related_name='diaries')
     local_date = models.DateField(editable=False)
-    class Meta:
-        unique_together = ('whatsapp_user', 'local_date')
 
-    def __str__(self):
-        return f"Diary for {self.whatsapp_user} on {self.local_date}"
-    
+    calorie_goal = models.IntegerField(validators=[MinValueValidator(0)], editable=False)
+    protein_g_goal = models.IntegerField(validators=[MinValueValidator(0)], editable=False)
+    fat_g_goal = models.IntegerField(validators=[MinValueValidator(0)], editable=False)
+    carb_g_goal = models.IntegerField(validators=[MinValueValidator(0)], editable=False)
+
     @property
     def total_nutrition(self):
         return self.day_meals.aggregate(
@@ -24,6 +24,20 @@ class Diary(models.Model):
             fat=Sum('fat'),
             protein=Sum('protein')
         )
+
+    def save(self, *args, **kwargs):
+        if not self.pk: # Only runs when creating a new diary
+            self.calorie_goal = self.whatsapp_user.calorie_goal
+            self.protein_g_goal = self.whatsapp_user.protein_g_goal
+            self.fat_g_goal = self.whatsapp_user.fat_g_goal
+            self.carb_g_goal = self.whatsapp_user.carb_g_goal
+        super().save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ('whatsapp_user', 'local_date')
+
+    def __str__(self):
+        return f"Diary for {self.whatsapp_user} on {self.local_date}"
 
 class Meal(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
