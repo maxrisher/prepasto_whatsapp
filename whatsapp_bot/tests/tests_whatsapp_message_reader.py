@@ -39,32 +39,16 @@ class WhatsappMessageReaderTestCase(TestCase):
         payload = webhkdta.make_wa_delete_press()
         self._test_message(payload, MessageType.DELETE_REQUEST)
 
-    def test_edit_meal_request(self):
-        payload = webhkdta.edit_meal_request_payload
-        self._test_message(payload, MessageType.EDIT_MEAL_REQUEST)
-
-    def test_duplicate_meal_request(self):
-        payload = webhkdta.duplicate_meal_request_payload
-        self._test_message(payload, MessageType.DUPLICATE_MEAL_REQUEST)
-
-    def test_meal_edit_confirm(self):
-        payload = webhkdta.meal_edit_confirm_payload
-        self._test_message(payload, MessageType.MEAL_EDIT_CONFIRM)
-
-    def test_meal_edit_cancel(self):
-        payload = webhkdta.meal_edit_cancel_payload
-        self._test_message(payload, MessageType.MEAL_EDIT_CANCEL)
-
     def test_nutrition_data_request(self):
-        payload = webhkdta.nutrition_data_request_payload
+        payload = webhkdta.make_nutrition_data_request()
         self._test_message(payload, MessageType.NUTRITION_DATA_REQUEST)
 
     def test_confirm_nutrition_goals(self):
-        payload = webhkdta.confirm_nutrition_goals_payload
+        payload = webhkdta.make_confirm_nutrition_goals()
         self._test_message(payload, MessageType.CONFIRM_NUTRITION_GOALS)
 
     def test_cancel_nutrition_goals(self):
-        payload = webhkdta.cancel_nutrition_goals_payload
+        payload = webhkdta.make_cancel_nutrition_goals
         self._test_message(payload, MessageType.CANCEL_NUTRITION_GOALS)
 
     def test_timezone_confirmation(self):
@@ -76,21 +60,25 @@ class WhatsappMessageReaderTestCase(TestCase):
         self._test_message(payload, MessageType.TIMEZONE_CANCELLATION)
 
     def test_prepasto_understanding(self):
-        payload = webhkdta.prepasto_understanding_payload
+        payload = webhkdta.make_prepasto_understanding_confirm()
         self._test_message(payload, MessageType.PREPASTO_UNDERSTANDING)
 
     def test_nutrition_goal_data(self):
-        payload = webhkdta.nutrition_goal_data_payload
+        payload = webhkdta.make_nutrition_goal_data()
         self._test_message(payload, MessageType.NUTRITION_GOAL_DATA)
 
     def test_location_share(self):
-        payload = webhkdta.location_share_payload
+        payload = webhkdta.make_wa_location_share()
         self._test_message(payload, MessageType.LOCATION_SHARE)
 
     def test_image_message(self):
-        payload = webhkdta.image_message_payload
+        payload = webhkdta.make_wa_image_message()
         self._test_message(payload, MessageType.IMAGE)
 
     def test_video_message(self):
-        payload = webhkdta.video_message_payload
+        payload = webhkdta.make_wa_video_message()
         self._test_message(payload, MessageType.VIDEO)
+
+    def test_unknown_message(self):
+        payload = webhkdta.make_wa_reaction_message()
+        self._test_message(payload, MessageType.UNKNOWN)

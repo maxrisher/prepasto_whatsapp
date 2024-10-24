@@ -1,3 +1,5 @@
+from django.conf import settings
+
 ### Generic whatsapp messages ###
 def make_wa_text_message(text="One peach", wamid="wamid_1", sender_wa_id="17204768288"):
     message = {
@@ -34,7 +36,7 @@ def make_wa_text_message(text="One peach", wamid="wamid_1", sender_wa_id="172047
     }
     return message
 
-def make_location_share(wamid="wamid_1", sender_wa_id="17204768288"):
+def make_wa_location_share(wamid="wamid_1", sender_wa_id="17204768288"):
     message = {
         "object": "whatsapp_business_account",
         "entry": [
@@ -78,7 +80,7 @@ def make_location_share(wamid="wamid_1", sender_wa_id="17204768288"):
     }
     return message
 
-def make_button_press(id="button_id", title="Button title", wamid="wamid_1", sender_wa_id="17204768288"):
+def make_wa_button_press(id="button_id", title="Button title", wamid="wamid_1", sender_wa_id="17204768288"):
     message = {
         "object": "whatsapp_business_account",
         "entry": [
@@ -123,11 +125,58 @@ def make_button_press(id="button_id", title="Button title", wamid="wamid_1", sen
     }
     return message
 
-### Custom whatsapp messages ###
-def make_wa_delete_press():
-    return make_button_press(title="DELETE this meal.")
+def make_wa_flow_payload(response_json, wamid="wamid_1", sender_wa_id="17204768288"):
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+            "id": "350132861527473",
+            "changes": [
+                {
+                "value": {
+                    "messaging_product": "whatsapp",
+                    "metadata": {
+                    "display_phone_number": "14153476103",
+                    "phone_number_id": "428381170351556"
+                    },
+                    "contacts": [
+                    {
+                        "profile": {
+                        "name": "Max Risher"
+                        },
+                        "wa_id": "17204768288"
+                    }
+                    ],
+                    "messages": [
+                    {
+                        "context": {
+                        "from": "14153476103",
+                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBJEMjQyREY5NTBDNDM0RDI1NDkA"
+                        },
+                        "from": sender_wa_id,
+                        "id": wamid,
+                        "timestamp": "1729786050",
+                        "type": "interactive",
+                        "interactive": {
+                        "type": "nfm_reply",
+                        "nfm_reply": {
+                            "response_json": response_json,
+                            "body": "Sent",
+                            "name": "flow"
+                        }
+                        }
+                    }
+                    ]
+                },
+                "field": "messages"
+                }
+            ]
+            }
+        ]
+    }
+    return message
 
-def make_wa_delete_press(id="f2e3b84f-c29d-4e03-bcfb-f4ca6918a64e", title="Fake title", wamid="wamid_1", sender_wa_id="17204768288"):
+def make_wa_image_message():
     message = {
         "object": "whatsapp_business_account",
         "entry": [
@@ -142,24 +191,19 @@ def make_wa_delete_press(id="f2e3b84f-c29d-4e03-bcfb-f4ca6918a64e", title="Fake 
                                 "phone_number_id": "428381170351556",
                             },
                             "contacts": [
-                                {"profile": {"name": "Max Risher"}, "wa_id": sender_wa_id}
+                                {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
                             ],
                             "messages": [
                                 {
-                                    "context": {
-                                        "from": "14153476103",
-                                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI2QTdGMENENjE2MDg0NDVENjcA",
-                                    },
-                                    "from": sender_wa_id,
-                                    "id": wamid,
-                                    "timestamp": "1726885734",
-                                    "type": "interactive",
-                                    "interactive": {
-                                        "type": "button_reply",
-                                        "button_reply": {
-                                            "id": id,
-                                            "title": "DELETE this meal.",
-                                        },
+                                    "from": "17204768288",
+                                    "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQUNGOTY4MzAxM0ZDMEMzRkIyNQA=",
+                                    "timestamp": "1729794615",
+                                    "type": "image",
+                                    "image": {
+                                        "caption": "Lentil curry",
+                                        "mime_type": "image/jpeg",
+                                        "sha256": "DTDyW52VDrY/EGmDuptarUyes0uMjsi1vbLF80uAVQA=",
+                                        "id": "560808869649560",
                                     },
                                 }
                             ],
@@ -171,96 +215,118 @@ def make_wa_delete_press(id="f2e3b84f-c29d-4e03-bcfb-f4ca6918a64e", title="Fake 
         ],
     }
     return message
+
+def make_wa_video_message():
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+                "id": "350132861527473",
+                "changes": [
+                    {
+                        "value": {
+                            "messaging_product": "whatsapp",
+                            "metadata": {
+                                "display_phone_number": "14153476103",
+                                "phone_number_id": "428381170351556",
+                            },
+                            "contacts": [
+                                {"profile": {"name": "Max Risher"}, "wa_id": "17204768288"}
+                            ],
+                            "messages": [
+                                {
+                                    "from": "17204768288",
+                                    "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTIzMjFDQTYxNUE3QTg4QTRGRAA=",
+                                    "timestamp": "1729794594",
+                                    "type": "video",
+                                    "video": {
+                                        "caption": "Caption",
+                                        "mime_type": "video/mp4",
+                                        "sha256": "LLvTQVSIXZMNSuzKyhQxMVWWkbLSeSW/FwibYIf0oNA=",
+                                        "id": "1241040980355718",
+                                    },
+                                }
+                            ],
+                        },
+                        "field": "messages",
+                    }
+                ],
+            }
+        ],
+    }
+    return message
+
+def make_wa_reaction_message():
+    message = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {
+            "id": "350132861527473",
+            "changes": [
+                {
+                "value": {
+                    "messaging_product": "whatsapp",
+                    "metadata": {
+                    "display_phone_number": "14153476103",
+                    "phone_number_id": "428381170351556"
+                    },
+                    "contacts": [
+                    {
+                        "profile": {
+                        "name": "Max Risher"
+                        },
+                        "wa_id": "17204768288"
+                    }
+                    ],
+                    "messages": [
+                    {
+                        "from": "17204768288",
+                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTZGRkU4QTMyNEQ4MzkzQTBBOQA=",
+                        "timestamp": "1726885687",
+                        "reaction": {
+                        "message_id": "wamid.HBgLMTcyMDQ3NjgyODgVAgASGBQzQTZGdkU4QTMyNEQ4MzkzQTBBOQA=",
+                        "emoji": "❤️"
+                        },
+                        "type": "reaction"
+                    }
+                    ]
+                },
+                "field": "messages"
+                }
+            ]
+            }
+        ]
+        }
+    return message
+
+### Custom whatsapp messages ###
+def make_wa_delete_press(wamid="wamid_1", sender_wa_id="17204768288"):
+    return make_wa_button_press(title="DELETE this meal.", wamid=wamid, sender_wa_id=sender_wa_id)
 
 def make_location_confirmation(timezone_name="America/Denver", wamid="wamid_1", sender_wa_id="17204768288"):
-    message = {
-        "object": "whatsapp_business_account",
-        "entry": [
-            {
-                "id": "350132861527473",
-                "changes": [
-                    {
-                        "value": {
-                            "messaging_product": "whatsapp",
-                            "metadata": {
-                                "display_phone_number": "14153476103",
-                                "phone_number_id": "428381170351556",
-                            },
-                            "contacts": [
-                                {"profile": {"name": "Max Risher"}, "wa_id": sender_wa_id}
-                            ],
-                            "messages": [
-                                {
-                                    "context": {
-                                        "from": "14153476103",
-                                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI3Mjg5MEJCQjg5M0IzOEJBMDgA",
-                                    },
-                                    "from": sender_wa_id,
-                                    "id": wamid,
-                                    "timestamp": "1726885490",
-                                    "type": "interactive",
-                                    "interactive": {
-                                        "type": "button_reply",
-                                        "button_reply": {
-                                            "id": "CONFIRM_TZ_"+timezone_name,
-                                            "title": "Yes",
-                                        },
-                                    },
-                                }
-                            ],
-                        },
-                        "field": "messages",
-                    }
-                ],
-            }
-        ],
-    }
-    return message
+    return make_wa_button_press(title="Yes", id="CONFIRM_TZ_"+timezone_name, wamid=wamid, sender_wa_id=sender_wa_id)
+
+def make_nutrition_data_request(wamid="wamid_1", sender_wa_id="17204768288"):
+    return make_wa_text_message(text="/stats", wamid=wamid, sender_wa_id=sender_wa_id)
 
 def make_location_cancel(wamid="wamid_1", sender_wa_id="17204768288"):
-    message = {
-        "object": "whatsapp_business_account",
-        "entry": [
-            {
-                "id": "350132861527473",
-                "changes": [
-                    {
-                        "value": {
-                            "messaging_product": "whatsapp",
-                            "metadata": {
-                                "display_phone_number": "14153476103",
-                                "phone_number_id": "428381170351556",
-                            },
-                            "contacts": [
-                                {"profile": {"name": "Max Risher"}, "wa_id": sender_wa_id}
-                            ],
-                            "messages": [
-                                {
-                                    "context": {
-                                        "from": "14153476103",
-                                        "id": "wamid.HBgLMTcyMDQ3NjgyODgVAgARGBI3Mjg5MEJCQjg5M0IzOEJBMDgA",
-                                    },
-                                    "from": sender_wa_id,
-                                    "id": wamid,
-                                    "timestamp": "1726885552",
-                                    "type": "interactive",
-                                    "interactive": {
-                                        "type": "button_reply",
-                                        "button_reply": {
-                                            "id": "CANCEL_TZ",
-                                            "title": "No, let's try again",
-                                        },
-                                    },
-                                }
-                            ],
-                        },
-                        "field": "messages",
-                    }
-                ],
-            }
-        ],
-    }
-    return message
+    return make_wa_button_press(title="No, let's try again", id="CANCEL_TZ", wamid=wamid, sender_wa_id=sender_wa_id)
+
+def make_confirm_nutrition_goals():
+    return make_wa_button_press(title="Yes", id="CONFIRM_NUTRITION_GOAL_CL_1000_P20_F20_CB20")
+
+def make_cancel_nutrition_goals():
+    return make_wa_button_press(title="No, let's try again", id=settings.CANCEL_NUTRITION_GOAL_BUTTON_ID)
+
+def make_nutrition_goal_data():
+    flow_json = '{"flow_token":"AQAAAAACS5FpgQ_cAAAAAD0QI3s","screen_0_TextInput_1":"150","screen_0_TextInput_0":"2000","screen_0_TextInput_3":"56","screen_0_TextInput_2":"378"}'
+    return make_wa_flow_payload(response_json=flow_json)
+
+def make_prepasto_understanding_confirm():
+    return make_wa_button_press(title="Yep, got it!", id=settings.PREPASTO_UNDERSTANDING_ID)
+
+
+
 
 whatsapp_webhook_user_reacts_to_message = {
   "object": "whatsapp_business_account",

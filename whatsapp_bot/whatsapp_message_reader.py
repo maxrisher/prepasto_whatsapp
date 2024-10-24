@@ -256,25 +256,25 @@ class WhatsappMessageReader:
     def _test_if_whatsapp_status_update_sent(self):
         try:
             return self.message_statuses[0]["status"] == "sent"
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_status_update_read(self):
         try:
             return self.message_statuses[0]["status"] == "read"
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_status_update_failed(self):
         try:
             return self.message_statuses[0]["status"] == "failed"
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_whatsapp_status_update_delivered(self):
         try:
             return self.message_statuses[0]["status"] == "delivered"
-        except KeyError:
+        except (KeyError, TypeError):
             return False
         
     def _test_if_nutrition_goal_data(self):
