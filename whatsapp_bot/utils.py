@@ -38,13 +38,13 @@ def user_timezone_from_lat_long(latitude, longitude):
     return timezone_name
 
 class NutritionDataCleaner:
-    def __init__(self, calories, protein_pct, carbs_pct, fat_pct):
-        self.calories_in = abs(calories)
-        self.total_pct = protein_pct + carbs_pct + fat_pct
-
-        self.protein_pct_in = abs(protein_pct)
-        self.carbs_pct_in = abs(carbs_pct)
-        self.fat_pct_in = abs(fat_pct)
+    def __init__(self, calories_str, protein_pct_str, carbs_pct_str, fat_pct_str):
+        string_to_pos_int = lambda str : int(abs(float(str)))
+        
+        self.calories_in = string_to_pos_int(calories_str)
+        self.protein_pct_in = string_to_pos_int(protein_pct_str)
+        self.carbs_pct_in = string_to_pos_int(carbs_pct_str)
+        self.fat_pct_in = string_to_pos_int(fat_pct_str)
 
         self.protein_pct_final = 0
         self.carbs_pct_final = 0
@@ -60,12 +60,14 @@ class NutritionDataCleaner:
         self._calculate_nutrition()
 
     def _fix_percentages(self):
-        if self.total_pct <= 0:
+        total_pct = self.protein_pct_in + self.carbs_pct_in + self.fat_pct_in
+
+        if total_pct <= 0:
             self.protein_pct_final = 20
             self.carbs_pct_final = 50
             self.fat_pct_final = 30
         else:
-            pct_deflator = 100 / self.total_pct
+            pct_deflator = 100 / total_pct
             self.protein_pct_final = pct_deflator * self.protein_pct_in
             self.carbs_pct_final = pct_deflator * self.carbs_pct_in
             self.fat_pct_final = pct_deflator * self.fat_pct_in

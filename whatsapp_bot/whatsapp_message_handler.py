@@ -76,7 +76,7 @@ class OnboardingMessageHandler:
 
         # If the user sent anything else
         else:
-            self.sender.send_text_message("Welcome to Prepasto. We automate nutrition tracking. When you send me a text describing your food, I'll tell you the calories and macros!")        
+            self.sender.send_text_message("Welcome to Prepasto 😊. We automate nutrition tracking. When you send me a text describing your food, I'll tell you the calories and macros!")        
             self.sender.send_text_message("If you don't yet know your exact nutrition goals, we suggest using a calculator like this one: https://www.calculator.net/macro-calculator.html")
             self.sender.send_set_goals_flow()
 
