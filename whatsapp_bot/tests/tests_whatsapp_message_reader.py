@@ -61,7 +61,7 @@ class WhatsappMessageReaderTestCase(TestCase):
 
     def test_prepasto_understanding(self):
         payload = webhkdta.make_prepasto_understanding_confirm()
-        self._test_message(payload, MessageType.PREPASTO_UNDERSTANDING)
+        self._test_message(payload, MessageType.SERVICE_UNDERSTANDING)
 
     def test_nutrition_goal_data(self):
         payload = webhkdta.make_nutrition_goal_data()

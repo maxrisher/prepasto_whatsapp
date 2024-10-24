@@ -70,7 +70,7 @@ class WhatsappMessageSender:
                 "file_name": file_name
             }
         }
-        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.IMAGE.value)
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.DOCUMENT.value)
         
     def send_set_goals_flow(self):
         request_text = "Let's set your nutrition goals"

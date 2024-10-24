@@ -456,8 +456,8 @@ def make_whatsapp_status_update_failed(original_whatsapp_wamid="wamid_1", origin
 
 
 ### Custom whatsapp messages ###
-def make_wa_delete_press(wamid="wamid_1", sender_wa_id="17204768288"):
-    return make_wa_button_press(title="DELETE this meal.", wamid=wamid, sender_wa_id=sender_wa_id)
+def make_wa_delete_press(meal_id = "button_id", wamid="wamid_1", sender_wa_id="17204768288"):
+    return make_wa_button_press(id=meal_id, title="DELETE this meal.", wamid=wamid, sender_wa_id=sender_wa_id)
 
 def make_location_confirmation(timezone_name="America/Denver", wamid="wamid_1", sender_wa_id="17204768288"):
     return make_wa_button_press(title="Yes", id="CONFIRM_TZ_"+timezone_name, wamid=wamid, sender_wa_id=sender_wa_id)
@@ -468,8 +468,9 @@ def make_nutrition_data_request(wamid="wamid_1", sender_wa_id="17204768288"):
 def make_location_cancel(wamid="wamid_1", sender_wa_id="17204768288"):
     return make_wa_button_press(title="No, let's try again", id="CANCEL_TZ", wamid=wamid, sender_wa_id=sender_wa_id)
 
-def make_confirm_nutrition_goals():
-    return make_wa_button_press(title="Yes", id="CONFIRM_NUTRITION_GOAL_CL1000_P20_F20_CB20")
+def make_confirm_nutrition_goals(calories=1000):
+    id=f"CONFIRM_NUTRITION_GOAL_CL{calories}_P20_F20_CB20"
+    return make_wa_button_press(title="Yes", id=id)
 
 def make_cancel_nutrition_goals():
     return make_wa_button_press(title="No, let's try again", id=settings.CANCEL_NUTRITION_GOAL_BUTTON_ID)

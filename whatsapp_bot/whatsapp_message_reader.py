@@ -108,7 +108,7 @@ class WhatsappMessageReader:
         elif self._test_if_nutrition_goal_cancellation():
             self.message_content.message_type = MessageType.CANCEL_NUTRITION_GOALS
         elif self._test_if_prepasto_understanding():
-            self.message_content.message_type = MessageType.PREPASTO_UNDERSTANDING
+            self.message_content.message_type = MessageType.SERVICE_UNDERSTANDING
         elif self._test_if_nutrition_data_request():
             self.message_content.message_type = MessageType.NUTRITION_DATA_REQUEST
 
@@ -137,7 +137,7 @@ class WhatsappMessageReader:
             self.message_content.message_type = MessageType.UNKNOWN      
 
     def _extract_relevant_message_data(self):
-        generic_button_press = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CANCELLATION, MessageType.CANCEL_NUTRITION_GOALS, MessageType.PREPASTO_UNDERSTANDING]
+        generic_button_press = [MessageType.DELETE_REQUEST, MessageType.TIMEZONE_CANCELLATION, MessageType.CANCEL_NUTRITION_GOALS, MessageType.SERVICE_UNDERSTANDING]
         not_failing_status_updates = [MessageType.STATUS_UPDATE_SENT, MessageType.STATUS_UPDATE_READ, MessageType.STATUS_UPDATE_DELIVERED]
 
         if self.message_content.message_type == MessageType.TEXT:

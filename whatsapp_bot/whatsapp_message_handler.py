@@ -6,7 +6,7 @@ from django.utils import timezone
 from main_app.models import Meal
 
 from .utils import send_to_aws_lambda, user_timezone_from_lat_long, NutritionDataCleaner
-from .models import MessageType, WhatsappUser, OnboardingStep
+from .models import MessageType, OnboardingStep
 from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
@@ -113,7 +113,7 @@ class OnboardingMessageHandler:
             self.sender.request_location()
 
     def _handle_awaiting_prepasto_understanding(self, message_content):
-        if message_content.message_type == MessageType.PREPASTO_UNDERSTANDING:
+        if message_content.message_type == MessageType.SERVICE_UNDERSTANDING:
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.COMPLETED
             message_content.prepasto_whatsapp_user.onboarded_at = timezone.now()
             message_content.prepasto_whatsapp_user.save()
@@ -211,4 +211,5 @@ class PremiumHandler:
 
 class NotPremiumHandler():
     def handle(self, message_content):
-        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry, but your subscription has expired. Please contact support at +17204768288 to subscribe again or if you think there is an issue")
+        WhatsappMessageSender(message_content.whatsapp_wa_id).send_text_message("Sorry, but your subscription has expired. Please contact support at +17204768288 to subscribe again or if you think there is an issue", 
+                                                                                db_message_type=MessageType.PREPASTO_SUBSCRIPTION_EXPIRED.value)
