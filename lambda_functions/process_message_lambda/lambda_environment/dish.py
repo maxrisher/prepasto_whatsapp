@@ -22,7 +22,7 @@ class Dish:
         self.chain_restaurant = llm_dish_dict.get('chain_restaurant')
 
         # Attributes set while processing
-        self.is_generic_dish: bool = True
+        self.is_usda_dish: bool = True
         self.nutrients_per_100g = {'calories_per_100g': 0,
                                 'carbs_per_100g': 0,
                                 'fat_per_100g': 0,
@@ -45,9 +45,9 @@ class Dish:
         self._calculate_total_nutrition()
 
     async def _find_nutrient_density(self):
-        self.is_generic_dish = self.brand_name is None and self.chain_restaurant is None
+        self.is_usda_dish = self.brand_name is None and self.chain_restaurant is None
         
-        if self.is_generic_dish:
+        if self.is_usda_dish:
             searcher = UsdaNutrientSearcher(self.llm_dish_dict)
             await searcher.search()
             self.prepasto_usda_code = searcher.prepasto_usda_code
@@ -71,7 +71,7 @@ class Dish:
         })
     
     async def _estimate_mass(self):
-        if self.is_generic_dish:
+        if self.is_usda_dish:
             portion_reference_csv = FoodDataGetter().return_portions_csv(self.prepasto_usda_code)
         else:
             portion_reference_csv = self.web_portion_reference_csv
