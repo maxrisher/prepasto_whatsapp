@@ -194,8 +194,13 @@ class PremiumHandler:
 
     def _handle_image_message(self, message_content):
         self.sender.send_text_message("💬📷")
+
+        caption = message_content.image_caption
         
-        lambda_event = {'user_caption': message_content.image_caption,
+        if message_content.image_caption is None:
+            caption = ''
+            
+        lambda_event = {'user_caption': caption,
                         'user_image_id': message_content.image_id,
                         'whatsapp_wa_id': message_content.whatsapp_wa_id,
                         'whatsapp_wamid': message_content.whatsapp_message_id}
