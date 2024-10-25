@@ -373,4 +373,4 @@ class WhatsappMessageReader:
     def _get_image_data(self):
         image_dict = self.message_messages[0]['image']
         self.message_content.image_id = image_dict['id']
-        self.message_content.image_caption = image_dict['caption']
+        self.message_content.image_caption = image_dict.get('caption')
