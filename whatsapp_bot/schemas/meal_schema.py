@@ -22,19 +22,8 @@ meal_schema = {
         "type": "number",
         "description": "The amount of a nutrient, such as calories, protein, fat, carbohydrates, etc."
       }
-    },
-    "errors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "A list of any errors encountered during the processing of the meal or its dishes."
-    },
-    "llm_responses": {
-      "type": "object",
-      "description": "Responses from the language model from dish extraction."
     }
   },
-  "required": ["description", "dishes", "total_nutrition", "errors", "llm_responses"],
-  "additionalProperties": False,
+  "required": ["description", "dishes", "total_nutrition"],
+  "additionalProperties": True,
 }

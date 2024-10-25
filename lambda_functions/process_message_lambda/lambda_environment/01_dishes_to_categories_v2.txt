@@ -317,7 +317,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
         <FoodLog>
         {
             "name": "toast with almond butter",
-            "common_ingredients": [
+            "usual_ingredients": [
             "bread",
             "almond butter"
             ],
@@ -328,7 +328,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
             "almond butter"
             ],
             "amount": "one open-faced sandwich (one thick slice of sourdough bread, standard portion of almond butter)",
-            "similar_dishes": [
+            "similar_foods": [
             "peanut butter toast",
             "peanut butter and jelly sandwich",
             "toast with nutella",
@@ -356,7 +356,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
         <FoodLog>
         {
             "name": "Fish Fragrant Eggplant",
-            "common_ingredients": [
+            "usual_ingredients": [
                 "eggplant",
                 "garlic",
                 "ginger",
@@ -375,7 +375,7 @@ Note 3: Output your thinking within <Thinking> tags. Output your answer as <Wwei
                 "soy sauce"
             ],
             "amount": "not specified",
-            "similar_dishes": [
+            "similar_foods": [
                 "ratatouille",
                 "spicy barbecue roasted vegetables",
                 "cajun-spiced vegetables",

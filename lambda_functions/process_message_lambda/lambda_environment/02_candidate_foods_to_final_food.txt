@@ -46,7 +46,7 @@ First, think about the best food code. Write your thinking in a <Thinking> tag. 
             "Fuji apples"
         ],
         "amount": "one bag",
-        "similar_dishes": [
+        "similar_foods": [
             "dried apple slices",
             "baked apple slices",
             "apple crisps",

@@ -1,11 +1,53 @@
+from openai import OpenAI
 import re
 import os
 import requests
-import logging
-import time
-import json
 
-logger = logging.getLogger("helpers")
+def describe_b64_food_image(image_base64_content, client_caption):
+    client = OpenAI(api_key=os.getenv('OPENAI_KEY'))
+    model = "gpt-4o"
+    system_prompt = read_file('00_prompt_image_to_meal_description.txt')
+    user_prompt = _write_user_prompt(image_base64_content, client_caption)
+    assistant_completion = {"role": "assistant", "content": "<Thinking>\n"}
+    temperature = 0.1
+
+    llm_response = client.chat.completions.create(
+                model = model,
+                messages = [
+                    {
+                        "role": "system",
+                        "content": system_prompt
+                    },
+                    {
+                        "role": "user",
+                        "content": user_prompt
+                    },
+                    assistant_completion
+                ],
+                temperature=temperature
+            )
+    print(llm_response)
+
+    meal_log = get_answer_str(llm_response.choices[0].message.content)
+    return meal_log
+    
+def read_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+    
+def _write_user_prompt(image_base64_content, client_caption):
+    return [
+            {
+                "type": "text",
+                "text": "<ClientCaption>\n"+client_caption+"\n</ClientCaption>\n",
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url":  f"data:image/jpeg;base64,{image_base64_content}"
+                },
+            },
+        ]
 
 def get_answer_str(input_string):
     # First, try to extract between <Answer> and </Answer> tags
@@ -22,37 +64,17 @@ def get_answer_str(input_string):
 
         if fallback_match:
             answer_str = fallback_match.group(1).strip()
-            logger.warning(json.dumps({
-                "event_type": "llm_response_format_error",
-                "timestamp": time.time(),
-                "error": "LLM response missing closing </Answer> tag",
-                "response_received": input_string
-            }))
-            return answer_str
+            print("LLM response missing closing </Answer> tag")
         else:
             # Log error if no <Answer> tag is found at all
-            logger.error(json.dumps({
-                "event_type": "llm_response_format_error",
-                "timestamp": time.time(),
-                "error": "LLM response missing <Answer> tags",
-                "response_received": input_string
-            }))
+            print("LLM response missing <Answer> tags")
             raise ValueError("No <Answer> tag found.")
-    
-def usda_code_from_usda_url(url):
-    pattern = r'https://fdc\.nal\.usda\.gov/fdc-app\.html#/food-details/(\d+)/nutrients'
-    match = re.search(pattern, url)
-    if match:
-        usda_fdc_code = match.group(1)
-        return usda_fdc_code
-    else:
-        return None
-
+        
 # sends a post request to the backend webhook which collects lambda responses
 def send_to_django(dict):
-    headers = {'Authorization': 'Bearer ' + os.getenv('LAMBDA_TO_DJANGO_API_KEY')}
+    headers = {'Authorization': 'Bearer ' + os.getenv('DESCRIBE_FOOD_IMAGE_TO_DJANGO_API_KEY')}
     # Set to pull request site
-    url='https://'+os.getenv('RAILWAY_PUBLIC_DOMAIN')+'/bot/lambda_webhook/'
+    url='https://'+os.getenv('RAILWAY_PUBLIC_DOMAIN')+'/bot/describe_food_image_webhook/'
     print("Sending meal result to this url: "+url)
 
     try:

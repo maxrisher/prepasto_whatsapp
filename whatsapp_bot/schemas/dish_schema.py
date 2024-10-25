@@ -3,117 +3,120 @@ dish_schema = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Dish",
   "type": "object",
+  "required": [
+    "name",
+    "usual_ingredients",
+    "state", 
+    "qualifiers",
+    "confirmed_ingredients",
+    "amount",
+    "similar_foods",
+    "brand_name",
+    "chain_restaurant",
+    "fndds_categories",
+    "prepasto_usda_code",
+    "usda_food_data_central_id",
+    "usda_food_data_central_food_name",
+    "nutrition_citation_website",
+    "grams",
+    "nutrition"
+  ],
   "properties": {
     "name": {
       "type": "string",
-      "description": "A short and general description of the food. If we're lucky, there will be a FNDDS dish with the same name. E.g., 'Shepherd's pie'."
+      "description": "A short and general description of the food. If we're lucky, there will be a USDA code with the same name. Eg. 'shepherd's pie'."
     },
     "usual_ingredients": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Ingredients often found in the generic version of the dish. Helps match the dish to a FNDDS food based on ingredients lists. E.g., ['ground lamb', 'onions', 'carrots', etc.]."
+      "description": "List the ingredients often found in the generic version of the food. Eg. ['ground lamb', 'onions', 'carrots', 'peas', 'garlic', 'tomato paste', 'Worcestershire sauce', 'thyme', 'rosemary', 'salt', 'pepper', 'beef broth', 'flour', 'potatoes', 'butter', 'milk', 'cheese']."
     },
     "state": {
       "type": "string",
-      "description": "Words describing how the food has been prepared, including the degree of preparation, cooking method, or preservation method. E.g., 'cooked, sauteed (meat and vegetable filling), boiled and mashed (potato topping), baked (entire pie)'."
+      "description": "Describe how the food has been prepared, if at all. Includes degree of preparation (raw, whole, drained, sliced, etc.), method of cooking (baked, boiled, etc.), and/or method of preservation (frozen, cured, etc.). Eg. 'cooked, sauteed (meat and vegetable filling), boiled and mashed (potato topping), baked (entire pie)'."
     },
     "qualifiers": {
-      "type": ["array"],
-      "items": {
-        "type": "string"
-      },
-      "description": "Any user-provided information on the overall nutritional content of a dish. Can be null if no information is provided. E.g., 'sugar-free', 'full-fat', 'high-protein', etc."
+      "type": ["string", "null"],
+      "description": "Describe any client-provided information on the overall nutritional content of a food. Eg. 'sugar-free', 'full-fat', 'high-protein', or 'low-sodium'."
     },
     "confirmed_ingredients": {
-      "type": ["array"],
+      "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Any user-provided details on the ingredients present in the dish. Allows the system to store additional user-provided information about the dish's ingredients. E.g., ['lamb'] or ['beef', 'cheddar']."
+      "description": "List any client-provided information on what ingredients are present in a food. Eg. ['lamb'] or ['beef', 'cheddar']."
     },
     "amount": {
-      "type": "string",
-      "description": "Useful information about the amount of the dish consumed, including any detail about quantities of dish ingredients. E.g., '3 cups of shepherd's pie. 1 cup of the pie was mashed potatoes', '369 g total', 'Not specified'."
+      "type": "string", 
+      "description": "Add all useful information about the amount of the food consumed. Include any details about quantities of ingredients. Eg. '3 cups of shepherd's pie. 1 cup of the pie was mashed potatoes', '369 g total', or 'Not specified'."
     },
-    "similar_dishes": {
+    "similar_foods": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Common but nutritionally similar dishes that can be used as a fallback if the dish is missing from the database. Dishes should be common, have similar ingredients, similar macronutrient ratios, caloric density, and physical density. E.g., ['moussaka', 'irish stew', 'meat pie', etc.]."
+      "description": "Common but nutritionally similar foods to the client's food which could be used as a fallback. Eg. ['moussaka', 'irish stew', 'meat pie', 'bangers and mash', 'chicken pot pie', 'pastel de papa']."
     },
-    "llm_responses": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "string"
-      },
-      "description": "Dictionary of responses from the language model, with keys and string values"
+    "brand_name": {
+      "type": ["string", "null"],
+      "description": "If the client specifies that the food is from a particular manufacturer, list it here. Eg. 'barilla'."
     },
-    "errors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "List of errors encountered during processing"
-    },
-    "candidate_thalos_ids": {
-      "type": "object",
-      "properties": {
-        "fndds_category_search_results": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        },
-        "fndds_and_sr_legacy_google_search_results": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      },
-      "description": "List of candidate food codes for the dish."
-    },
-    "matched_thalos_id": {
-      "type": ["integer"],
-      "description": "The matched food code"
-    },
-    "usda_food_data_central_id": {
-      "type": ["integer", "null"],
-      "description": "USDA Food Data Central ID for the matched food, or null if not found."
-    },
-    "usda_food_data_central_food_name": {
-      "type": ["string"],
-      "description": "USDA Food Data Central name for the matched food"
-    },
-    "grams": {
-      "type": ["integer"],
-      "description": "The weight of the dish in grams, or null if not specified"
-    },
-    "nutrition": {
-      "type": ["object"],
-      "additionalProperties": {
-        "type": "integer"
-      },
-      "description": "A dictionary containing nutritional information, where keys are nutrient names and values are nutrient quantities"
+    "chain_restaurant": {
+      "type": ["string", "null"],
+      "description": "If the client specifies that the food is from a chain restaurant (20 or more locations), list it here. Eg. 'McDonald's'."
     },
     "fndds_categories": {
       "type": "array",
       "items": {
-        "type": "integer"
+        "type": "string"
       },
       "description": "FNDDS categories matched for the dish."
     },
-    "google_search_queries_usda_site": {
-      "type": "array",
-      "items": {
-        "type": "string"
+    "prepasto_usda_code": {
+      "type": ["string", "null"],
+      "description": "The matched internal prepasto representation of the USDA food code for this dish."
+    },
+    "usda_food_data_central_id": {
+      "type": ["string", "null"],
+      "description": "USDA Food Data Central ID for the matched food."
+    },
+    "usda_food_data_central_food_name": {
+      "type": ["string", "null"],
+      "description": "USDA Food Data Central name for the matched food."
+    },
+    "nutrition_citation_website": {
+      "type": "string",
+      "description": "Source website for nutrition information. Either 'USDA' or the specific website URL."
+    },
+    "grams": {
+      "type": "integer",
+      "description": "The weight of the food in grams."
+    },
+    "nutrition": {
+      "type": "object",
+      "required": ["calories", "carbs", "fat", "protein"],
+      "properties": {
+        "calories": {
+          "type": "integer",
+          "description": "Total calories in the food portion"
+        },
+        "carbs": {
+          "type": "integer",
+          "description": "Total carbohydrates in grams"
+        },
+        "fat": {
+          "type": "integer",
+          "description": "Total fat in grams"
+        },
+        "protein": {
+          "type": "integer",
+          "description": "Total protein in grams"
+        }
       },
-      "description": "List of Google search queries used to search the USDA site."
+      "description": "Nutritional information for the food portion"
     }
   },
-  "required": ["name", "usual_ingredients", "state", "qualifiers", "confirmed_ingredients", "amount", "similar_dishes", "llm_responses", "errors", "candidate_thalos_ids", "matched_thalos_id", "usda_food_data_central_id", "usda_food_data_central_food_name", "grams", "nutrition", "fndds_categories", "google_search_queries_usda_site"],
-  "additionalProperties": False
+  "additionalProperties": True
 }

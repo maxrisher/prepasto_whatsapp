@@ -6,7 +6,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.conf import settings
 
-from .mock_food_processing_lambda_webhook_data import mock_lambda_output_breakfast
+from .mock_food_processing_lambda_webhook_data import mock_lambda_output_dinner
 from whatsapp_bot.models import WhatsappUser, WhatsappMessage
 from main_app.models import Meal, Diary, Dish
 
@@ -14,7 +14,7 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.url = reverse('lambda-webhook')
-        self.lambda_output = mock_lambda_output_breakfast
+        self.lambda_output = mock_lambda_output_dinner
         self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
         self.existing_whatsapp_user = WhatsappUser.objects.create(
             whatsapp_wa_id="17204768288",
@@ -79,7 +79,7 @@ class FoodProcessingLambdaWebhookIntegrationTest(TestCase):
 
         # Check if Dishes were created
         self.assertTrue(Dish.objects.filter(meal=created_meal).exists())
-        self.assertEqual(Dish.objects.filter(meal=created_meal).count(), 3)  # As per the mock data
+        self.assertEqual(Dish.objects.filter(meal=created_meal).count(), 4)  # As per the mock data
 
         # Check if messages were recorded in the database
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)

@@ -1,0 +1,248 @@
+<Instructions>
+You are an expert AI dietician. 
+
+Your job is to break down client meal diaries (inside <ClientMealDiary>) into a structured JSON array of food objects. To help you, we have already interpreted the <ClientMealDiary> into a JSON of foods and any ingredients <DraftJson>. The JSON array of food objects be matched to USDA Food Data Central (FDC) database entries for accurate analysis of clients' diets. 
+
+Answer JSON schema:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+      "type": "object",
+      "required": [
+          "name",
+          "usual_ingredients",
+          "state",
+          "qualifiers",
+          "confirmed_ingredients",
+          "amount",
+          "similar_foods",
+          "manufactured_by",
+          "chain_restaurant",
+      ],
+      "properties": {
+          "name": {
+              "type": "string",
+              "description": "Create a short and general description of the food. If we're lucky, there will be a USDA code with the same name. Eg. 'shepherd's pie'.",
+          },
+          "usual_ingredients": {
+              "type": "array",
+              "items": {"type": "string"},
+              "minItems": 0,
+              "description": "List the ingredients often found in the generic version of the food. Eg. ['ground lamb', 'onions', 'carrots', 'peas', 'garlic', 'tomato paste', 'Worcestershire sauce', 'thyme', 'rosemary', 'salt', 'pepper', 'beef broth', 'flour', 'potatoes', 'butter', 'milk', 'cheese'].",
+          },
+          "state": {
+              "type": "string",
+              "description": "Describe how the food has been prepared, if at all. Includes degree of preparation (raw, whole, drained, sliced, etc.), method of cooking (baked, boiled, etc.), and/or method of preservation (frozen, cured, etc.). Eg. 'cooked, sauteed (meat and vegetable filling), boiled and mashed (potato topping), baked (entire pie)'.",
+          },
+          "qualifiers": {
+              "type": ["string", "null"],
+              "description": "Describe any client-provided information on the overall nutritional content of a food. Eg. 'sugar-free', 'full-fat', 'high-protein', or 'low-sodium'.",
+          },
+          "confirmed_ingredients": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "List any client-provided information on what ingredients are present in a food. Eg. ['lamb'] or ['beef', 'cheddar'].",
+          },
+          "amount": {
+              "type": "string",
+              "description": "Add all useful information about the amount of the food consumed. Include any details about quantities of ingredients. Eg. '3 cups of shepherd's pie. 1 cup of the pie was mashed potatoes', '369 g total', or 'Not specified'.",
+          },
+          "similar_foods": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Common but nutritionally similar foods to the client's food which could be used as a fallback. Eg. ['moussaka', 'irish stew', 'meat pie', 'bangers and mash', 'chicken pot pie', 'pastel de papa'].",
+          },
+          "manufactured_by": {
+              "type": ["string", "null"],
+              "description": "If the client specifies that the food is from a particular manufacturer, list it here. Eg. 'barilla'.",
+          },
+          "chain_restaurant": {
+              "type": ["string", "null"],
+              "description": "If the client specifies that the food is from a chain restaurant (20 or more locations), list it here. Eg. 'McDonald's'.",
+          },
+      },
+  },
+}
+
+<DraftJson> format:
+[
+    {
+      "independent_food": "sourdough toast: thick slice",
+      "descriptor_foods": []
+    },
+    {
+      "independent_food": "almond butter: a good layer on one slice of bread",
+      "descriptor_foods": []
+    },
+    {
+      "independent_food": "blueberries: 1/2 cup",
+      "descriptor_foods": []
+    },
+    {
+      "independent_food": "scrambled eggs: from two eggs",
+      "descriptor_foods": [
+        "eggs: two",
+        "no chives"
+      ]
+    },
+    {
+      "independent_food": "chives: a sprinkle",
+      "descriptor_foods": []
+    },
+    {
+      "independent_food": "cold-brew coffee: tall glass",
+      "descriptor_foods": []
+    }
+  ]
+    
+Your thinking
+- For each independent_food from the <DraftJson>, discuss its quantity. Using the <ClientMealDiary>, create a description of the food's quantity.
+- For each independent_food, discuss its state with reference to the <ClientMealDiary>.
+- Wrap your reasoning in <Thinking> tags.
+
+Your answer
+- Create a JSON array in the answer JSON schema format with an object for each independent_food from the <DraftJson>. 
+- Use any descriptor_foods to inform the creation of the parent food object.
+- Wrap your JSON array in <Answer> tags.
+</Instructions>
+<DraftJson>
+[
+  {
+    "independent_food": "chicken",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "white rice",
+    "amount": "double serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "black beans",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "corn",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "sour cream",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "cheese",
+    "amount": "one serving",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "mild salsa",
+    "amount": "one serving",
+    "descriptor_foods": []
+  }
+]
+</DraftJson>
+<Example>
+<Thinking>
+- The client ordered a bowl from Chipotle, meaning it's a composed dish but made up of distinct ingredients. 
+- The stated amounts in the diary should translate directly to servings for most ingredients.
+  - Chicken: "one serving" likely means a standard Chipotle serving.
+  - White rice: "double serving" indicates a double portion of what Chipotle would normally provide for rice.
+  - Black beans: "one serving" is standard.
+  - Corn: "one serving" is standard.
+  - Sour cream: "one serving" is standard.
+  - Cheese: "one serving" is standard.
+  - Mild salsa: "one serving" is standard.
+- No specific preparation method is mentioned for the ingredients, but based on common knowledge:
+  - Chicken is likely grilled.
+  - Rice is cooked.
+  - Black beans are cooked.
+  - Corn is often steamed or boiled.
+  - Sour cream, cheese, and salsa are served fresh/raw, unless otherwise noted.
+- No specific nutritional qualifiers are mentioned.
+</Thinking>
+<Answer>
+[
+  {
+    "name": "chicken",
+    "usual_ingredients": [],
+    "state": "likely grilled",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["grilled chicken", "chicken breast"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "white rice",
+    "usual_ingredients": [],
+    "state": "cooked",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "double serving",
+    "similar_foods": ["steamed rice", "boiled rice"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "black beans",
+    "usual_ingredients": [],
+    "state": "cooked",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["pinto beans", "kidney beans"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "corn",
+    "usual_ingredients": [],
+    "state": "likely steamed or boiled",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["sweet corn", "maize"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "sour cream",
+    "usual_ingredients": [],
+    "state": "fresh",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["greek yogurt", "creme fraiche"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "cheese",
+    "usual_ingredients": [],
+    "state": "fresh",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["cheddar", "mozzarella"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  },
+  {
+    "name": "mild salsa",
+    "usual_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime"],
+    "state": "fresh",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "one serving",
+    "similar_foods": ["pico de gallo", "fresh salsa"],
+    "manufactured_by": null,
+    "chain_restaurant": "Chipotle"
+  }
+]
+</Answer>
+</Example>

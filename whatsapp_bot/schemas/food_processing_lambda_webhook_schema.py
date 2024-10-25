@@ -28,5 +28,5 @@ new_meal_from_lambda_payload_schema = {
       }
   },
   "required": ["meal_requester_whatsapp_wa_id", "original_message", "meal_data", "unhandled_errors", "seconds_elapsed"],
-  "additionalProperties": False,
+  "additionalProperties": True,
 }

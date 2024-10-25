@@ -1,13 +1,22 @@
 import pytz
 from enum import Enum
+from datetime import timedelta
 
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator
+
+class OnboardingStep(models.TextChoices):
+    INITIAL = 'INITIAL', 'Initial WhatsApp Contact'
+    GOALS_SET = 'GOALS_SET', 'Nutrition Goals Set'
+    TIMEZONE_SET = 'TIMEZONE_SET', 'Timezone Set'
+    COMPLETED = 'COMPLETED', 'Onboarding Completed'
 
 class WhatsappUser(models.Model):
     whatsapp_wa_id = models.CharField(max_length=20, primary_key=True)
-    time_zone_name = models.CharField(max_length=50)
+    whatsapp_profile_name = models.CharField(max_length=255)
+    time_zone_name = models.CharField(max_length=50, null=True, blank=True)
     custom_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -15,6 +24,28 @@ class WhatsappUser(models.Model):
         blank=True,
         related_name='whatsapp_user'
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    onboarding_step = models.CharField(max_length=50, choices=OnboardingStep.choices, default=OnboardingStep.INITIAL)
+    onboarded_at = models.DateTimeField(null=True, blank=True)
+
+    calorie_goal = models.IntegerField(validators=[MinValueValidator(0)], default=2500)
+    protein_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=188)
+    fat_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=56)
+    carb_g_goal = models.IntegerField(validators=[MinValueValidator(0)], default=313)
+
+    is_subscribed = models.BooleanField(default=False)
+
+    @property
+    def is_premium(self):
+        if self.is_subscribed == True:
+            return True
+        
+        if self.onboarded_at:        
+            if timezone.now() - self.onboarded_at <= timedelta(days=100000):
+                return True
+        
+        return False
 
     @property
     def current_date(self):
@@ -27,35 +58,47 @@ class WhatsappUser(models.Model):
         return f"{self.whatsapp_wa_id}"
     
 class MessageType(Enum):
-    #Incoming NEW user messages
-    NEW_USER_TEXT = "NEW_USER_TEXT"
-    NEW_USER_LOCATION_SHARE = "NEW_USER_LOCATION_SHARE"
-    NEW_USER_TIMEZONE_CONFIRMATION = "NEW_USER_TIMEZONE_CONFIRMATION"
-    NEW_USER_TIMEZONE_CANCELLATION = "NEW_USER_TIMEZONE_CANCELLATION"
-    NEW_USER_MESSAGE_GENERIC = "NEW_USER_MESSAGE_GENERIC"
-    NEW_USER_STATUS_UPDATE_SENT = "NEW_USER_STATUS_UPDATE_SENT"
-    NEW_USER_STATUS_UPDATE_READ = "NEW_USER_STATUS_UPDATE_READ"
-    NEW_USER_STATUS_UPDATE_FAILED = "NEW_USER_STATUS_UPDATE_FAILED"
-    NEW_USER_STATUS_UPDATE_DELIVERED = "NEW_USER_STATUS_UPDATE_DELIVERED"
+    ### INCOMING ###
+    #Incoming message types
+    DELETE_REQUEST = "DELETE_REQUEST"
+    EDIT_MEAL_REQUEST = "EDIT_MEAL_REQUEST"
+    DUPLICATE_MEAL_REQUEST = "DUPLICATE_MEAL_REQUEST"
+    MEAL_EDIT_CONFIRM = "MEAL_EDIT_CONFIRM"
+    MEAL_EDIT_CANCEL = "MEAL_EDIT_CANCEL"
+    NUTRITION_DATA_REQUEST = "NUTRITION_DATA_REQUEST"
 
-    #Incoming USER messages
-    USER_DELETE_REQUEST = "USER_DELETE_REQUEST"
-    USER_TEXT = "USER_TEXT"
-    USER_IMAGE = "USER_IMAGE"
-    USER_VIDEO = "USER_VIDEO"
-    USER_MESSAGE_GENERIC = "USER_MESSAGE_GENERIC"
-    USER_STATUS_UPDATE_SENT = "USER_STATUS_UPDATE_SENT"
-    USER_STATUS_UPDATE_READ = "USER_STATUS_UPDATE_READ"
-    USER_STATUS_UPDATE_FAILED = "USER_STATUS_UPDATE_FAILED"
-    USER_STATUS_UPDATE_DELIVERED = "USER_STATUS_UPDATE_DELIVERED"
+    #Incoming onboarding specific
+    CONFIRM_NUTRITION_GOALS = "CONFIRM_NUTRITION_GOALS"
+    CANCEL_NUTRITION_GOALS = "CANCEL_NUTRITION_GOALS"
+    TIMEZONE_CONFIRMATION = "TIMEZONE_CONFIRMATION"
+    TIMEZONE_CANCELLATION = "TIMEZONE_CANCELLATION"
+    SERVICE_UNDERSTANDING = "SERVICE_UNDERSTANDING"
+    NUTRITION_GOAL_DATA = "NUTRITION_GOAL_DATA"
 
-    #Outgoing for new users
+    #Incoming status update types
+    STATUS_UPDATE_SENT = "STATUS_UPDATE_SENT"
+    STATUS_UPDATE_READ = "STATUS_UPDATE_READ"
+    STATUS_UPDATE_FAILED = "STATUS_UPDATE_FAILED"
+    STATUS_UPDATE_DELIVERED = "STATUS_UPDATE_DELIVERED"
+
+    ### Generic ###
+    TEXT = "TEXT"
+    LOCATION_SHARE = "LOCATION_SHARE"
+    IMAGE = "IMAGE"
+    VIDEO = "VIDEO"
+    DOCUMENT = "DOCUMENT"
+
+    ### OUTGOING ###
+    #Onboarding
+    PREPASTO_SET_GOALS_FLOW = "PREPASTO_SET_GOALS_FLOW"
+    PREPASTO_CONFIRM_NUTRITION_BUTTON = "PREPASTO_CONFIRM_NUTRITION_BUTTON"
+    PREPASTO_LOCATION_REQUEST_BUTTON = "PREPASTO_LOCATION_REQUEST_BUTTON"
+    PREPASTO_CONFIRM_TIMEZONE_BUTTON = "PREPASTO_CONFIRM_TIMEZONE_BUTTON"
+    PREPASTO_UNDERSTANDING_BUTTON = "PREPASTO_UNDERSTANDING_BUTTON"
+
     PREPASTO_ONBOARDING_TEXT = "PREPASTO_ONBOARDING_TEXT"
     PREPASTO_CONTACT_CARD = "PREPASTO_CONTACT_CARD"
     PREPASTO_REQUEST_FEEDBACK = "PREPASTO_REQUEST_FEEDBACK"
-    PREPASTO_CONFIRM_USER_TEXT = "PREPASTO_CONFIRM_USER_TEXT"
-    PREPASTO_LOCATION_REQUEST_BUTTON = "PREPASTO_LOCATION_REQUEST_BUTTON"
-    PREPASTO_CONFIRM_TIMEZONE_BUTTON = "PREPASTO_CONFIRM_TIMEZONE_BUTTON"
     
     #Outgoing meal creation
     PREPASTO_CREATING_MEAL_TEXT = "PREPASTO_CREATING_MEAL_TEXT"
@@ -67,10 +110,9 @@ class MessageType(Enum):
 
     #Outgoing error messages
     PREPASTO_ERROR_TEXT = "PREPASTO_ERROR_TEXT"
-    PREPASTO_IS_TEXT_ONLY = "PREPASTO_IS_TEXT_ONLY"
-    PREPASTO_LOCATION_TRY_AGAIN = "PREPASTO_LOCATION_TRY_AGAIN"
+    PREPASTO_SUBSCRIPTION_EXPIRED = "PREPASTO_SUBSCRIPTION_EXPIRED"
 
-    #Other
+    ### OTHER ###
     UNKNOWN = "UNKNOWN"
     
 class WhatsappMessage(models.Model):
