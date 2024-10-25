@@ -22,7 +22,7 @@ class Dish:
         self.chain_restaurant = llm_dish_dict.get('chain_restaurant')
 
         # Attributes set while processing
-        self.is_generic_dish: bool = True
+        self.is_usda_dish: bool = True
         self.nutrients_per_100g = {'calories_per_100g': 0,
                                 'carbs_per_100g': 0,
                                 'fat_per_100g': 0,
@@ -45,9 +45,9 @@ class Dish:
         self._calculate_total_nutrition()
 
     async def _find_nutrient_density(self):
-        self.is_generic_dish = self.brand_name is None and self.chain_restaurant is None
+        self.is_usda_dish = self.brand_name is None and self.chain_restaurant is None
         
-        if self.is_generic_dish:
+        if self.is_usda_dish:
             searcher = UsdaNutrientSearcher(self.llm_dish_dict)
             await searcher.search()
             self.prepasto_usda_code = searcher.prepasto_usda_code
@@ -71,7 +71,7 @@ class Dish:
         })
     
     async def _estimate_mass(self):
-        if self.is_generic_dish:
+        if self.is_usda_dish:
             portion_reference_csv = FoodDataGetter().return_portions_csv(self.prepasto_usda_code)
         else:
             portion_reference_csv = self.web_portion_reference_csv
@@ -101,9 +101,9 @@ class Dish:
         'similar_foods': self.similar_foods,
         'brand_name': self.brand_name,
         'chain_restaurant': self.chain_restaurant,
-        'fndds_categories': self.fndds_categories,
-        'prepasto_usda_code': self.prepasto_usda_code,
-        'usda_food_data_central_id': self.usda_food_data_central_id,
+        'fndds_categories': [str(int_category) for int_category in self.fndds_categories], #Django backend wants these as strings
+        'prepasto_usda_code': str(self.prepasto_usda_code), #Django backend wants these as strings
+        'usda_food_data_central_id': str(self.usda_food_data_central_id), #Django backend wants these as strings
         'usda_food_data_central_food_name': self.usda_food_data_central_food_name,
         'nutrition_citation_website': self.nutrition_citation_website,
         'grams': self.grams,

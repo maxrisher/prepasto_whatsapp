@@ -44,6 +44,6 @@ class FoodDataGetter:
         return portion_lookup_row
 
     def return_portions_csv(self, prepasto_usda_code):
-        portion_row = self.get_rows_food_codes_lookup('thalos_id', prepasto_usda_code)
+        portion_row = self.get_rows_food_portion_lookup('thalos_id', prepasto_usda_code)
         portion_row = portion_row.drop(columns=['thalos_id'])
         return portion_row.to_csv(index=False)
