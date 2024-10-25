@@ -4,7 +4,7 @@ from django.conf import settings
 from main_app.models import Meal, Diary
 from whatsapp_bot.meal_data_processor import MealDataProcessor
 from whatsapp_bot.models import WhatsappUser
-from whatsapp_bot.tests.mock_lambda_payloads import hot_dog_lambda_meal_payload
+from whatsapp_bot.tests.mock_food_processing_lambda_webhook_data import mock_lambda_output_dinner
 
 from unittest.mock import patch
 from jsonschema import ValidationError
@@ -16,7 +16,7 @@ class MealDataProcessorTests(TestCase):
             whatsapp_wa_id='17204768288',
             time_zone_name='America/New_York'
         )
-        self.mock_payload = hot_dog_lambda_meal_payload
+        self.mock_payload = mock_lambda_output_dinner
         self.django_whatsapp_user, created = WhatsappUser.objects.get_or_create(whatsapp_wa_id=settings.WHATSAPP_BOT_WHATSAPP_WA_ID)
 
     @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender._send_message')
@@ -34,13 +34,13 @@ class MealDataProcessorTests(TestCase):
 
         # Check that the meal entry was created
         meal = Meal.objects.get(whatsapp_user=self.whatsapp_user, diary=diary)
-        self.assertEqual(meal.calories, 177)
-        self.assertEqual(meal.fat, 16)
-        self.assertEqual(meal.carbs, 2)
-        self.assertEqual(meal.protein, 7)
+        self.assertEqual(meal.calories, 1324)
+        self.assertEqual(meal.fat, 42)
+        self.assertEqual(meal.carbs, 193)
+        self.assertEqual(meal.protein, 40)
 
         # Check that the returned calories match the meal calories
-        self.assertEqual(diary.total_nutrition['calories'], 177)
+        self.assertEqual(diary.total_nutrition['calories'], 1324)
 
         # Check that send_whatsapp_message was called
         self.assertEqual(mock_send_message.call_count, 2)
@@ -72,17 +72,18 @@ class MealDataProcessorTests(TestCase):
         self.diary.refresh_from_db()
 
         # Check that the total calories for the day are correct
-        self.assertEqual(self.diary.total_nutrition['calories'], 677)
+        self.assertEqual(self.diary.total_nutrition['calories'], 1824)
 
         self.assertEqual(mock_send_message.call_count, 2)
     
     @patch('whatsapp_bot.whatsapp_message_sender.WhatsappMessageSender.send_generic_error_message')
     def test_unhandled_error_from_lambda(self, send_generic_error_message):
         # Create a payload with errors
-        error_payload = {
-            'meal_requester_whatsapp_wa_id': '17204768288',
-            'unhandled_errors': ['Some error occurred']
-        }
+        error_payload = {'meal_requester_whatsapp_wa_id': '17204768288', 
+                         'original_message': 'bomb a building', 
+                         'meal_data': None, 'unhandled_errors': 'No <Answer> tag found.', 
+                         'seconds_elapsed': 0.5245304107666016}
+
 
         # Create an instance of MealDataProcessor
         processor = MealDataProcessor(error_payload)

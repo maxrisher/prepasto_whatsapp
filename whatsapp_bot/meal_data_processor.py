@@ -82,7 +82,7 @@ class MealDataProcessor:
                 whatsapp_user=self.prepasto_whatsapp_user,
                 meal=self.meal,
                 name=dish_data['name'],
-                matched_thalos_id=dish_data['prepasto_usda_code'],
+                prepasto_usda_code=dish_data['prepasto_usda_code'],
                 usda_food_data_central_id=dish_data['usda_food_data_central_id'],
                 usda_food_data_central_food_name=dish_data['usda_food_data_central_food_name'],
                 grams=dish_data['grams'],
@@ -95,7 +95,7 @@ class MealDataProcessor:
                 qualifiers=dish_data['qualifiers'],
                 confirmed_ingredients=dish_data['confirmed_ingredients'],
                 amount=dish_data['amount'],
-                similar_dishes=dish_data['similar_foods'],
+                similar_foods=dish_data['similar_foods'],
                 fndds_categories=dish_data['fndds_categories'],
                 nutrition_citation_website=dish_data['nutrition_citation_website']
             )

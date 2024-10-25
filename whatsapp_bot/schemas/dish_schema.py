@@ -118,5 +118,5 @@ dish_schema = {
       "description": "Nutritional information for the food portion"
     }
   },
-  "additionalProperties": False
+  "additionalProperties": True
 }

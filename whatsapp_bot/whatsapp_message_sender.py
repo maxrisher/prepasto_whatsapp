@@ -19,7 +19,7 @@ class WhatsappMessageSender:
     def _send_message(self, data_for_whatsapp_api, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, in_reply_to=None):
         response = requests.post(os.getenv('WHATSAPP_API_URL'), headers=self.whatsapp_post_request_headers, json=data_for_whatsapp_api)
         response_data = response.json()
-
+        print(response_data)
         sent_message_whatsapp_wamid = response_data['messages'][0]['id']
 
         WhatsappMessage.objects.create(whatsapp_message_id=sent_message_whatsapp_wamid,
@@ -33,7 +33,10 @@ class WhatsappMessageSender:
         
         logger.info("Sent message (waid: "+str(sent_message_whatsapp_wamid)+") of type: "+db_message_type+" to "+str(self.destination_whatsapp_wa_id))
         
-    def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None):
+    def send_text_message(self, message_text, db_message_type=MessageType.UNKNOWN.value, db_record_content=None, save_text=True):
+        if save_text:
+            db_record_content = message_text
+
         data_for_whatsapp_api = {
             "messaging_product": "whatsapp",
             "to": self.destination_whatsapp_wa_id,
@@ -41,30 +44,126 @@ class WhatsappMessageSender:
             "text": {"body": message_text},
         }
         self._send_message(data_for_whatsapp_api, db_message_type=db_message_type, db_record_content=db_record_content)
-        
-    def onboard_new_user(self):
-        """
-        These are the first messages we send to a new user.
-        """
-        self.send_text_message(message_text="Welcome to Prepasto. We automate nutrition tracking. If you send me any text describing something you ate, I'll tell you the calories and macros!",
-                               db_message_type=MessageType.PREPASTO_ONBOARDING_TEXT.value)
-        self.send_request_for_feedback()
-        self.request_location()
 
-    def confirm_new_user(self):
-        """
-        These are the messages we send to a user after they have confirmed their timezone.
-        """
-        self.send_text_message("Great, you're all set. You might also want to add Prepasto as a contact",
-                               db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
-        self.send_prepasto_contact_card()
-        self.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"",
-                        db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
-        self.send_text_message("To begin tracking your food, just text me a description of something you ate",
-                               db_message_type=MessageType.PREPASTO_CONFIRM_USER_TEXT.value)
+    def send_image(self, media_id, caption=None):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "image",
+            "to": self.destination_whatsapp_wa_id,
+            "image": {
+                "id" : media_id,
+                "caption": caption
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.IMAGE.value)
+
+    def send_document(self, media_id, caption=None, file_name=None):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "document",
+            "to": self.destination_whatsapp_wa_id,
+            "document": {
+                "id" : media_id,
+                "caption": caption,
+                "filename": file_name
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.DOCUMENT.value)
+        
+    def send_set_goals_flow(self):
+        request_text = "Let's set your nutrition goals"
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": self.destination_whatsapp_wa_id,
+            "interactive": {
+                "type": "flow",
+                "body": {
+                "text": request_text
+                },
+                "action": {
+                "name": "flow",
+                    "parameters": {
+                        "flow_message_version": "3",
+                        "flow_token": settings.NUTRITION_GOAL_DATA_FLOW_TOKEN,
+                        "flow_id": "960004426143961",
+                        "flow_cta": "Set goals",
+                        "flow_action": "navigate",
+                        "flow_action_payload": {
+                            "screen": "CAL_AND_MACROS"
+                        }
+                    }
+                }
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_SET_GOALS_FLOW.value)
+    
+    def send_goal_data_confirmation(self, calorie_goal, protein_goal, carb_goal, fat_goal):
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": self.destination_whatsapp_wa_id,
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": f"It looks like your nutrition goals are: {calorie_goal} calories, {protein_goal} g protein, {fat_goal} g fat, and {carb_goal} g carbs. Is that right?"
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": f"CONFIRM_NUTRITION_GOAL_CL{calorie_goal}_P{protein_goal}_F{fat_goal}_CB{carb_goal}",
+                                "title": "Yes"
+                            }
+                        },
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": settings.CANCEL_NUTRITION_GOAL_BUTTON_ID,
+                                "title": "No, let's try again"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONFIRM_NUTRITION_BUTTON.value)
+    
+    def ask_for_final_prepasto_understanding(self):
+        button_body = "Does that all make sense?"
+        data_for_whatsapp_api = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "type": "interactive",
+            "to": self.destination_whatsapp_wa_id,
+            "interactive": {
+                "type": "button",
+                "body": {
+                    "text": button_body
+                },
+                "action": {
+                    "buttons": [
+                        {
+                            "type": "reply",
+                            "reply": {
+                                "id": settings.PREPASTO_UNDERSTANDING_ID,
+                                "title": "Yep, got it!"
+                            }
+                        },
+                    ]
+                }
+            }
+        }
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_UNDERSTANDING_BUTTON.value)
 
     def notify_message_sender_of_processing(self):
-        self.send_text_message(message_text="I got your message and I'm calculating the nutritional content!", 
+        self.send_text_message(message_text="💬🍽️", 
                                db_message_type=MessageType.PREPASTO_CREATING_MEAL_TEXT.value)
 
     def request_location(self):
@@ -165,7 +264,7 @@ class WhatsappMessageSender:
             if dish.usda_food_data_central_food_name:
                 citation = f"> {dish.usda_food_data_central_food_name} (USDA)\n"
             else:
-                citation = f"> {dish.description} ({dish.nutrition_citation_website})\n"
+                citation = f"> {dish.name} ({dish.nutrition_citation_website})\n"
 
             text_message += (
                 f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
@@ -216,7 +315,6 @@ class WhatsappMessageSender:
                 }
             }
         }
-
         self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_REQUEST_FEEDBACK.value)
     
     def send_prepasto_contact_card(self):
@@ -241,7 +339,3 @@ class WhatsappMessageSender:
         }
 
         self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONTACT_CARD.value)
-
-    def send_response_to_image_or_video(self):
-        self.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.", 
-                               MessageType.PREPASTO_IS_TEXT_ONLY.value)

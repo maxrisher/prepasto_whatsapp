@@ -25,5 +25,5 @@ meal_schema = {
     }
   },
   "required": ["description", "dishes", "total_nutrition"],
-  "additionalProperties": False,
+  "additionalProperties": True,
 }
