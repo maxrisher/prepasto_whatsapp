@@ -13,6 +13,7 @@ from .whatsapp_message_reader import WhatsappMessageReader, MessageContent
 from .meal_data_processor import MealDataProcessor
 from .whatsapp_message_handler import WhatsappMessageHandler
 from .whatsapp_message_sender import WhatsappMessageSender
+from whatsapp_bot.models import WhatsappUser, MessageType
 
 logger = logging.getLogger('whatsapp_bot')
 
@@ -109,7 +110,9 @@ def food_image_description_lambda_webhook(request):
             food_image_description = payload_dict['food_image_meal_description']
 
             message = MessageContent(whatsapp_wa_id = food_image_sender,
-                                     whatsapp_text_message_text = food_image_description)
+                                     prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=food_image_sender),
+                                     whatsapp_text_message_text = food_image_description,
+                                     message_type = MessageType.TEXT)
             WhatsappMessageHandler().handle(message)
 
             WhatsappMessageSender(food_image_sender).send_text_message(f"*Interpretation*\n\n{food_image_description}")
