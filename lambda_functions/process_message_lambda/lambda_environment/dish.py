@@ -101,9 +101,9 @@ class Dish:
         'similar_foods': self.similar_foods,
         'brand_name': self.brand_name,
         'chain_restaurant': self.chain_restaurant,
-        'fndds_categories': self.fndds_categories,
-        'prepasto_usda_code': self.prepasto_usda_code,
-        'usda_food_data_central_id': self.usda_food_data_central_id,
+        'fndds_categories': [str(int_category) for int_category in self.fndds_categories], #Django backend wants these as strings
+        'prepasto_usda_code': str(self.prepasto_usda_code), #Django backend wants these as strings
+        'usda_food_data_central_id': str(self.usda_food_data_central_id), #Django backend wants these as strings
         'usda_food_data_central_food_name': self.usda_food_data_central_food_name,
         'nutrition_citation_website': self.nutrition_citation_website,
         'grams': self.grams,

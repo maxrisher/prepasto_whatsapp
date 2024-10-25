@@ -21,10 +21,10 @@ class UsdaNutrientSearcher:
         # Attributes set while processing
         self.candidate_prepasto_usda_codes: Dict[str, List[int]] = {'fndds_category_search_results': [],
                                                         'fndds_and_sr_legacy_google_search_results': []}
-        self.prepasto_usda_code: str = None
-        self.usda_food_data_central_id: str = None
+        self.prepasto_usda_code: int = None
+        self.usda_food_data_central_id: int = None
         self.usda_food_data_central_food_name: str = None
-        self.fndds_categories: List[str] = [] # FNDDS: Food and Nutrient Database for Dietary Studies
+        self.fndds_categories: List[int] = [] # FNDDS: Food and Nutrient Database for Dietary Studies
         self.google_search_queries_usda_site: List[str] = []
         self.calories_per_100g: int = None
         self.carbs_per_100g: int = None
