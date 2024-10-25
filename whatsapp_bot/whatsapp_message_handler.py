@@ -11,7 +11,7 @@ from .whatsapp_message_sender import WhatsappMessageSender
 
 logger = logging.getLogger('whatsapp_bot')
 
-I_DONT_UNDERSTAND = "I'm sorry but I didn't understand that. Unfortunately, I'm not a conversational 'chat bot'"
+I_DONT_UNDERSTAND = "I'm sorry but I didn't understand that. Unfortunately, I'm not a conversational chat bot"
 STATUS_UPDATE_TYPES = [MessageType.STATUS_UPDATE_SENT, 
                        MessageType.STATUS_UPDATE_DELIVERED, 
                        MessageType.STATUS_UPDATE_READ, 
@@ -61,7 +61,7 @@ class OnboardingMessageHandler:
             #Advance the user to the next onboarding step
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.GOALS_SET
             message_content.prepasto_whatsapp_user.save()
-            self.sender.send_text_message(message_text="Thank you for setting your nutrition goals")
+            self.sender.send_text_message(message_text="Nutrition goals set!")
 
             self.sender.request_location()
         
@@ -86,15 +86,15 @@ class OnboardingMessageHandler:
         if message_content.message_type == MessageType.TIMEZONE_CONFIRMATION:
             message_content.prepasto_whatsapp_user.time_zone_name = message_content.timezone_name
             message_content.prepasto_whatsapp_user.save()
-            self.sender.send_text_message("Thank you for setting your timezone")
+            self.sender.send_text_message("Timezone set!")
             
             #Advance the user to the next onboarding step
             message_content.prepasto_whatsapp_user.onboarding_step = OnboardingStep.TIMEZONE_SET
             message_content.prepasto_whatsapp_user.save()
 
-            self.sender.send_text_message("So we're on the same page, Prepasto is not a ‘chat bot’ (at least right now). The way it works is that you just send me descriptions or photos of food you ate, and I’ll calculate and keep track of your nutrition.\n\nI’m intelligent when it comes to food 👨‍🔬🍎, but I can’t hold a conversation 🤯")
+            self.sender.send_text_message("So we're on the same page, Prepasto is not a chat bot.\n\nThe way it works is that you just send me descriptions or photos of food you ate, and I’ll calculate and keep track of your nutrition.\n\nI’m intelligent when it comes to food 👨‍🔬🍎, but I can’t hold a conversation 🤯")
             self.sender.send_prepasto_contact_card()
-            self.sender.send_text_message("When Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"")
+            self.sender.send_text_message("We recommend adding Prepasto as a contact.\n\nWhen Prepasto is a contact, it works with Siri:\n\n> Hey Siri, send a WhatsApp to Prepasto: \"one apple.\"")
             self.sender.ask_for_final_prepasto_understanding()
 
         #The user didn't like their timezone

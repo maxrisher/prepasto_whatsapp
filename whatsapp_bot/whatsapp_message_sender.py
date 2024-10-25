@@ -304,7 +304,7 @@ class WhatsappMessageSender:
             "interactive": {
                 "type": "cta_url",
                 "body": {
-                    "text": "If you have any issues/questions/requests please just reach out at the link below!"
+                    "text": "If you have any issues/questions/requests please reach out!"
                 },
                 "action": {
                     "name": "cta_url",
