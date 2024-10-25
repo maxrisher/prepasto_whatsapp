@@ -133,7 +133,7 @@ class WhatsappMessageSender:
             }
         }
 
-        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONFIRM_NUTRITION_BUTTON.value)        #TODO
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_CONFIRM_NUTRITION_BUTTON.value)
     
     def ask_for_final_prepasto_understanding(self):
         button_body = "Does that all make sense?"
@@ -160,7 +160,7 @@ class WhatsappMessageSender:
                 }
             }
         }
-        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_UNDERSTANDING_BUTTON.value)        #TODO
+        self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_UNDERSTANDING_BUTTON.value)
 
     def notify_message_sender_of_processing(self):
         self.send_text_message(message_text="💬🍽️", 
