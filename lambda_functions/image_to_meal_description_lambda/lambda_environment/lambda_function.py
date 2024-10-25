@@ -8,6 +8,7 @@ def lambda_handler(event, context):
     start_time = time.time()
     errors = None
     set_django_url(context)
+    print(event)
 
     client_caption = event.get('user_caption', '') #if we don't get a caption set this to an empty string
     client_whatsapp_media_id = event.get('user_image_id')
