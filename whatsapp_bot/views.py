@@ -109,13 +109,13 @@ def food_image_description_lambda_webhook(request):
             food_image_sender = payload_dict['food_image_sender_whatsapp_wa_id']
             food_image_description = payload_dict['food_image_meal_description']
 
+            WhatsappMessageSender(food_image_sender).send_text_message(f"*Interpretation*\n{food_image_description}")
+
             message = MessageContent(whatsapp_wa_id = food_image_sender,
                                      prepasto_whatsapp_user = WhatsappUser.objects.get(whatsapp_wa_id=food_image_sender),
                                      whatsapp_text_message_text = food_image_description,
                                      message_type = MessageType.TEXT)
             WhatsappMessageHandler().handle(message)
-
-            WhatsappMessageSender(food_image_sender).send_text_message(f"*Interpretation*\n\n{food_image_description}")
 
             return JsonResponse({'message': 'OK'}, status=200)
         

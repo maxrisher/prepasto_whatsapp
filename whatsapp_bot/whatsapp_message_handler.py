@@ -193,7 +193,7 @@ class PremiumHandler:
         self.sender.send_diary_message(diary_to_change)
 
     def _handle_image_message(self, message_content):
-        self.sender.send_text_message("Sorry, Prepasto only works with text messages right now. Please try describing your meal.")
+        self.sender.send_text_message("💬📷")
         
         lambda_event = {'user_caption': message_content.image_caption,
                         'user_image_id': message_content.image_id,
