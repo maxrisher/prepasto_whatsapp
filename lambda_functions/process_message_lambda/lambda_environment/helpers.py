@@ -43,7 +43,8 @@ def usda_code_from_usda_url(url):
     pattern = r'https://fdc\.nal\.usda\.gov/fdc-app\.html#/food-details/(\d+)/nutrients'
     match = re.search(pattern, url)
     if match:
-        usda_fdc_code = match.group(1)
+        usda_fdc_code_str = match.group(1)
+        usda_fdc_code = int(usda_fdc_code_str)
         return usda_fdc_code
     else:
         return None
