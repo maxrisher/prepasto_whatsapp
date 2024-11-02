@@ -289,7 +289,7 @@ class WhatsappMessageSender:
                 dish_message += (
                     f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
                     f"{citation}"
-                    f"- {dish.calories} kcal\n"
+                    f"- {dish.calories} kcal\n\n"
                 )
         
         if len(dish_message) > 1000:
@@ -302,7 +302,11 @@ class WhatsappMessageSender:
     def send_diary_message(self, diary):
         nutrition_totals_dict = diary.total_nutrition
         date_str = diary.local_date.strftime("%-d %B %Y")
-        progress_out_of_10 = lambda actual, goal: round(10 * actual / goal, ndigits=0) if goal != 0 else 0
+        
+        # Comparing the actual to the goal value, what is the progress level between 0 and 10?
+        progress_out_of_10 = lambda actual, goal: min( round(10*actual/goal), 10 ) if goal != 0 else 0
+        
+        # Print a progress bar with darkened squares between 0 and 10.
         progress_bar = lambda progress_tenths: '■' * progress_tenths + '□' * (10 - progress_tenths)
 
         calories = nutrition_totals_dict.get('calories', 0)
