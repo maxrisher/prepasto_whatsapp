@@ -302,12 +302,30 @@ class WhatsappMessageSender:
     def send_diary_message(self, diary):
         nutrition_totals_dict = diary.total_nutrition
         date_str = diary.local_date.strftime("%-d %B %Y")
+        progress_out_of_10 = lambda actual, goal: round(10 * actual / goal, ndigits=0) if goal != 0 else 0
+        progress_bar = lambda progress_tenths: '■' * progress_tenths + '□' * (10 - progress_tenths)
+
+        calories = nutrition_totals_dict.get('calories', 0)
+        protein = nutrition_totals_dict.get('protein', 0)
+        fat = nutrition_totals_dict.get('fat', 0)
+        carbs = nutrition_totals_dict.get('carbs', 0)
+
+        cal_out_of_10 = progress_out_of_10(calories, diary.calorie_goal)
+        protein_out_of_10 = progress_out_of_10(protein, diary.protein_g_goal)
+        fat_out_of_10 = progress_out_of_10(fat, diary.fat_g_goal)
+        carb_out_of_10 = progress_out_of_10(carbs, diary.carb_g_goal)
+
         formatted_text = (
             f"*{date_str}*\n"
-            f"{nutrition_totals_dict['calories'] or 0} kcal ⚡️\n"
-            f"{nutrition_totals_dict['protein'] or 0}g protein 🥩\n"
-            f"{nutrition_totals_dict['fat'] or 0}g fat 🧈\n"
-            f"{nutrition_totals_dict['carbs'] or 0}g carbs 🥖"
+            f"⚡️{calories} kcal\n"
+            f"{progress_bar(cal_out_of_10)}\n\n"
+
+            f"🥛 Protein: {protein}g\n"
+            f"{progress_bar(protein_out_of_10)}\n"
+            f"🥑 Fat: {fat}g\n"
+            f"{progress_bar(fat_out_of_10)}\n"
+            f"🥖 Carbs: {carbs}g\n"
+            f"{progress_bar(carb_out_of_10)}\n"
         )
     
         self.send_text_message(message_text=formatted_text, db_message_type=MessageType.PREPASTO_DIARY_TEXT.value)
