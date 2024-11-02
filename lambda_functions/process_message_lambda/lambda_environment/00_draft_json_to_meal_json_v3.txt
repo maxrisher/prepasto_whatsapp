@@ -106,6 +106,69 @@ Your answer
 - Use any descriptor_foods to inform the creation of the parent food object.
 - Wrap your JSON array in <Answer> tags.
 </Instructions>
+<Example>
+<ClientMealDiary>
+8 oz dry gluten free pasta, 0.5 container Classico vodka sauce
+</ClientMealDiary>
+<DraftJson>
+[
+  {
+    "independent_food": "gluten free pasta",
+    "amount": "8 oz dry",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "Classico vodka sauce",
+    "amount": "0.5 container",
+    "descriptor_foods": []
+  }
+]
+</DraftJson>
+<Thinking>
+For gluten free pasta:
+- Amount is clearly specified as "8 oz dry"
+- This would yield approximately 16-20 oz cooked pasta
+- No specific type of gluten-free pasta is mentioned (could be corn, rice, quinoa, etc.)
+- State would be dry initially, but likely cooked before consuming
+
+For Classico vodka sauce:
+- Amount is specified as "0.5 container"
+- Standard Classico sauce containers are 24 oz
+- So this would be approximately 12 oz of sauce
+- State would be ready-to-serve, likely heated before consumption
+- This is a manufactured product from Classico brand
+</Thinking>
+<Answer>
+[
+  {
+    "name": "gluten free pasta",
+    "usual_ingredients": ["rice flour", "corn flour", "quinoa flour", "xanthan gum"],
+    "state": "dry, uncooked",
+    "qualifiers": "gluten-free",
+    "confirmed_ingredients": [],
+    "amount": "8 oz dry (approximately 16-20 oz when cooked)",
+    "similar_foods": ["pasta", "rice noodles", "quinoa", "chickpea pasta"],
+    "manufactured_by": null,
+    "chain_restaurant": null
+  },
+  {
+    "name": "vodka sauce",
+    "usual_ingredients": ["tomatoes", "heavy cream", "vodka", "onions", "garlic", "olive oil", "parmesan cheese", "herbs", "spices"],
+    "state": "prepared, ready-to-serve",
+    "qualifiers": null,
+    "confirmed_ingredients": [],
+    "amount": "0.5 container (approximately 12 oz)",
+    "similar_foods": ["creamy tomato sauce", "four cheese sauce", "alfredo sauce", "marinara sauce"],
+    "manufactured_by": "Classico",
+    "chain_restaurant": null
+  }
+]
+</Answer>
+</Example>
+<Example>
+<ClientMealDiary>
+Chipotle chicken bowl with double white rice black beans cheese and mild salsa
+</ClientMealDiary>
 <DraftJson>
 [
   {
@@ -124,125 +187,95 @@ Your answer
     "descriptor_foods": []
   },
   {
-    "independent_food": "corn",
-    "amount": "one serving",
-    "descriptor_foods": []
-  },
-  {
-    "independent_food": "sour cream",
-    "amount": "one serving",
-    "descriptor_foods": []
-  },
-  {
     "independent_food": "cheese",
     "amount": "one serving",
     "descriptor_foods": []
   },
   {
-    "independent_food": "mild salsa",
+    "independent_food": "pico de gallo",
     "amount": "one serving",
     "descriptor_foods": []
   }
 ]
 </DraftJson>
-<Example>
 <Thinking>
-- The client ordered a bowl from Chipotle, meaning it's a composed dish but made up of distinct ingredients. 
-- The stated amounts in the diary should translate directly to servings for most ingredients.
-  - Chicken: "one serving" likely means a standard Chipotle serving.
-  - White rice: "double serving" indicates a double portion of what Chipotle would normally provide for rice.
-  - Black beans: "one serving" is standard.
-  - Corn: "one serving" is standard.
-  - Sour cream: "one serving" is standard.
-  - Cheese: "one serving" is standard.
-  - Mild salsa: "one serving" is standard.
-- No specific preparation method is mentioned for the ingredients, but based on common knowledge:
-  - Chicken is likely grilled.
-  - Rice is cooked.
-  - Black beans are cooked.
-  - Corn is often steamed or boiled.
-  - Sour cream, cheese, and salsa are served fresh/raw, unless otherwise noted.
-- No specific nutritional qualifiers are mentioned.
+For chicken:
+- Standard Chipotle serving is 4 oz of grilled chicken
+- State is grilled chicken pieces marinated in chipotle adobo sauce
+
+For white rice:
+- Standard Chipotle serving is 4 oz of cilantro-lime white rice
+- Client ordered double serving, so approximately 8 oz
+- Rice is cooked and seasoned with lime juice and cilantro
+
+For black beans:
+- Standard Chipotle serving is 4 oz of black beans
+- Beans are cooked with spices and seasonings
+
+For cheese:
+- Standard Chipotle serving is approximately 1 oz of shredded cheese
+- Monterey Jack cheese, shredded
+
+For pico de gallo:
+- Standard Chipotle serving is approximately 3.5 oz
+- Fresh, chopped ingredients
 </Thinking>
 <Answer>
 [
   {
-    "name": "chicken",
-    "usual_ingredients": [],
-    "state": "likely grilled",
+    "name": "chicken breast",
+    "usual_ingredients": ["chicken breast", "chipotle peppers in adobo", "olive oil", "garlic", "oregano", "black pepper", "salt"],
+    "state": "grilled, chopped",
     "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["grilled chicken", "chicken breast"],
+    "confirmed_ingredients": ["chicken"],
+    "amount": "4 oz (standard Chipotle serving)",
+    "similar_foods": ["turkey breast", "chicken thigh", "duck breast"],
     "manufactured_by": null,
     "chain_restaurant": "Chipotle"
   },
   {
     "name": "white rice",
-    "usual_ingredients": [],
-    "state": "cooked",
+    "usual_ingredients": ["white rice", "lime juice", "cilantro", "salt"],
+    "state": "cooked, seasoned",
     "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "double serving",
-    "similar_foods": ["steamed rice", "boiled rice"],
+    "confirmed_ingredients": ["white rice"],
+    "amount": "8 oz (double standard Chipotle serving)",
+    "similar_foods": ["brown rice", "quinoa", "couscous"],
     "manufactured_by": null,
     "chain_restaurant": "Chipotle"
   },
   {
     "name": "black beans",
-    "usual_ingredients": [],
-    "state": "cooked",
+    "usual_ingredients": ["black beans", "onions", "garlic", "cumin", "oregano", "bay leaf", "salt"],
+    "state": "cooked, seasoned",
     "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["pinto beans", "kidney beans"],
+    "confirmed_ingredients": ["black beans"],
+    "amount": "4 oz (standard Chipotle serving)",
+    "similar_foods": ["pinto beans", "refried beans", "Cuban black beans"],
     "manufactured_by": null,
     "chain_restaurant": "Chipotle"
   },
   {
-    "name": "corn",
-    "usual_ingredients": [],
-    "state": "likely steamed or boiled",
+    "name": "monterey jack",
+    "usual_ingredients": ["pasteurized milk", "salt", "enzymes"],
+    "state": "shredded, refrigerated",
     "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["sweet corn", "maize"],
+    "confirmed_ingredients": ["cheese"],
+    "amount": "1 oz (standard Chipotle serving)",
+    "similar_foods": ["cheddar cheese", "Mexican cheese", "queso fresco"],
     "manufactured_by": null,
     "chain_restaurant": "Chipotle"
   },
   {
-    "name": "sour cream",
-    "usual_ingredients": [],
-    "state": "fresh",
-    "qualifiers": null,
+    "name": "pico de gallo",
+    "usual_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime juice", "salt"],
+    "state": "fresh, chopped",
+    "qualifiers": "mild",
     "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["greek yogurt", "creme fraiche"],
-    "manufactured_by": null,
-    "chain_restaurant": "Chipotle"
-  },
-  {
-    "name": "cheese",
-    "usual_ingredients": [],
-    "state": "fresh",
-    "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["cheddar", "mozzarella"],
-    "manufactured_by": null,
-    "chain_restaurant": "Chipotle"
-  },
-  {
-    "name": "mild salsa",
-    "usual_ingredients": ["tomatoes", "onions", "cilantro", "jalapenos", "lime"],
-    "state": "fresh",
-    "qualifiers": null,
-    "confirmed_ingredients": [],
-    "amount": "one serving",
-    "similar_foods": ["pico de gallo", "fresh salsa"],
+    "amount": "3.5 oz (standard Chipotle serving)",
+    "similar_foods": ["chunky salsa", "bruschetta topping", "tomato salsa"],
     "manufactured_by": null,
     "chain_restaurant": "Chipotle"
   }
 ]
 </Answer>
-</Example>
