@@ -22,7 +22,7 @@ The PortionReference contains guideline information about the mass of some typic
 - Sometimes the PortionReference 'portion' and 'grams' data will be irrelevant for a good estimate. In these cases, rely on your work in Step 1.
 
 # Note
-First, think through your answer (in a <Thinking> tag). Then, output your final answer as an integer (in an <Answer> tag).
+First, think through your answer (in a <Thinking> tag). Then, output your final answer as an integer in an <Answer> tag.
 </Instructions>
 <Example>
 <PortionReference>

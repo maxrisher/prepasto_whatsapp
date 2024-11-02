@@ -14,5 +14,7 @@ from meal import Meal
 import asyncio
 os.chdir('lambda_functions/process_message_lambda/lambda_environment/')
 
-new_meal = Meal("one pineapple")
+new_meal = Meal("120 g raw pork loin")
 asyncio.run(new_meal.process())
+print(new_meal.to_dict())
+print('done')
