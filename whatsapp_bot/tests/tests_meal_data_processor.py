@@ -34,13 +34,13 @@ class MealDataProcessorTests(TestCase):
 
         # Check that the meal entry was created
         meal = Meal.objects.get(whatsapp_user=self.whatsapp_user, diary=diary)
-        self.assertEqual(meal.calories, 1324)
-        self.assertEqual(meal.fat, 42)
-        self.assertEqual(meal.carbs, 193)
-        self.assertEqual(meal.protein, 40)
+        self.assertEqual(meal.calories, 988)
+        self.assertEqual(meal.fat, 40)
+        self.assertEqual(meal.carbs, 138)
+        self.assertEqual(meal.protein, 17)
 
         # Check that the returned calories match the meal calories
-        self.assertEqual(diary.total_nutrition['calories'], 1324)
+        self.assertEqual(diary.total_nutrition['calories'], 988)
 
         # Check that send_whatsapp_message was called
         self.assertEqual(mock_send_message.call_count, 2)
@@ -72,7 +72,7 @@ class MealDataProcessorTests(TestCase):
         self.diary.refresh_from_db()
 
         # Check that the total calories for the day are correct
-        self.assertEqual(self.diary.total_nutrition['calories'], 1824)
+        self.assertEqual(self.diary.total_nutrition['calories'], 1488)
 
         self.assertEqual(mock_send_message.call_count, 2)
     

@@ -8,8 +8,8 @@ class WebNutrientSearcher:
     def __init__(self, llm_dish_dict):
         self.llm_dish_dict = llm_dish_dict
         self.food_name = llm_dish_dict.get('name')
-        self.food_brand = llm_dish_dict.get('brand_name')
-        self.food_chain_restaurant = llm_dish_dict.get('chain_restaurant')
+        self.food_brand = llm_dish_dict.get('manufactured_by', None)
+        self.food_chain_restaurant = llm_dish_dict.get('chain_restaurant', None)
         
         self.web_search_queries: List[str] = None
         self.web_result_urls: Dict[str: List] = None
@@ -49,8 +49,11 @@ class WebNutrientSearcher:
 
     async def _get_nutrition_facts_from_llm(self):
         llm = LlmCaller()
-        await llm.brand_name_food_estimate_nutrition_facts(self.food_name, self.food_brand, self.food_chain_restaurant)
-        
+        await llm.brand_name_food_estimate_nutrition_facts(
+                    food_name=self.food_name,
+                    food_brand=self.food_brand if self.food_brand is not None else "",
+                    food_chain_restaurant=self.food_chain_restaurant if self.food_chain_restaurant is not None else ""
+                )        
         self.final_nutrition_citation_website = 'AI estimate'
         self.product_name = llm.cleaned_response.get('product_name')
         self.product_size_description = llm.cleaned_response.get('product_size_description')
