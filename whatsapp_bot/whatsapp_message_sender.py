@@ -249,24 +249,27 @@ class WhatsappMessageSender:
         self._send_message(data_for_whatsapp_api, db_message_type=MessageType.PREPASTO_MEAL_BUTTON.value)
 
     def _meal_to_text_message(self, new_meal_object, new_dishes_objects):
-        # Format the total nutrition section
-        text_message = (
-            f"*Nutrition:*\n"
-            f"{new_meal_object.calories} kcal\n"
-            f"{new_meal_object.protein} g protein\n"
-            f"{new_meal_object.fat} g fat\n"
-            f"{new_meal_object.carbs} g carbs\n\n"
-            f"*Items:*\n"
-        )
+        full_message = "*Nutrition:*\n"
+        dish_message = ""
+
+        # Add a total nutrition section if more than one dish
+        if len(new_dishes_objects) > 1:
+            full_message += (
+                f"{new_meal_object.calories} kcal\n"
+                f"{new_meal_object.protein} g protein\n"
+                f"{new_meal_object.fat} g fat\n"
+                f"{new_meal_object.carbs} g carbs\n\n"
+                f"*Items:*\n"
+            )
         
         # Format the individual dish sections
         for index, dish in enumerate(new_dishes_objects, start=1):
             if dish.usda_food_data_central_food_name:
                 citation = f"> {dish.usda_food_data_central_food_name} (USDA)\n"
             else:
-                citation = f"> {dish.name} ({dish.nutrition_citation_website})\n"
+                citation = f"> {dish.nutrition_citation_website}\n"
 
-            text_message += (
+            dish_message += (
                 f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
                 f"{citation}"
                 f"- {dish.calories} kcal\n"
@@ -274,18 +277,59 @@ class WhatsappMessageSender:
                 f"- {dish.fat} g fat\n"
                 f"- {dish.carbs} g carbs\n\n"
             )
+
+        if len(dish_message) > 1000:
+            dish_message = ""
+            for index, dish in enumerate(new_dishes_objects, start=1):
+                if dish.usda_food_data_central_food_name:
+                    citation = f"> {dish.usda_food_data_central_food_name} (USDA)\n"
+                else:
+                    citation = f"> {dish.nutrition_citation_website}\n"
+
+                dish_message += (
+                    f"{index}. {dish.name.capitalize()} ({dish.grams} g)\n"
+                    f"{citation}"
+                    f"- {dish.calories} kcal\n\n"
+                )
         
-        return text_message.strip()  # Strip any trailing whitespace or newline
+        if len(dish_message) > 1000:
+            dish_message = f"{len(new_dishes_objects)} food items"
+
+        full_message += dish_message
+        
+        return full_message.strip()  # Strip any trailing whitespace or newline
 
     def send_diary_message(self, diary):
         nutrition_totals_dict = diary.total_nutrition
         date_str = diary.local_date.strftime("%-d %B %Y")
+        
+        # Comparing the actual to the goal value, what is the progress level between 0 and 10?
+        progress_out_of_10 = lambda actual, goal: min( round(10*actual/goal), 10 ) if goal != 0 else 0
+        
+        # Print a progress bar with darkened squares between 0 and 10.
+        progress_bar = lambda progress_tenths: '■' * progress_tenths + '□' * (10 - progress_tenths)
+
+        calories = nutrition_totals_dict.get('calories', 0)
+        protein = nutrition_totals_dict.get('protein', 0)
+        fat = nutrition_totals_dict.get('fat', 0)
+        carbs = nutrition_totals_dict.get('carbs', 0)
+
+        cal_out_of_10 = progress_out_of_10(calories, diary.calorie_goal)
+        protein_out_of_10 = progress_out_of_10(protein, diary.protein_g_goal)
+        fat_out_of_10 = progress_out_of_10(fat, diary.fat_g_goal)
+        carb_out_of_10 = progress_out_of_10(carbs, diary.carb_g_goal)
+
         formatted_text = (
             f"*{date_str}*\n"
-            f"{nutrition_totals_dict['calories'] or 0} kcal ⚡️\n"
-            f"{nutrition_totals_dict['protein'] or 0}g protein 🥩\n"
-            f"{nutrition_totals_dict['fat'] or 0}g fat 🧈\n"
-            f"{nutrition_totals_dict['carbs'] or 0}g carbs 🥖"
+            f"⚡️{calories} kcal\n"
+            f"{progress_bar(cal_out_of_10)}\n\n"
+
+            f"🥛 Protein: {protein}g\n"
+            f"{progress_bar(protein_out_of_10)}\n"
+            f"🥑 Fat: {fat}g\n"
+            f"{progress_bar(fat_out_of_10)}\n"
+            f"🥖 Carbs: {carbs}g\n"
+            f"{progress_bar(carb_out_of_10)}\n"
         )
     
         self.send_text_message(message_text=formatted_text, db_message_type=MessageType.PREPASTO_DIARY_TEXT.value)

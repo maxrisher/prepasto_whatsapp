@@ -34,5 +34,5 @@ class FoodImageDescriptionIntegrationTest(TestCase):
         # Check if messages were recorded in the database
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
         self.assertEqual(messages.count(), 2)
-        self.assertEqual(messages[0].message_type, 'PREPASTO_CREATING_MEAL_TEXT')
-        self.assertEqual(messages[1].message_type, 'UNKNOWN')
+        self.assertEqual(messages[0].message_type, 'UNKNOWN')
+        self.assertEqual(messages[1].message_type, 'PREPASTO_CREATING_MEAL_TEXT')
