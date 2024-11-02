@@ -14,7 +14,7 @@ from meal import Meal
 import asyncio
 os.chdir('lambda_functions/process_message_lambda/lambda_environment/')
 
-new_meal = Meal("1/2 pound of dry spaghetti, 340 g of marinara sauce, and 1/4 pound of chopped spinach")
+new_meal = Meal("Pasta bake with peas, sweetcorn, and extra high-protein cheese")
 asyncio.run(new_meal.process())
 print(new_meal.to_dict())
 print('done')

@@ -125,3 +125,53 @@ This is more conservative and avoids potentially underestimating the ratio of pa
 ]
 </Answer>
 </Example>
+<Example>
+<Thinking>
+# Step 1: Understanding <ClientMealDiary>
+The entry is clear with these components:
+- Shreddies (cereal): large bowl
+- Blueberries: quantity unknown
+- Milk: quantity unknown but typically enough to cover cereal
+- Pumpkin seeds: quantity unknown
+
+# Step 2: Decomposing <ClientMealDiary>
+## Decomposition thoughts
+We could:
+1. List everything as one independent food "cereal with toppings"
+2. List each component as separate independent foods
+3. List cereal with milk as one independent food, and toppings separately
+
+## Evaluation
+- Cereal with milk is a very common combination with standard USDA entries
+- However, we know this is a "large bowl" which gives us useful quantity information
+- Blueberries and pumpkin seeds are additional toppings that might not be captured in standard cereal entries
+- I am confident these are all the ingredients (>95% described)
+- For maximum accuracy and to avoid double-counting, better to list all components separately
+- The milk quantity can be reasonably estimated based on the cereal portion
+- This maximizes independent foods while maintaining accuracy
+</Thinking>
+<Answer>
+[
+  {
+    "independent_food": "shreddies cereal",
+    "amount": "large bowl",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "milk",
+    "amount": "enough to cover large bowl of cereal",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "blueberries",
+    "amount": "cereal topping portion",
+    "descriptor_foods": []
+  },
+  {
+    "independent_food": "pumpkin seeds",
+    "amount": "cereal topping portion",
+    "descriptor_foods": []
+  }
+]
+</Answer>
+</Example>

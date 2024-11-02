@@ -159,7 +159,7 @@ class LlmCaller:
         self.cleaned_response = json.loads(self.answer_string)
 
     async def estimate_food_grams(self, food_name, food_amount, food_state, portion_csv_str):
-        self.system_prompt_file = '03_dish_quant_to_g_v3.txt'
+        self.system_prompt_file = '03_dish_quant_to_g_v4.txt'
         self.user_prompt_file = '03_food_and_portion_csv_v1.txt'
         self.user_format_vars = {
                 'portion_csv': portion_csv_str,
