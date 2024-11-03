@@ -1,14 +1,11 @@
 import json
 import os
 import psycopg2
-import pandas as pd
 import tempfile
 
 from prepasto_database import get_user_timezone, get_user_diary_df, get_user_dish_df, make_year_diary_df
 from data_visualization import save_diary_plot
 from web_requests import upload_to_whatsapp, send_to_django
-
-WHATSAPP_PHONE_NUMBER_ID=''
 
 def lambda_handler(event, context):
     """
@@ -52,11 +49,15 @@ def lambda_handler(event, context):
             }
 
             print(payload)
-        prepasto_db_connection.close()
 
-        get_django_url(context)
+        set_django_url(context)
         send_to_django(payload)
-        return {'statusCode': 200}
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(payload)
+        }    
+    
     except Exception as e:
         return {
             'statusCode': 500,
@@ -66,41 +67,10 @@ def lambda_handler(event, context):
         }
     
     finally:
-        if 'conn' in locals():
+        if 'prepasto_db_connection' in locals():
             prepasto_db_connection.close()
-    diary_df = get_user_diary_df(prepasto_db_connection, user_whatsapp_id)
-    dish_df = get_user_dish_df(prepasto_db_connection, user_whatsapp_id, user_timezone_str)
-    diary_plot_image = draw_diary_plot(diary_df, user_timezone_str)
-
-    #Save files to the tmp/
-    diary_xlsx_path = save_df_to_tmp_xlsx(diary_df, 'diaries.xlsx')
-    dish_xlsx_path = save_df_to_tmp_xlsx(dish_df, 'dishes.xlsx')
-    diary_plot_path = save_to_tmp(diary_plot_image, 'two_week_diaries.png')
-
-    #Upload files to whatsapp
-    whatsapp_media_ids = {}
-    whatsapp_media_ids['diary_xlsx_whatsapp_id'] = upload_to_whatsapp(diary_xlsx_path)
-    whatsapp_media_ids['dish_xlsx_whatsapp_id'] = upload_to_whatsapp(dish_xlsx_path)
-    whatsapp_media_ids['diary_plot_whatsapp_id'] = upload_to_whatsapp(diary_plot_path)
-
-    #Pass media IDs to django
-    django_url = get_django_url(context)
-    send_to_django(django_url, whatsapp_media_ids)
-
-    #Clean up
-    os.remove(tmp_path)
-    prepasto_db_connection.close()
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps({
-            'message': 'Nutrition report generated and uploaded successfully',
-            'excel_media_id': excel_media_id,
-            'image_media_id': image_media_id
-        })
-    }
     
-def get_django_url(context):
+def set_django_url(context):
     """
     Sets the django site url depending on which alias the function has
     """
@@ -125,5 +95,3 @@ def get_lambda_alias(arn):
         return parts[7]
     else:
         return 'production' #default to production alias if there is no alias
-
-lambda_handler({'user_whatsapp_id': '17204768288'}, 'test')

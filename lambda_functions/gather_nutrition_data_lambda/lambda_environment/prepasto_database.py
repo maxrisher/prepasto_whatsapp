@@ -114,11 +114,6 @@ def get_user_dish_df(conn, user_whatsapp_waid, user_timezone_str):
     return df
 
 def make_year_diary_df(diary_df):
-    # find the most recent date from the 'date' column.
-    # Create an empty df of all of the days this year until the newest date
-    # Merge the diary_df with this empty df
-    # Return it
-
     # Ensure date column is datetime
     diary_df['date'] = pd.to_datetime(diary_df['date'])
     
@@ -134,5 +129,5 @@ def make_year_diary_df(diary_df):
     
     # Merge with original diary entries
     result_df = pd.merge(complete_df, diary_df, on='date', how='left')
-    
+
     return result_df

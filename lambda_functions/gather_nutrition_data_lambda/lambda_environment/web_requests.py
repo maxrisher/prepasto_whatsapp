@@ -35,6 +35,3 @@ def send_to_django(dict):
     
     except requests.RequestException as e:
         raise RuntimeError(f"Error sending data to Django: {e}")
-    
-# id = upload_to_whatsapp('daily_totals.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-# print('done')
