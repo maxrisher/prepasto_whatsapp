@@ -211,7 +211,7 @@ class PremiumHandler:
         logger.info('I got a message of an unsupported message type')
     
     def _handle_nutrition_data_request(self, message_content):
-        self.sender.send_text_message("Sorry, this feature is still in the works")
+        self.sender.send_text_message("💬📊")
         send_to_aws_lambda(os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_FUNCTION_NAME'), os.getenv('GENERATE_USER_NUTRITION_DATA_LAMBDA_ALIAS'), {"user_whatsapp_id": message_content.whatsapp_wa_id})
 
 class NotPremiumHandler():

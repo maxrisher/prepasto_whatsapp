@@ -71,6 +71,39 @@ Resources:
       FunctionVersion: 3
       Name: production
 
+  GatherNutritionDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda_functions/gather_nutrition_data_lambda/lambda_environment/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      MemorySize: 3008
+      Timeout: 120      
+      AutoPublishAlias: pullRequestAlias 
+      Environment:
+        Variables: # These are variables stored in our AWS parameter store
+          WHATSAPP_TOKEN: '{{resolve:ssm:/gather_nutrition_data_lambda/production/whatsapp_token:1}}'
+          DATABASE_URL: '{{resolve:ssm:/gather_nutrition_data_lambda/production/database_url:1}}'
+          WHATSAPP_MEDIA_API_URL: '{{resolve:ssm:/gather_nutrition_data_lambda/production/whatsapp_media_api_url:1}}'
+          GATHER_NUTRITION_DATA_TO_DJANGO_API_KEY: '{{resolve:ssm:/gather_nutrition_data_lambda/production/gather_nutrition_data_to_django_api_key:1}}'
+          PRODUCTION_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/gather_nutrition_data_lambda/production/production_railway_public_domain:1}}'
+          PULL_REQUEST_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/gather_nutrition_data_lambda/production/pull_request_railway_public_domain}}' #always just point to the latest PR domain in our variable store
+          STAGING_RAILWAY_PUBLIC_DOMAIN: '{{resolve:ssm:/gather_nutrition_data_lambda/production/staging_railway_public_domain:1}}'
+
+  StagingGatherNutritionDataAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GatherNutritionDataFunction 
+      FunctionVersion: 2
+      Name: stagingAlias
+
+  ProductionGatherNutritionDataAlias:
+    Type: AWS::Lambda::Alias
+    Properties:
+      FunctionName: !Ref GatherNutritionDataFunction 
+      FunctionVersion: 2
+      Name: production
+
 Outputs:
   ProcessMessageFunctionArn:
     Description: "ARN of the ProcessMessageFunction Lambda"
@@ -79,3 +112,7 @@ Outputs:
   ImageToMealDescriptionFunctionArn:
     Description: "ARN of the ImageToMealDescriptionFunction Lambda"
     Value: !GetAtt ImageToMealDescriptionFunction.Arn
+
+  GatherNutritionDataFunctionArn:
+    Description: "ARN of the GatherNutritionDataFunction Lambda"
+    Value: !GetAtt GatherNutritionDataFunction.Arn
