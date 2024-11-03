@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     Uses temporary file system for file operations.
     """
     try:
-        start = time.now()
+        start = time.time()
         user_whatsapp_id = event['user_whatsapp_id']
         print(user_whatsapp_id)
 
@@ -44,7 +44,7 @@ def lambda_handler(event, context):
                 'foods_xlsx_id': upload_to_whatsapp(dish_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
                 'diary_plot_id': upload_to_whatsapp(plot_path, 'image/png'),
                 'unhandled_error': None,
-                "seconds_elapsed": time.now()-start
+                "seconds_elapsed": time.time()-start
             }
 
             print(payload)

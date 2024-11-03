@@ -22,6 +22,7 @@ def test_lambda_full(go_to_lambda_dir):
     context = MockContext(invoked_function_arn='arn:aws:lambda:region:account-id:function:my-function:stagingAlias')
     print("START")
     response = lambda_handler(event, context)
+    print(response)
     assert response['statusCode'] == 200  # Ensure the response is happy
     print("END")
 
