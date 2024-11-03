@@ -94,14 +94,14 @@ Resources:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref GatherNutritionDataFunction 
-      FunctionVersion: "$LATEST"
+      FunctionVersion: 1
       Name: stagingAlias
 
   ProductionGatherNutritionDataAlias:
     Type: AWS::Lambda::Alias
     Properties:
       FunctionName: !Ref GatherNutritionDataFunction 
-      FunctionVersion: "$LATEST"
+      FunctionVersion: 1
       Name: production
 
 Outputs:
