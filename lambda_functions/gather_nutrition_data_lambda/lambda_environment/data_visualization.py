@@ -1,9 +1,10 @@
 import pandas as pd
 import pytz
 from datetime import datetime, timedelta
-# import matplotlib as plt
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-def draw_diary_plot(diary_df, user_tz_string):
+def save_diary_plot(diary_df, user_tz_string, plt_path):
     user_tz = pytz.timezone(user_tz_string)
     end_datetime = datetime.now(user_tz)
     end_date = end_datetime.date()
@@ -22,23 +23,21 @@ def draw_diary_plot(diary_df, user_tz_string):
     plt_df['fat_completion'] = 100 * plt_df.fat / plt_df.fat_goal
     print(plt_df)
 
-    # _plot_diary_df(plt_df)
+    _plot_diary_df(plt_df, plt_path)
 
-    print(plt_df)
-
-def _plot_diary_df(df):
+def _plot_diary_df(df, plt_pth):
     # Create the scatter plot
     plt.figure(figsize=(12, 6))
 
     # Plot each completion metric
-    plt.scatter(df['date'], df['calorie_completion'], label='Calories', alpha=0.7, s=100, c='blue')
-    plt.plot(df['date'], df['calorie_completion'], alpha=0.7, c='blue')
+    plt.scatter(df['date'], df['calorie_completion'], label='Calories', alpha=1, s=100, c='black')
+    plt.plot(df['date'], df['calorie_completion'], alpha=1, c='black')
 
     plt.scatter(df['date'], df['protein_completion'], label='Protein', alpha=0.7, s=100, c='green')
     plt.plot(df['date'], df['protein_completion'], alpha=0.7, c='green')
 
-    plt.scatter(df['date'], df['carbs_completion'], label='Carbs', alpha=0.7, s=100, c='orange')
-    plt.plot(df['date'], df['carbs_completion'], alpha=0.7, c='orange')
+    plt.scatter(df['date'], df['carbs_completion'], label='Carbs', alpha=0.7, s=100, c='blue')
+    plt.plot(df['date'], df['carbs_completion'], alpha=0.7, c='blue')
 
     plt.scatter(df['date'], df['fat_completion'], label='Fat', alpha=0.7, s=100, c='red')
     plt.plot(df['date'], df['fat_completion'], alpha=0.7, c='red')
@@ -72,5 +71,5 @@ def _plot_diary_df(df):
     # Adjust layout to prevent label cutoff
     plt.tight_layout()
 
-    # Show the plot
-    plt.show()
+    plt.savefig(plt_pth)
+    plt.close()
