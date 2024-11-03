@@ -27,6 +27,7 @@ class SendNutritionDataIntegrationTest(TestCase):
 
         # Check if messages were recorded in the database
         messages = WhatsappMessage.objects.filter(whatsapp_user=self.django_whatsapp_user)
-        self.assertEqual(messages.count(), 2)
+        self.assertEqual(messages.count(), 3)
         self.assertEqual(messages[0].message_type, 'IMAGE')
         self.assertEqual(messages[1].message_type, 'DOCUMENT')
+        self.assertEqual(messages[2].message_type, 'DOCUMENT')
