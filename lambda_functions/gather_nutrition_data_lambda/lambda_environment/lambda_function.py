@@ -1,16 +1,43 @@
 import json
 import os
+import psycopg2
+import pandas as pd
+
+from prepasto_database import get_user_timezone, get_user_diary_df
+from data_visualization import draw_diary_plot
 
 def lambda_handler(event, context):
     """
     AWS Lambda handler that creates an Excel file and uploads it to WhatsApp servers.
     Uses temporary file system for file operations.
     """
-    user_whatsapp_id = event['user_whatsapp_id']
+    try:
+        user_whatsapp_id = event['user_whatsapp_id']
+        print(user_whatsapp_id)
 
-    #Download and generate data
-    prepasto_db_connection = get_db_connection()
-    user_timezone_str = get_user_timezone(prepasto_db_connection, user_whatsapp_id)
+        #Download and generate data
+        prepasto_db_connection = psycopg2.connect(os.getenv('DATABASE_URL'))
+        user_timezone_str = get_user_timezone(prepasto_db_connection, user_whatsapp_id)
+        print(user_timezone_str)
+
+        diary_df = get_user_diary_df(prepasto_db_connection, user_whatsapp_id, user_timezone_str)
+        print(diary_df)
+        print(diary_df.to_csv())
+
+        plot_bytes = draw_diary_plot(diary_df, user_timezone_str)
+        prepasto_db_connection.close()
+        return {'statusCode': 200}
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'error': str(e)
+            })
+        }
+    
+    finally:
+        if 'conn' in locals():
+            prepasto_db_connection.close()
     diary_df = get_user_diary_df(prepasto_db_connection, user_whatsapp_id)
     dish_df = get_user_dish_df(prepasto_db_connection, user_whatsapp_id, user_timezone_str)
     diary_plot_image = draw_diary_plot(diary_df, user_timezone_str)
