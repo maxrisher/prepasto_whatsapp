@@ -2,6 +2,7 @@ import json
 import os
 import psycopg2
 import tempfile
+import time
 
 from prepasto_database import get_user_timezone, get_user_diary_df, get_user_dish_df, make_year_diary_df
 from data_visualization import save_diary_plot
@@ -13,6 +14,7 @@ def lambda_handler(event, context):
     Uses temporary file system for file operations.
     """
     try:
+        start = time.now()
         user_whatsapp_id = event['user_whatsapp_id']
         print(user_whatsapp_id)
 
@@ -22,15 +24,10 @@ def lambda_handler(event, context):
         print(user_timezone_str)
 
         diary_df = get_user_diary_df(prepasto_db_connection, user_whatsapp_id, user_timezone_str)
-        print(diary_df)
-        print(diary_df.to_csv())
-        year_diary_df = make_year_diary_df(diary_df)
-        print(year_diary_df)
-        print(year_diary_df.to_csv())
 
+        year_diary_df = make_year_diary_df(diary_df)
         dish_df = get_user_dish_df(prepasto_db_connection, user_whatsapp_id, user_timezone_str)
 
-        print(dish_df)
         with tempfile.TemporaryDirectory() as tmp_dir:
             diary_path = os.path.join(tmp_dir, 'daily_totals.xlsx')
             year_diary_df.to_excel(diary_path, index=False)
@@ -43,9 +40,11 @@ def lambda_handler(event, context):
             
             payload = {
                 'nutrition_data_requester_whatsapp_wa_id': user_whatsapp_id,
-                'diary_xlsx': upload_to_whatsapp(diary_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-                'nutrition_xlsx_ytd_id': upload_to_whatsapp(dish_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-                'nutrition_bar_chart_id': upload_to_whatsapp(plot_path, 'image/png')
+                'diary_xlsx_id': upload_to_whatsapp(diary_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                'foods_xlsx_id': upload_to_whatsapp(dish_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+                'diary_plot_id': upload_to_whatsapp(plot_path, 'image/png'),
+                'unhandled_error': None,
+                "seconds_elapsed": time.now()-start
             }
 
             print(payload)
