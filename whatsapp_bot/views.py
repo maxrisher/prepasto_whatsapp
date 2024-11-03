@@ -146,10 +146,12 @@ def send_nutrition_data_webhook(request):
 
             user_whatsapp_wa_id = payload_dict['nutrition_data_requester_whatsapp_wa_id']
             bar_chart_image_media_id = payload_dict['nutrition_bar_chart_id']
-            annual_data_xlsx_media_id = payload_dict['nutrition_xlsx_ytd_id']
+            foods_xlsx = payload_dict['nutrition_xlsx_ytd_id']
+            diary_xlsx = payload_dict['diary_xlsx']
 
             WhatsappMessageSender(user_whatsapp_wa_id).send_image(bar_chart_image_media_id)
-            WhatsappMessageSender(user_whatsapp_wa_id).send_document(annual_data_xlsx_media_id, file_name="your_data.xlsx")
+            WhatsappMessageSender(user_whatsapp_wa_id).send_document(foods_xlsx, file_name="your_foods.xlsx")
+            WhatsappMessageSender(user_whatsapp_wa_id).send_document(diary_xlsx, file_name="your_diaries.xlsx")
 
             return JsonResponse({'message': 'OK'}, status=200)
         
